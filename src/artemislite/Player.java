@@ -24,8 +24,15 @@ public class Player extends Actor {
         this.name = name;
         this.playerResources = 500;
     }
-
+    
     /**
+	 * @return the playerID
+	 */
+	public int getPlayerID() {
+		return playerID;
+	}
+
+	/**
      * @return the name
      */
     public String getName() {
