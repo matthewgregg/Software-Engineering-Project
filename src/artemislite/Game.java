@@ -8,63 +8,63 @@ import java.util.Scanner;
 
 public class Game {
 
-	protected static boolean isGameOver = false;
-	protected static boolean quitGame = false;
-	private static Random rand = new Random();
-	private List<Player> players;
+	private static final Random rand = new Random();
+	private static List<Player> players;
 	private static final Scanner scanner = new Scanner(System.in);
 	//scanner cannot be closed and then reused
 
 	SetupGame gameSetup = new SetupGame();
 	
 	public static void main(String[] args) {
+		boolean isGameOver = false;
+		boolean quitGame = false;
 
 		new Game();
 		
 		System.out.println("Welcome to Artemislite");
-		
-		while(!isGameOver) {
-			while(!quitGame) {
-				currentPlayerMenu(scanner);
-				
-			
+		int playerCount = 0;
+		do {
+			playerCount++;
+			if (playerCount > players.size()) {
+				playerCount = 1;
 			}
-			System.out.println("I've Quit the Game");
-			
-			isGameOver = true;
-		}
-		System.out.println("Game is Over! There is a winner");
-		
-		
+			System.out.printf("%s's turn\n", players.get(playerCount - 1).getName());
+			quitGame = !currentPlayerMenu(scanner);
+
+		} while(!isGameOver && !quitGame);
+
+		System.out.printf("Game is over! %s quit the game\n", players.get(playerCount - 1).getName());
 	}
 		
 	public Game() {
-		
 		players = new ArrayList<>(gameSetup.playerCreation(scanner));
 		
-		System.out.println("Players Added");
+		clearScreen();
 		for(Player player : players) {
 			System.out.print("[ Name: " + player.getName() + ", ID: " + player.getPlayerID() + " ] ");
 		}
 		System.out.println();
 	}
 
-	public static void currentPlayerMenu(Scanner scanner) {
+	public static boolean currentPlayerMenu(Scanner scanner) {
 		int userOption = 0;
+		boolean turnFinished = false;
+
+		System.out.println("Menu");
+		System.out.println("1. Display Resources");
+		System.out.println("2. Roll Dice");
+		System.out.println("3. Purchase Square");
+		System.out.println("4. Purchase Element");
+		System.out.println("5. Develop Element");
+		System.out.println("6. Finish Turn");
+		System.out.println("7. Quit Game");
+		System.out.println("Enter option ");
 
 		do {
-			System.out.println("Menu");
-			System.out.println("1. Display Resources");
-			System.out.println("2. Roll Dice");
-			System.out.println("3. Purchase Square");
-			System.out.println("4. Purchase Element");
-			System.out.println("5. Develop Element");
-			System.out.println("6. Finish Turn");
-			System.out.println("7. Quit Game");
-			System.out.println("Enter option ");
 
 			try {
 				userOption = scanner.nextInt();
+				scanner.nextLine();
 			} catch (Exception e) {
 				System.out.println("Please enter a number between 1 and 7.");
 				scanner.next();
@@ -76,8 +76,7 @@ public class Game {
 					break;
 				case 2:
 					int[] roll = rollDice();
-					System.out.println("Dice 1 : " +roll[0]);
-					System.out.println("Dice 2 : " +roll[1]);
+					System.out.printf("You rolled a %d and a %d", roll[0], roll[1]);
 					break;
 				case 3:
 
@@ -89,15 +88,14 @@ public class Game {
 
 					break;
 				case 6:
-
+					turnFinished = true;
 					break;
 				case 7:
-					quitGame = true;
 					System.out.println("Quitting");
 					break;
 			}
-		} while (userOption != 7);
-		//scanner.close();
+		} while (!turnFinished && userOption != 7);
+		return turnFinished;
 	}
 	
 	
@@ -107,5 +105,10 @@ public class Game {
 		roll[1] = rand.nextInt(6) + 1;
 		
 		return roll;
+	}
+
+	public static void clearScreen() {
+		System.out.print("\033[H\033[2J");
+		System.out.flush();
 	}
 }
