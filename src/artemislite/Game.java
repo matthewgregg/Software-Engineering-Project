@@ -1,5 +1,7 @@
 package artemislite;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -8,7 +10,7 @@ public class Game {
 	protected static boolean isGameOver = false;
 	protected static boolean quitGame = false;
 	private static Random rand = new Random();
-	private static Scanner scanner = new Scanner(System.in);
+	private List<Player> players;
 	
 	SetupGame gameSetup = new SetupGame();
 	
@@ -35,15 +37,17 @@ public class Game {
 		
 	public Game() {
 		
-		gameSetup.playerCreation();
+		players = new ArrayList<>(gameSetup.playerCreation());
 		
 		System.out.println("Players Added");
-		for(Player play : gameSetup.players) {
-			System.out.print("[ Name: " + play.getName() + " - ID: " + play.getPlayerID() + " ] ");
+		for(Player player : players) {
+			System.out.print("[ Name: " + player.getName() + ", ID: " + player.getPlayerID() + " ] ");
 		}
+		System.out.println();
 	}
 	
 	public static void currentPlayerMenu() {
+		Scanner scanner = new Scanner(System.in);
 		int userOption;
 		
 		do {
@@ -56,39 +60,39 @@ public class Game {
 			System.out.println("6. Finish Turn");
 			System.out.println("7. Quit Game");
 			System.out.println("Enter option ");
-			
+
+			// TODO fix NoSuchElementException occurring here
 			userOption = scanner.nextInt();
 
 			switch (userOption) {
-			case 1:
-				
-				break;
-			case 2:
-				int[] roll = rollDice();
-				System.out.println("Dice 1 : " +roll[0]);
-				System.out.println("Dice 2 : " +roll[1]);
-				break;
-			case 3:
-				
-				break;
-			case 4:
-				
-				break;
-			case 5:
-				
-				break;
-			case 6:
-				
-				break;
-			case 7:
-				quitGame = true;
-				
-				System.out.println("Quitting");
-				break;
-			default:
-				System.out.println("Done");
-			}
+				case 1:
 
+					break;
+				case 2:
+					int[] roll = rollDice();
+					System.out.println("Dice 1 : " +roll[0]);
+					System.out.println("Dice 2 : " +roll[1]);
+					break;
+				case 3:
+
+					break;
+				case 4:
+
+					break;
+				case 5:
+
+					break;
+				case 6:
+
+					break;
+				case 7:
+					quitGame = true;
+
+					System.out.println("Quitting");
+					break;
+				default:
+					System.out.println("Done");
+			}
 		} while (userOption != 7);
 		//scanner.close();
 	}
