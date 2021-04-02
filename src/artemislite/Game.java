@@ -1,5 +1,6 @@
 package artemislite;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -11,7 +12,9 @@ public class Game {
 	protected static boolean quitGame = false;
 	private static Random rand = new Random();
 	private List<Player> players;
-	
+	private static final Scanner scanner = new Scanner(System.in);
+	//scanner cannot be closed and then reused
+
 	SetupGame gameSetup = new SetupGame();
 	
 	public static void main(String[] args) {
@@ -22,7 +25,7 @@ public class Game {
 		
 		while(!isGameOver) {
 			while(!quitGame) {
-				currentPlayerMenu();
+				currentPlayerMenu(scanner);
 				
 			
 			}
@@ -37,7 +40,7 @@ public class Game {
 		
 	public Game() {
 		
-		players = new ArrayList<>(gameSetup.playerCreation());
+		players = new ArrayList<>(gameSetup.playerCreation(scanner));
 		
 		System.out.println("Players Added");
 		for(Player player : players) {
@@ -45,11 +48,10 @@ public class Game {
 		}
 		System.out.println();
 	}
-	
-	public static void currentPlayerMenu() {
-		Scanner scanner = new Scanner(System.in);
-		int userOption;
-		
+
+	public static void currentPlayerMenu(Scanner scanner) {
+		int userOption = 0;
+
 		do {
 			System.out.println("Menu");
 			System.out.println("1. Display Resources");
@@ -61,8 +63,12 @@ public class Game {
 			System.out.println("7. Quit Game");
 			System.out.println("Enter option ");
 
-			// TODO fix NoSuchElementException occurring here
-			userOption = scanner.nextInt();
+			try {
+				userOption = scanner.nextInt();
+			} catch (Exception e) {
+				System.out.println("Please enter a number between 1 and 7.");
+				scanner.next();
+			}
 
 			switch (userOption) {
 				case 1:
@@ -87,11 +93,8 @@ public class Game {
 					break;
 				case 7:
 					quitGame = true;
-
 					System.out.println("Quitting");
 					break;
-				default:
-					System.out.println("Done");
 			}
 		} while (userOption != 7);
 		//scanner.close();

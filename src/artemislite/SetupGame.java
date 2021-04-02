@@ -13,10 +13,10 @@ public class SetupGame {
 	private static final int NUMBER_OF_SQUARES = 12;
 	private ArrayList<Square> squares;
 
-	public List<Player> playerCreation() {
+	public List<Player> playerCreation(Scanner scanner) {
 		List<Player> players = new ArrayList<>();
 
-		try (Scanner scanner = new Scanner(System.in)) {
+		try {
 			String userOption = "";
 			int numPlayers = 0;
 			boolean valid = false;
