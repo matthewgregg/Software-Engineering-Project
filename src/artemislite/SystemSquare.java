@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class SystemSquare extends Square {
     private static final int MIN_DEVELOPMENT = 0;
     private static final int MAX_DEVELOPMENT = 4;
-    private static final String INVALID_SYSTEM_NAME = "Invalid systen name";
+    private static final String INVALID_SYSTEM_NAME = "Invalid system name";
     private static final String MAX_DEVELOPMENT_REACHED = "Element fully developed";
 
     private SystemName systemName;
