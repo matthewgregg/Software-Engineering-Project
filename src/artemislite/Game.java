@@ -95,7 +95,6 @@ public class Game {
 	
 	
 	public static int[] rollDice() {
-					
 		int[] roll = new int[2];
 		roll[0] = rand.nextInt(6) + 1;
 		roll[1] = rand.nextInt(6) + 1;

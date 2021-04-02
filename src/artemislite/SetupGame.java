@@ -1,14 +1,9 @@
-/**
- * 
- */
 package artemislite;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
-
-import com.sun.tools.javac.comp.Todo;
 
 /**
  * @author mark
@@ -20,7 +15,7 @@ public class SetupGame {
 	private static final int MAX_PLAYERS = 4;
 	private static final int NUMBER_OF_SQUARES = 12;
 
-	protected List<Player> players = new ArrayList<Player>();
+	protected List<Player> players = new ArrayList<>();
 	private ArrayList<Square> squares;
 
 	public void playerCreation() {
