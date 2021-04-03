@@ -21,19 +21,21 @@ public class Game {
 
 		new Game();
 		
-		System.out.println("Welcome to Artemislite");
+		System.out.println("Welcome to ArtemisLite");
 		int playerCount = 0;
 		do {
 			playerCount++;
 			if (playerCount > players.size()) {
 				playerCount = 1;
 			}
+			clearScreen();
 			System.out.printf("%s's turn\n", players.get(playerCount - 1).getName());
 			quitGame = !currentPlayerMenu(scanner);
-
 		} while(!isGameOver && !quitGame);
 
-		System.out.printf("Game is over! %s quit the game\n", players.get(playerCount - 1).getName());
+		if (quitGame) {
+			System.out.printf("Game is over! %s quit the game\n", players.get(playerCount - 1).getName());
+		}
 	}
 		
 	public Game() {
@@ -47,6 +49,7 @@ public class Game {
 	}
 
 	public static boolean currentPlayerMenu(Scanner scanner) {
+		String option = "";
 		int userOption = 0;
 		boolean turnFinished = false;
 
@@ -61,14 +64,21 @@ public class Game {
 		System.out.println("Enter option ");
 
 		do {
-
-			try {
-				userOption = scanner.nextInt();
-				scanner.nextLine();
-			} catch (Exception e) {
-				System.out.println("Please enter a number between 1 and 7.");
-				scanner.next();
-			}
+			boolean valid = false;
+			//TODO remove nested while loop
+			do {
+				try {
+					option = scanner.nextLine();
+					if (Integer.parseInt(option) >= 1 && Integer.parseInt(option) <= 7) {
+						valid = true;
+						userOption = Integer.parseInt(option);
+					} else {
+						throw new NumberFormatException();
+					}
+				} catch (NumberFormatException e) {
+					System.out.println("Please enter a number between 1 and 7.");
+				}
+			} while (!valid);
 
 			switch (userOption) {
 				case 1:
@@ -76,7 +86,7 @@ public class Game {
 					break;
 				case 2:
 					int[] roll = rollDice();
-					System.out.printf("You rolled a %d and a %d", roll[0], roll[1]);
+					System.out.printf("You rolled a %d and a %d\n", roll[0], roll[1]);
 					break;
 				case 3:
 
@@ -108,7 +118,18 @@ public class Game {
 	}
 
 	public static void clearScreen() {
-		System.out.print("\033[H\033[2J");
-		System.out.flush();
+		try {
+			final String os = System.getProperty("os.name");
+
+			if (os.contains("Windows")) {
+				new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+			} else {
+				System.out.print("\033[H\033[2J");
+				System.out.flush();
+			}
+		}
+		catch (final Exception e) {
+			System.out.println("Error clearing console.");
+		}
 	}
 }
