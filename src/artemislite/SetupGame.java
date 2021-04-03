@@ -1,9 +1,6 @@
 package artemislite;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * @author mark
@@ -14,86 +11,45 @@ public class SetupGame {
 	private static final int MIN_PLAYERS = 2;
 	private static final int MAX_PLAYERS = 4;
 	private static final int NUMBER_OF_SQUARES = 12;
-
-	protected List<Player> players = new ArrayList<>();
 	private ArrayList<Square> squares;
 
-	public void playerCreation() {
+	public List<Player> playerCreation(Scanner scanner) {
+		List<Player> players = new ArrayList<>();
 
-		// Todo - Extra player getting added to the Array?!?! :-(
-		// Todo - If you type a String it throws an exception - 
-		//        the try catch continues the game without entering names
-		
-		Scanner scanner = new Scanner(System.in);
-		Random rand = new Random();
-		boolean playerSelect = true;
-
-		System.out.println("How many players between 2-4 players");
 		try {
-
-			while (playerSelect) {
-
-				int userOption = scanner.nextInt();
-
-				if (userOption == 2) {
-					System.out.println("Enter the name's of the 2 Player's");
-
-					while (players.size() <= MIN_PLAYERS) {
-
-						String name = scanner.nextLine();
-						int playerID = name.length() + rand.nextInt(24) + 1;
-						Player player = new Player(playerID, name);
-
-						// System.out.println(player.getName());
-
-						addPlayer(player);
-
+			String userOption = "";
+			int numPlayers = 0;
+			boolean valid = false;
+			System.out.println("How many players? Enter a number between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
+			do {
+				try {
+					/* don't mix nextLine and nextInt as nextInt doesn't read the following new line character
+					which results ina empty string */
+					userOption = scanner.nextLine();
+					if (Integer.parseInt(userOption) >= MIN_PLAYERS && Integer.parseInt(userOption) <= MAX_PLAYERS) {
+						valid = true;
+						numPlayers = Integer.parseInt(userOption);
+					} else {
+						System.out.println("Please enter a number between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
 					}
-					break;
-				} else if (userOption == 3) {
-					System.out.println("Enter the name's of the 3 Player's");
-
-					while (players.size() <= MAX_PLAYERS - 1) {
-
-						String name = scanner.nextLine();
-						int playerID = rand.nextInt(24) + 1;
-						Player player = new Player(playerID, name);
-
-						// System.out.println(player.getName());
-
-						addPlayer(player);
-
-					}
-					break;
-				} else if (userOption == 4) {
-					System.out.println("Enter the name's of the 4 Player's");
-
-					while (players.size() <= MAX_PLAYERS) {
-
-						String name = scanner.nextLine();
-						int playerID = rand.nextInt(24) + 1;
-						Player player = new Player(playerID, name);
-
-						// System.out.println(player.getName());
-
-						addPlayer(player);
-
-					}
-					break;
-				} else {
-					System.out.println("Please select between 2-4 Players");
+				} catch (NumberFormatException e) {
+					System.out.println("Error! Try again.");
 				}
+			} while (!valid);
+
+			System.out.println("Enter the names of the " + userOption + " players. Press return after entering a name.");
+			int playerID = 1;
+			while (players.size() < numPlayers) {
+				String name = scanner.nextLine();
+				//TODO mix up playerIDs?
+				Player player = new Player(playerID, name);
+				players.add(player);
+				playerID++;
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-
-		// scanner.close();
-
-	}
-
-	public void addPlayer(Player player) {
-		players.add(player);
+		return players;
 	}
 
 	public void playerNameCheck() {
