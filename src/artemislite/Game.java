@@ -17,35 +17,33 @@ public class Game {
 	
 	public static void main(String[] args) {
 		boolean isGameOver = false;
-		boolean quitGame = false;
+		boolean quitGame;
 
-		new Game();
-		
-		System.out.println("Welcome to ArtemisLite");
+		players = new ArrayList<>(SetupGame.playerCreation(scanner));
+
+		clearScreen();
+
+		System.out.println(welcomeMessage(players));
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			System.out.println("Thread error");
+		}
 		int playerCount = 0;
 		do {
+			clearScreen();
 			playerCount++;
 			if (playerCount > players.size()) {
 				playerCount = 1;
 			}
-			clearScreen();
 			System.out.printf("%s's turn\n", players.get(playerCount - 1).getName());
 			quitGame = !currentPlayerMenu(scanner);
 		} while(!isGameOver && !quitGame);
 
 		if (quitGame) {
+			clearScreen();
 			System.out.printf("Game is over! %s quit the game\n", players.get(playerCount - 1).getName());
 		}
-	}
-		
-	public Game() {
-		players = new ArrayList<>(gameSetup.playerCreation(scanner));
-		
-		clearScreen();
-		for(Player player : players) {
-			System.out.print("[ Name: " + player.getName() + ", ID: " + player.getPlayerID() + " ] ");
-		}
-		System.out.println();
 	}
 
 	public static boolean currentPlayerMenu(Scanner scanner) {
@@ -115,6 +113,21 @@ public class Game {
 		roll[1] = rand.nextInt(6) + 1;
 		
 		return roll;
+	}
+
+	public static StringBuilder welcomeMessage(List<Player> players) {
+		StringBuilder welcome = new StringBuilder();
+		for(int i = players.size(); i > 0; i--) {
+			welcome.insert(0, players.get(i-1).getName());
+			if (i == players.size()) {
+				welcome.insert(0, " and ");
+			} else if (i > 1) {
+				welcome.insert(0,", ");
+			}
+		}
+		welcome.append(".");
+		welcome.insert(0, "Welcome to ArtemisLite, ");
+		return welcome;
 	}
 
 	public static void clearScreen() {
