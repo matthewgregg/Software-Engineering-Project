@@ -1,10 +1,7 @@
 package artemislite;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
 
 public class Game {
 
@@ -16,6 +13,7 @@ public class Game {
 	SetupGame gameSetup = new SetupGame();
 	
 	public static void main(String[] args) {
+		clearScreen();
 		boolean isGameOver = false;
 		boolean quitGame;
 
@@ -31,13 +29,12 @@ public class Game {
 		}
 		int playerCount = 0;
 		do {
-			clearScreen();
 			playerCount++;
+			Player player = players.get(playerCount - 1);
 			if (playerCount > players.size()) {
 				playerCount = 1;
 			}
-			System.out.printf("%s's turn\n", players.get(playerCount - 1).getName());
-			quitGame = !currentPlayerMenu(scanner);
+			quitGame = !generateOptionsMenu(scanner, player);
 		} while(!isGameOver && !quitGame);
 
 		if (quitGame) {
@@ -46,63 +43,89 @@ public class Game {
 		}
 	}
 
-	public static boolean currentPlayerMenu(Scanner scanner) {
+	public static boolean generateOptionsMenu(Scanner scanner, Player player) {
 		String option = "";
 		int userOption = 0;
 		boolean turnFinished = false;
-
-		System.out.println("Menu");
-		System.out.println("1. Display Resources");
-		System.out.println("2. Roll Dice");
-		System.out.println("3. Purchase Square");
-		System.out.println("4. Purchase Element");
-		System.out.println("5. Develop Element");
-		System.out.println("6. Finish Turn");
-		System.out.println("7. Quit Game");
-		System.out.println("Enter option ");
+		boolean rolled = false;
+		int menuNum;
+		HashMap<Integer, Integer> menuOptions = new HashMap<>();
+		String[] allMenu = new String[7];
+		allMenu[0] = "Display Resources";
+		allMenu[1] = "Roll Dice";
+		allMenu[2] = "Purchase Square";
+		allMenu[3] = "Offer Element";
+		allMenu[4] = "Develop Element";
+		allMenu[5] = "Finish Turn";
+		allMenu[6] = "Quit Game";
 
 		do {
+			menuNum = 0;
+			clearScreen();
+			System.out.printf("%s's turn\n", player.getName());
+			System.out.println("Menu");
+
+			for (int i = 0; i < allMenu.length; i++) {
+				if (allMenu[i].equals("Roll Dice") && rolled) {
+					continue;
+				}
+				menuNum++;
+				System.out.println(menuNum + ". " + allMenu[i]);
+				menuOptions.put(menuNum, i+1);
+			}
+			System.out.println("Enter option");
+
 			boolean valid = false;
-			//TODO remove nested while loop
+
 			do {
 				try {
 					option = scanner.nextLine();
-					if (Integer.parseInt(option) >= 1 && Integer.parseInt(option) <= 7) {
+					if (Integer.parseInt(option) >= 1 && Integer.parseInt(option) <= menuNum) {
 						valid = true;
 						userOption = Integer.parseInt(option);
 					} else {
 						throw new NumberFormatException();
 					}
 				} catch (NumberFormatException e) {
-					System.out.println("Please enter a number between 1 and 7.");
+					System.out.printf("Please enter a number between 1 and %d.\n", menuNum);
 				}
 			} while (!valid);
 
-			switch (userOption) {
+			switch (menuOptions.get(userOption)) {
 				case 1:
-
+					clearScreen();
+					System.out.print("Resources");
+					loading();
 					break;
 				case 2:
+					clearScreen();
+					rolled = true;
 					int[] roll = rollDice();
-					System.out.printf("You rolled a %d and a %d\n", roll[0], roll[1]);
+					System.out.printf("You rolled a %d and a %d\nMoving %d spaces", roll[0], roll[1], roll[0]+roll[1]);
+					loading();
 					break;
 				case 3:
-
+					clearScreen();
+					System.out.print("Purchase");
+					loading();
 					break;
 				case 4:
-
+					clearScreen();
+					System.out.print("Offer");
+					loading();
 					break;
 				case 5:
-
+					clearScreen();
+					System.out.print("Develop");
+					loading();
 					break;
 				case 6:
 					turnFinished = true;
 					break;
 				case 7:
-					System.out.println("Quitting");
 					break;
 			}
-		} while (!turnFinished && userOption != 7);
+		} while (!turnFinished && userOption != menuNum);
 		return turnFinished;
 	}
 	
@@ -113,6 +136,18 @@ public class Game {
 		roll[1] = rand.nextInt(6) + 1;
 		
 		return roll;
+	}
+
+	public static void loading() {
+		try {
+			for (int i=0; i<=3;i++) {
+				Thread.sleep(1000);
+				System.out.print(".");
+			}
+		} catch (InterruptedException e) {
+			System.out.println("Thread error");
+		}
+		System.out.println();
 	}
 
 	public static StringBuilder welcomeMessage(List<Player> players) {
