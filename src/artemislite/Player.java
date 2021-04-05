@@ -1,5 +1,6 @@
 package artemislite;
 
+import javax.naming.ConfigurationException;
 import java.util.ArrayList;
 
 /**
@@ -19,8 +20,12 @@ public class Player extends Actor {
      * @param playerID the playerID
      * @param name the player's name
      */
-    public Player(int playerID, String name) {
-        this.playerID = playerID;
+    public Player(int playerID, String name) throws ConfigurationException {
+        if (name.equalsIgnoreCase("quit")) {
+            throw new ConfigurationException();
+        } else {
+            this.playerID = playerID;
+        }
         this.name = name;
         this.playerResources = 500;
     }
