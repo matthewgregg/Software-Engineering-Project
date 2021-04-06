@@ -92,10 +92,17 @@ public class SetupGame {
 
 	public static ArrayList<Square> setupBoard() {
 		ArrayList<Square> squares = new ArrayList<>();
-		Square sq1 = new Square("Start", 1, "Pass Go, Collect 200! or something ...");
-		Square sq2 = new Square("Empty Space", 12, "To go were no man has gone before ...");
+		Square sq1 = new Square("Go", 0, "Pass Go, Collect 200! or something ...");
 		
-		SystemSquare ss1 = new SystemSquare("System 1",
+		SystemSquare ss1 = new SystemSquare("Square 1",
+				1,
+				"System 1",
+				SystemName.SYSTEM_NAME_1,
+				2,
+				300,
+				200);
+
+		SystemSquare ss2 = new SystemSquare("Square 2",
 				2,
 				"System 1",
 				SystemName.SYSTEM_NAME_1,
@@ -103,7 +110,73 @@ public class SetupGame {
 				300,
 				200);
 
-		Collections.addAll(squares, sq1, sq2, ss1, null, null, null, null, null, null, null, null, null);
+		SystemSquare ss3 = new SystemSquare("Square 3",
+				3,
+				"System 1",
+				SystemName.SYSTEM_NAME_2,
+				2,
+				300,
+				200);
+
+		SystemSquare ss4 = new SystemSquare("Square 4",
+				4,
+				"System 1",
+				SystemName.SYSTEM_NAME_2,
+				2,
+				300,
+				200);
+
+		Square sq2 = new Square("Nothing", 11, "Missed launch window");
+
+		SystemSquare ss5 = new SystemSquare("Square 5",
+				6,
+				"System 1",
+				SystemName.SYSTEM_NAME_2,
+				2,
+				300,
+				200);
+
+		SystemSquare ss6 = new SystemSquare("Square 6",
+				7,
+				"System 1",
+				SystemName.SYSTEM_NAME_3,
+				2,
+				300,
+				200);
+
+		SystemSquare ss7 = new SystemSquare("Square 7",
+				8,
+				"System 1",
+				SystemName.SYSTEM_NAME_3,
+				2,
+				300,
+				200);
+
+		SystemSquare ss8 = new SystemSquare("Square 8",
+				9,
+				"System 1",
+				SystemName.SYSTEM_NAME_3,
+				2,
+				300,
+				200);
+
+		SystemSquare ss9 = new SystemSquare("Square 9",
+				10,
+				"System 1",
+				SystemName.SYSTEM_NAME_4,
+				2,
+				300,
+				200);
+
+		SystemSquare ss10 = new SystemSquare("Square 10",
+				11,
+				"System 1",
+				SystemName.SYSTEM_NAME_4,
+				2,
+				300,
+				200);
+
+		Collections.addAll(squares, sq1, ss1, ss2, ss3, ss4, sq2, ss5, ss6, ss7, ss8, ss9, ss10);
 		return squares;
 	}
 
