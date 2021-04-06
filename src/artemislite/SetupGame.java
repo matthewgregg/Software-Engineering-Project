@@ -101,8 +101,7 @@ public class SetupGame {
 				SystemName.SYSTEM_NAME_1,
 				2,
 				300,
-				200,
-				false);
+				200);
 
 		Collections.addAll(squares, sq1, sq2, ss1, null, null, null, null, null, null, null, null, null);
 		return squares;

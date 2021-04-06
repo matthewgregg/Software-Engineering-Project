@@ -25,7 +25,6 @@ public class SystemSquare extends Square {
      * @param minigameDifficulty the minigame difficulty
      * @param baseCost the base cost of the square
      * @param costPerDevelopment the cost per development
-     * @param squareOwned the square's ownership status
      */
     public SystemSquare(String squareName,
                         int position,
@@ -33,14 +32,13 @@ public class SystemSquare extends Square {
                         SystemName systemName,
                         int minigameDifficulty,
                         int baseCost,
-                        int costPerDevelopment,
-                        boolean squareOwned) throws IllegalArgumentException {
+                        int costPerDevelopment) throws IllegalArgumentException {
         super(squareName, position, message);
         this.systemName = systemName;
         this.minigameDifficulty = minigameDifficulty;
         this.baseCost = baseCost;
         this.costPerDevelopment = costPerDevelopment;
-        this.squareOwned = squareOwned;
+        this.squareOwned = false;
         this.development = 0;
         setSystemType();
     }
@@ -128,13 +126,6 @@ public class SystemSquare extends Square {
      */
     public boolean isSquareOwned() {
         return squareOwned;
-    }
-
-    /**
-     * @param squareOwned the squareOwned to set
-     */
-    public void setSquareOwned(boolean squareOwned) {
-        this.squareOwned = squareOwned;
     }
 
     /**

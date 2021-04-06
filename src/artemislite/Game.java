@@ -66,11 +66,25 @@ public class Game {
 			clearScreen();
 			System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
 			Square landed = unownedSquares.get(player.getPosition());
-			if (landed == null && rolled) {
-				System.out.print("You have landed on . It is not owned.\n");
-			} else if (rolled) {
-				System.out.printf("You have landed on %s. It is not owned.\n", landed.getSquareName());
+
+			boolean onSysSq = true;
+			if (player.getPosition() == 0 || player.getPosition() == 6) {
+				onSysSq = false;
 			}
+			if (landed == null) {
+				Pair<Player, SystemSquare> ownedSquare = getSquareAndOwner(player.getPosition());
+				String squareName = ownedSquare.getSecond().getSquareName();
+				if (ownedSquare.getFirst().equals(player)) {
+					System.out.printf("You are on %s. You own it.", squareName);
+				} else {
+					System.out.printf("You are on %s. It is owned by %s.\n", squareName, ownedSquare.getFirst().getName());
+				}
+			} else if (!onSysSq){
+				System.out.printf("You are on %s. It can't be owned.\n", landed.getSquareName());
+			} else {
+				System.out.printf("You are on %s. It is not owned.\n", landed.getSquareName());
+			}
+
 			System.out.println("Menu");
 
 			for (int i = 0; i < allMenu.length; i++) {
@@ -80,7 +94,7 @@ public class Game {
 				if (i > 1 && i < 6 && !rolled) {
 					continue;
 				}
-				if (i > 1 && i < 4 && (landed == null || player.getPosition() == 0 || player.getPosition() == 6)) {
+				if (i > 1 && i < 4 && (landed == null || !onSysSq)) {
 					continue;
 				}
 				menuNum++;
@@ -131,7 +145,8 @@ public class Game {
 					loading();
 					break;
 				case 4:
-					System.out.print("Offer");
+					System.out.print("Auction");
+					//this should happen automatically if player can't buy development
 					loading();
 					break;
 				case 5:
@@ -200,6 +215,21 @@ public class Game {
 			}
 			System.out.println();
 		}
+	}
+
+	static Pair<Player, SystemSquare> getSquareAndOwner(int position) {
+		SystemSquare squareMatch = null;
+		Player playerMatch = null;
+		for (Player player : players) {
+			for (SystemSquare square : player.getOwnedElements()) {
+				if (square.getPosition() == position) {
+					squareMatch = square;
+					playerMatch = player;
+					break;
+				}
+			}
+		}
+		return new Pair<Player, SystemSquare>(playerMatch, squareMatch);
 	}
 
 	public static void clearScreen() {
