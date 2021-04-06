@@ -53,7 +53,7 @@ public class Game {
 	 * @param scanner the scanner object
 	 * @param player the current player
 	 * @param unownedSquares the list of unowned squares
-	 * @return a boolean for whether the user finished their turn or not. If false, the player quit the game. If true, the player won the game
+	 * @return a boolean for whether the user finished their turn or not. If false, the player quit the game. If true, the player finished their turn
 	 */
 	public static boolean generateOptionsMenu(Scanner scanner, Player player, ArrayList<Square> unownedSquares) {
 		//TODO split this method up as it's getting too large
