@@ -48,7 +48,15 @@ public class Game {
 		}
 	}
 
+	/**
+	 * generate options for user
+	 * @param scanner the scanner object
+	 * @param player the current player
+	 * @param unownedSquares the list of unowned squares
+	 * @return a boolean for whether the user finished their turn or not. If false, the player quit the game. If true, the player won the game
+	 */
 	public static boolean generateOptionsMenu(Scanner scanner, Player player, ArrayList<Square> unownedSquares) {
+		//TODO split this method up as it's getting too large
 		int userOption = 0;
 		boolean turnFinished = false;
 		boolean rolled = false;
@@ -66,29 +74,47 @@ public class Game {
 		do {
 			menuNum = 0;
 			clearScreen();
-			System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
-			Square landed = unownedSquares.get(player.getPosition());
 
 			boolean onSysSq = true;
 			if (player.getPosition() == 0 || player.getPosition() == 5) {
 				onSysSq = false;
 			}
+			SystemSquare ss = null;
+			System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
+			Square landed = unownedSquares.get(player.getPosition());
+
 			if (landed == null) {
 				Pair<Player, SystemSquare> ownedSquare = getSquareAndOwner(player.getPosition());
 				String squareName = ownedSquare.getSecond().getSquareName();
 				if (ownedSquare.getFirst().equals(player)) {
 					System.out.printf("You are on %s. You own it.\n", squareName);
+					ss = ownedSquare.getSecond();
 				} else {
+					int cost = ownedSquare.getSecond().getLandingCost();
+					try {
+						player.updateResources(-1 * cost);
+						clearScreen();
+						System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
+						System.out.printf("Paid %s %d units", ownedSquare.getFirst().getName(), cost);
+					} catch (IndexOutOfBoundsException e) {
+						System.out.println(e.getMessage());
+						//TODO handle player going bankrupt
+					}
 					System.out.printf("You are on %s. It is owned by %s.\n", squareName, ownedSquare.getFirst().getName());
 				}
 			} else if (!onSysSq) {
 				System.out.printf("You are on %s. It can't be owned.\n", landed.getSquareName());
 			} else {
 				System.out.printf("You are on %s. It is not owned.\n", landed.getSquareName());
+				Square square = unownedSquares.get(player.getPosition());
+				if (square instanceof SystemSquare) {
+					ss = (SystemSquare) square;
+				}
 			}
 
 			System.out.println("Menu");
 
+			//load options menu, with some skipped
 			for (int i = 0; i < allMenu.length; i++) {
 				if (i == 1 && rolled) {
 					continue;
@@ -131,7 +157,7 @@ public class Game {
 				break;
 			case 2:
 				rolled = true;
-				int[] roll = rollDice(player);
+				int[] roll = rollDice();
 				System.out.printf("You rolled a %d and a %d.\nMoving %d spaces", roll[0], roll[1], roll[0] + roll[1]);
 				loading();
 				try {
@@ -139,30 +165,42 @@ public class Game {
 				} catch (IndexOutOfBoundsException e) {
 					System.out.print("You passed Go! Updating resources");
 					player.updateResources(GO_RESOURCES);
+					loading();
 				}
-				loading();
 				break;
 			case 3:
-				Square square = unownedSquares.get(player.getPosition());
-				if (square instanceof SystemSquare) {
-					SystemSquare ss = (SystemSquare) square;
-					player.purchaseSquare(ss);
+				if (ss != null) {
+					try {
+						player.purchaseSquare(ss);
+						//replace square with null
+						unownedSquares.set(player.getPosition(), null);
+						System.out.print("Purchasing " + ss.getSquareName());
+						loading();
+						break;
+					} catch (IndexOutOfBoundsException e) {
+						System.out.print("You cannot purchase this element. It will be auctioned");
+						loading();
+						//don't break to allow auction case to be executed
+						//TODO could change to hide purchase option when resources are too low
+					}
+				}
+			case 4:
+				if (ss != null) {
+					player.auctionSquare(players, ss);
 					//replace square with null
 					unownedSquares.set(player.getPosition(), null);
-					System.out.print("Purchasing " + ss.getSquareName());
-				} else {
-					System.out.println("That square can't be purchased.");
+					loading();
 				}
-				loading();
-				break;
-			case 4:
-				System.out.print("Auction");
-				// this should happen automatically if player can't buy development
-				loading();
+				//TODO automatically auction when resources low?
 				break;
 			case 5:
-				System.out.print("Develop");
-				loading();
+				if (ss != null) {
+					//TODO currently only develops the element the player is on
+					player.developElement(ss);
+					System.out.print("Developing");
+					loading();
+				}
+				//TODO hide this options when resources too low
 				break;
 			case 6:
 				turnFinished = true;
@@ -179,7 +217,7 @@ public class Game {
 	 * 
 	 * @return two-element integer array
 	 */
-	public static int[] rollDice(Player player) {
+	public static int[] rollDice() {
 		int[] roll = new int[2];
 		roll[0] = rand.nextInt(6) + 1;
 		roll[1] = rand.nextInt(6) + 1;
@@ -223,7 +261,7 @@ public class Game {
 				for (int i = 0; i < player.getOwnedElements().size(); i++) {
 					SystemSquare e = player.getOwnedElements().get(i);
 					System.out.print(e.getSquareName());
-					System.out.printf(" (pos. %d)",e.getPosition()+1);
+					System.out.printf(" (pos. %d, dev. %d)",e.getPosition()+1, e.getDevelopment());
 					if (i > 1) {
 						System.out.print(", ");
 					}
@@ -246,7 +284,7 @@ public class Game {
 				}
 			}
 		}
-		return new Pair<Player, SystemSquare>(playerMatch, squareMatch);
+		return new Pair<>(playerMatch, squareMatch);
 	}
 
 	public static void clearScreen() {
