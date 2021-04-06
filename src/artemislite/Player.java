@@ -21,6 +21,7 @@ public class Player extends Actor {
      * @param name the player's name
      */
     public Player(int playerID, String name) throws ConfigurationException {
+        super(0);
         if (name.equalsIgnoreCase("quit")) {
             throw new ConfigurationException();
         } else {
@@ -89,10 +90,37 @@ public class Player extends Actor {
     }
 
     /**
-     * adds a SystemSquare to the player's element array
-     * @param square the square to be added
+     * updates a player's resources
+     * @param delta the change in resources
      */
-    public void updateOwnedElements(SystemSquare square) {
-        ownedElements.add(square);
+    public void updateResources(int delta) {
+        setPlayerResources(this.playerResources + delta);
+    }
+
+    /**
+     * develops a square
+     * @param square the square to be developed
+     */
+    public void developElement(SystemSquare square) {
+        // TODO develop square
+    }
+
+    /**
+     * purchases a square
+     * @param square the square to be purchased
+     */
+    public void purchaseSquare(SystemSquare square) {
+        this.ownedElements.add(square);
+        //this.setPlayerResources(this.playerResources - square.getBaseCost());
+        this.updateResources(-1 * square.getBaseCost());
+    }
+
+    /**
+     * auctions a square
+     * @param players all players
+     * @param square the square to auction
+     */
+    public void auctionSquare(ArrayList<Player> players, SystemSquare square) {
+        // TODO auction square
     }
 }
