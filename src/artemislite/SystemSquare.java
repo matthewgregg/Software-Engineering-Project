@@ -145,29 +145,4 @@ public class SystemSquare extends Square {
             throw new IllegalArgumentException(MAX_DEVELOPMENT_REACHED);
         }
     }
-
-    /**
-     * develops a square
-     * @param player the current player
-     */
-    public void developElement(Player player) {
-        // TODO develop square
-    }
-
-    /**
-     * purchases a square
-     * @param player the current player
-     */
-    public void purchaseSquare(Player player) {
-        // TODO purchase square
-        // should these methods be in player?
-    }
-
-    /**
-     * auctions a square
-     * @param players all players
-     */
-    public void auctionSquare(ArrayList<Player> players) {
-        // TODO auction square
-    }
 }
