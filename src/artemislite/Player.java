@@ -12,7 +12,7 @@ public class Player extends Actor {
     private static final String INVALID_PLAYER_ID = "Invalid player ID";
     private final int playerID;
     private final String name;
-    private ArrayList<SystemSquare> ownedElements;
+    private ArrayList<SystemSquare> ownedElements = new ArrayList<>();
     private int playerResources;
 
     /**

@@ -71,10 +71,12 @@ public class SystemSquare extends Square {
      */
     public void setSystemType() throws IllegalArgumentException {
         switch (systemName) {
-            case SYSTEM_NAME_1: this.systemType = 2;
-            case SYSTEM_NAME_2: this.systemType = 2;
-            case SYSTEM_NAME_3: this.systemType = 3;
-            case SYSTEM_NAME_4: this.systemType = 3;
+            case SYSTEM_NAME_1:
+            case SYSTEM_NAME_2:
+                this.systemType = 2; break;
+            case SYSTEM_NAME_3:
+            case SYSTEM_NAME_4:
+                this.systemType = 3; break;
             default: throw new IllegalArgumentException(INVALID_SYSTEM_NAME);
         }
     }
@@ -167,6 +169,7 @@ public class SystemSquare extends Square {
      */
     public void purchaseSquare(Player player) {
         // TODO purchase square
+        // should these methods be in player?
     }
 
     /**

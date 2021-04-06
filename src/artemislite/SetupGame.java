@@ -90,16 +90,22 @@ public class SetupGame {
 	}
 	 */
 
-	public void setupBoard() {
+	public static ArrayList<Square> setupBoard() {
+		ArrayList<Square> squares = new ArrayList<>();
 		Square sq1 = new Square("Start", 1, "Pass Go, Collect 200! or something ...");
-		Square sq12 = new Square("Empty Space", 12, "To go were no man has gone before ...");
+		Square sq2 = new Square("Empty Space", 12, "To go were no man has gone before ...");
 		
-		SystemSquare ss1 = new SystemSquare("System 1", 2, "System 1", SystemName.SYSTEM_NAME_1, 2, 300, 200, false);
-		ss1.setSquareName("System 1");
-		ss1.setPosition(2);
-		ss1.setMessage("This is a message for this Square");
-		
-		
+		SystemSquare ss1 = new SystemSquare("System 1",
+				2,
+				"System 1",
+				SystemName.SYSTEM_NAME_1,
+				2,
+				300,
+				200,
+				false);
+
+		Collections.addAll(squares, sq1, sq2, ss1, null, null, null, null, null, null, null, null, null);
+		return squares;
 	}
 
 	public void displayGameRules() {

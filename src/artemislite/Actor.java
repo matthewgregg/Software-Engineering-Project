@@ -8,22 +8,22 @@ public abstract class Actor {
     private static final int MAX_POSITION = 12;
     private static final String INVALID_POSITION = "Position is invalid";
 
-    private static int position;
+    private int position;
 
     /**
      * @return the position
      */
-    public static int getPosition() {
-        return position;
+    public int getPosition() {
+        return this.position;
     }
 
     /**
      * @param position the position to set
      * @throws IllegalArgumentException if outside bounds
      */
-    public static void setPosition(int position) throws IllegalArgumentException {
+    public void setPosition(int position) throws IllegalArgumentException {
         if (position >= MIN_POSITION && position <= MAX_POSITION) {
-            Actor.position = position;
+            this.position = position;
         } else {
             throw new IllegalArgumentException(INVALID_POSITION);
         }
@@ -33,7 +33,7 @@ public abstract class Actor {
      * updates the position of a player
      * @param delta - the change in position of a player
      */
-    public static void updatePosition(int delta) {
+    public void updatePosition(int delta) {
         setPosition(position + delta);
     }
 }
