@@ -27,11 +27,15 @@ public class SystemSquare extends Square {
      * @param costPerDevelopment the cost per development
      * @param squareOwned the square's ownership status
      */
-    public SystemSquare(SystemName systemName,
+    public SystemSquare(String squareName,
+                        int position,
+                        String message,
+                        SystemName systemName,
                         int minigameDifficulty,
                         int baseCost,
                         int costPerDevelopment,
                         boolean squareOwned) throws IllegalArgumentException {
+        super(squareName, position, message);
         this.systemName = systemName;
         this.minigameDifficulty = minigameDifficulty;
         this.baseCost = baseCost;
