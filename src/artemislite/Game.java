@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.List;
 
 public class Game {
+	private static final int GO_RESOURCES = 200;
 
 	private static final Random rand = new Random();
 	private static List<Player> players;
@@ -69,17 +70,16 @@ public class Game {
 			Square landed = unownedSquares.get(player.getPosition());
 
 			boolean onSysSq = true;
-			if (player.getPosition() == 0 || player.getPosition() == 6) {
+			if (player.getPosition() == 0 || player.getPosition() == 5) {
 				onSysSq = false;
 			}
 			if (landed == null) {
 				Pair<Player, SystemSquare> ownedSquare = getSquareAndOwner(player.getPosition());
 				String squareName = ownedSquare.getSecond().getSquareName();
 				if (ownedSquare.getFirst().equals(player)) {
-					System.out.printf("You are on %s. You own it.", squareName);
+					System.out.printf("You are on %s. You own it.\n", squareName);
 				} else {
-					System.out.printf("You are on %s. It is owned by %s.\n", squareName,
-							ownedSquare.getFirst().getName());
+					System.out.printf("You are on %s. It is owned by %s.\n", squareName, ownedSquare.getFirst().getName());
 				}
 			} else if (!onSysSq) {
 				System.out.printf("You are on %s. It can't be owned.\n", landed.getSquareName());
@@ -131,16 +131,24 @@ public class Game {
 				break;
 			case 2:
 				rolled = true;
-				int[] roll = rollDiceToMove(player);
+				int[] roll = rollDice(player);
 				System.out.printf("You rolled a %d and a %d.\nMoving %d spaces", roll[0], roll[1], roll[0] + roll[1]);
-				System.out.printf("You are now sitting at Square %s, what would you like to do?", player.getPosition());
+				loading();
+				try {
+					player.updatePosition(roll[0]+roll[1]);
+				} catch (IndexOutOfBoundsException e) {
+					System.out.print("You passed Go! Updating resources");
+					player.updateResources(GO_RESOURCES);
+				}
 				loading();
 				break;
 			case 3:
 				Square square = unownedSquares.get(player.getPosition());
 				if (square instanceof SystemSquare) {
 					SystemSquare ss = (SystemSquare) square;
-					ss.purchaseSquare(player);
+					player.purchaseSquare(ss);
+					//replace square with null
+					unownedSquares.set(player.getPosition(), null);
 					System.out.print("Purchasing " + ss.getSquareName());
 				} else {
 					System.out.println("That square can't be purchased.");
@@ -167,79 +175,15 @@ public class Game {
 	}
 
 	/**
-	 * Roll dice to see who goes first, second, third etc
+	 * Roll two virtual dice and return two numbers
 	 * 
-	 * @return
+	 * @return two-element integer array
 	 */
-	public static int[] rollDiceForPlayerOrder() {
+	public static int[] rollDice(Player player) {
 		int[] roll = new int[2];
 		roll[0] = rand.nextInt(6) + 1;
 		roll[1] = rand.nextInt(6) + 1;
-
 		return roll;
-	}
-
-	/**
-	 * Roll dice to enable players to move on board
-	 * 
-	 * @return
-	 */
-	public static int[] rollDiceToMove(Player player) {
-		int[] roll = new int[2];
-		roll[0] = rand.nextInt(6) + 1;
-		roll[1] = rand.nextInt(6) + 1;
-
-		traverseBoard(roll, player);
-		return roll;
-	}
-
-	/**
-	 * moves players' position on board based on result of dice roll
-	 */
-	public static void traverseBoard(int[] rolledNumber, Player player) {
-		
-		switch (rolledNumber[0]+rolledNumber[1]) {
-		case 0:
-			player.setPosition(0);
-			break;
-		case 1:
-			player.setPosition(1);
-			break;
-		case 2:
-			player.setPosition(2);
-			break;
-		case 3:
-			player.setPosition(3);
-			break;
-		case 4:
-			player.setPosition(4);
-			break;
-		case 5:
-			player.setPosition(5);
-			break;
-		case 6:
-			player.setPosition(6);
-			break;
-		case 7:
-			player.setPosition(7);
-			break;
-		case 8:
-			player.setPosition(8);
-			break;
-		case 9:
-			player.setPosition(9);
-			break;
-		case 10:
-			player.setPosition(10);
-			break;
-		case 11:
-			player.setPosition(11);
-			break;
-		case 12:
-			player.setPosition(12);
-			break;
-		}
-		
 	}
 
 	public static void loading() {
@@ -271,13 +215,15 @@ public class Game {
 
 	public static void displayBoardState() {
 		for (Player player : players) {
-			System.out.print(player.getName() + " ");
+			System.out.printf("%s (pos. %d) ", player.getName(), player.getPosition()+1);
 			if (player.getOwnedElements().size() == 0) {
 				System.out.print("[No owned elements]");
 			} else {
 				System.out.print("[");
 				for (int i = 0; i < player.getOwnedElements().size(); i++) {
-					System.out.print(player.getOwnedElements().get(i).getSquareName());
+					SystemSquare e = player.getOwnedElements().get(i);
+					System.out.print(e.getSquareName());
+					System.out.printf(" (pos. %d)",e.getPosition()+1);
 					if (i > 1) {
 						System.out.print(", ");
 					}
