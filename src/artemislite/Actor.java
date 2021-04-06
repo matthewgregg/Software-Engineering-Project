@@ -4,11 +4,15 @@ package artemislite;
  * represents an actor in the system
  */
 public abstract class Actor {
-    private static final int MIN_POSITION = 1;
-    private static final int MAX_POSITION = 12;
+    private static final int MIN_POSITION = 0;
+    private static final int MAX_POSITION = 11;
     private static final String INVALID_POSITION = "Position is invalid";
 
     private int position;
+
+    public Actor(int position) {
+        this.position = position;
+    }
 
     /**
      * @return the position
@@ -34,6 +38,12 @@ public abstract class Actor {
      * @param delta - the change in position of a player
      */
     public void updatePosition(int delta) {
-        setPosition(position + delta);
+        if (this.position + delta <= 11) {
+            setPosition(position + delta);
+        } else {
+            setPosition(((this.position + delta + 1) % 12) - 1);
+            throw new IndexOutOfBoundsException();
+        }
+
     }
 }
