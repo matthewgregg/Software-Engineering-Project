@@ -1,5 +1,6 @@
 package artemislite;
 
+import javax.naming.ConfigurationException;
 import java.util.ArrayList;
 
 /**
@@ -16,8 +17,10 @@ public class SystemSquare extends Square {
     private int minigameDifficulty;
     private int baseCost;
     private int costPerDevelopment;
+    //this may not be required
     private boolean squareOwned;
     private int development;
+    private int[] landingCost;
 
     /**
      * constructor with arguments
@@ -32,12 +35,14 @@ public class SystemSquare extends Square {
                         SystemName systemName,
                         int minigameDifficulty,
                         int baseCost,
-                        int costPerDevelopment) throws IllegalArgumentException {
+                        int costPerDevelopment,
+                        int[] landingCost) throws IllegalArgumentException {
         super(squareName, position, message);
         this.systemName = systemName;
         this.minigameDifficulty = minigameDifficulty;
         this.baseCost = baseCost;
         this.costPerDevelopment = costPerDevelopment;
+        setLandingCost(landingCost);
         this.squareOwned = false;
         this.development = 0;
         setSystemType();
@@ -143,6 +148,24 @@ public class SystemSquare extends Square {
             this.development = development;
         } else {
             throw new IllegalArgumentException(MAX_DEVELOPMENT_REACHED);
+        }
+    }
+
+    /**
+     * @return the landingCost
+     */
+    public int getLandingCost() {
+        return landingCost[this.development];
+    }
+
+    /**
+     * @param landingCost the landingCost to set
+     */
+    public void setLandingCost(int[] landingCost) throws IllegalArgumentException {
+        if (landingCost.length >= MIN_DEVELOPMENT && landingCost.length <= MAX_DEVELOPMENT + 1) {
+            this.landingCost = landingCost;
+        } else {
+            throw new IllegalArgumentException();
         }
     }
 }

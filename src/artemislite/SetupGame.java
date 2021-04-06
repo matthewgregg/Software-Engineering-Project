@@ -100,7 +100,8 @@ public class SetupGame {
 				SystemName.SYSTEM_NAME_1,
 				2,
 				300,
-				200);
+				200,
+				new int[]{10, 20, 30, 90, 150});
 
 		SystemSquare ss2 = new SystemSquare("Square 2",
 				2,
@@ -108,7 +109,8 @@ public class SetupGame {
 				SystemName.SYSTEM_NAME_1,
 				2,
 				300,
-				200);
+				200,
+				new int[]{10, 20, 30, 90, 150});
 
 		SystemSquare ss3 = new SystemSquare("Square 3",
 				3,
@@ -116,7 +118,8 @@ public class SetupGame {
 				SystemName.SYSTEM_NAME_2,
 				2,
 				300,
-				200);
+				200,
+				new int[]{10, 20, 30, 90, 150});
 
 		SystemSquare ss4 = new SystemSquare("Square 4",
 				4,
@@ -124,7 +127,8 @@ public class SetupGame {
 				SystemName.SYSTEM_NAME_2,
 				2,
 				300,
-				200);
+				200,
+				new int[]{10, 20, 30, 90, 150});
 
 		Square sq2 = new Square("Nothing", 11, "Missed launch window");
 
@@ -134,7 +138,8 @@ public class SetupGame {
 				SystemName.SYSTEM_NAME_2,
 				2,
 				300,
-				200);
+				200,
+				new int[]{10, 20, 30, 90, 150});
 
 		SystemSquare ss6 = new SystemSquare("Square 6",
 				7,
@@ -142,7 +147,8 @@ public class SetupGame {
 				SystemName.SYSTEM_NAME_3,
 				2,
 				300,
-				200);
+				200,
+				new int[]{10, 20, 30, 90, 150});
 
 		SystemSquare ss7 = new SystemSquare("Square 7",
 				8,
@@ -150,7 +156,8 @@ public class SetupGame {
 				SystemName.SYSTEM_NAME_3,
 				2,
 				300,
-				200);
+				200,
+				new int[]{10, 20, 30, 90, 150});
 
 		SystemSquare ss8 = new SystemSquare("Square 8",
 				9,
@@ -158,7 +165,8 @@ public class SetupGame {
 				SystemName.SYSTEM_NAME_3,
 				2,
 				300,
-				200);
+				200,
+				new int[]{10, 20, 30, 90, 150});
 
 		SystemSquare ss9 = new SystemSquare("Square 9",
 				10,
@@ -166,7 +174,8 @@ public class SetupGame {
 				SystemName.SYSTEM_NAME_4,
 				2,
 				300,
-				200);
+				200,
+				new int[]{10, 20, 30, 90, 150});
 
 		SystemSquare ss10 = new SystemSquare("Square 10",
 				11,
@@ -174,7 +183,8 @@ public class SetupGame {
 				SystemName.SYSTEM_NAME_4,
 				2,
 				300,
-				200);
+				200,
+				new int[]{10, 20, 30, 90, 150});
 
 		Collections.addAll(squares, sq1, ss1, ss2, ss3, ss4, sq2, ss5, ss6, ss7, ss8, ss9, ss10);
 		return squares;
