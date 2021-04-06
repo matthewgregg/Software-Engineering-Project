@@ -2,6 +2,7 @@ package artemislite;
 
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * represents a player in the system
@@ -12,7 +13,7 @@ public class Player extends Actor {
     private static final String INVALID_PLAYER_ID = "Invalid player ID";
     private final int playerID;
     private final String name;
-    private ArrayList<SystemSquare> ownedElements = new ArrayList<>();
+    private final ArrayList<SystemSquare> ownedElements = new ArrayList<>();
     private int playerResources;
 
     /**
@@ -93,23 +94,29 @@ public class Player extends Actor {
      * updates a player's resources
      * @param delta the change in resources
      */
-    public void updateResources(int delta) {
-        setPlayerResources(this.playerResources + delta);
+    public void updateResources(int delta) throws IndexOutOfBoundsException {
+        int res = this.playerResources + delta;
+        if (res >= 0) {
+            setPlayerResources(this.playerResources + delta);
+        } else {
+            throw new IndexOutOfBoundsException("You've gone bankrupt");
+        }
     }
 
     /**
      * develops a square
      * @param square the square to be developed
      */
-    public void developElement(SystemSquare square) {
-        // TODO develop square
+    public void developElement(SystemSquare square) throws IllegalArgumentException, IndexOutOfBoundsException {
+        square.setDevelopment(1+square.getDevelopment());
+        this.updateResources(-1 * square.getCostPerDevelopment());
     }
 
     /**
      * purchases a square
      * @param square the square to be purchased
      */
-    public void purchaseSquare(SystemSquare square) {
+    public void purchaseSquare(SystemSquare square) throws IndexOutOfBoundsException {
         this.ownedElements.add(square);
         //this.setPlayerResources(this.playerResources - square.getBaseCost());
         this.updateResources(-1 * square.getBaseCost());
@@ -120,7 +127,7 @@ public class Player extends Actor {
      * @param players all players
      * @param square the square to auction
      */
-    public void auctionSquare(ArrayList<Player> players, SystemSquare square) {
+    public void auctionSquare(List<Player> players, SystemSquare square) {
         // TODO auction square
     }
 }
