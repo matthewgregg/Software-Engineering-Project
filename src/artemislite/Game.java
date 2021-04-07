@@ -148,10 +148,11 @@ public class Game {
 				System.out.printf("\n%s doesn't have enough resources to buy %s.\nAuctioning element", player.getName(), ss.getSquareName());
 				loading(5);
 				auctionSquare(scanner, players, ss, player);
-				//TODO not loading anything here
 				auctioned = true;
 				paid = true;
 				loading(3);
+				clearScreen();
+				//TODO make L104 to L145 a method and call it again here
 			}
 
 			System.out.println("Menu");
