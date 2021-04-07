@@ -3,7 +3,18 @@ package artemislite;
 import java.util.*;
 import java.util.List;
 
+/**
+ * Represents the game , including setup of players and board, rolling
+ * dice, player movement on board, options menu functionality,
+ * purchasing/developing/auctioning squares and updating resources
+ * 
+ * @authors 40084448(Darragh Kieran), 40151114(Matthew Greg), 40246739 (Mark
+ *         Graham), 40315922 (Amit Jayaprakash).
+ *
+ */
 public class Game {
+
+	//global constants
 	private static final int GO_RESOURCES = 200;
 
 	private static final Random rand = new Random();
@@ -13,6 +24,10 @@ public class Game {
 
 	SetupGame gameSetup = new SetupGame();
 
+	/**
+	 * Main method ArtemisLite.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		clearScreen();
 		boolean isGameOver = false;
@@ -27,6 +42,7 @@ public class Game {
 		clearScreen();
 
 		System.out.println(welcomeMessage(players));
+		
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
@@ -41,7 +57,7 @@ public class Game {
 			Player player = players.get(playerCount - 1);
 			quitGame = !generateOptionsMenu(scanner, player, squares);
 		} while (!isGameOver && !quitGame);
-		//TODO is there a different ending if a player goes bankrupt
+		// TODO is there a different ending if a player goes bankrupt
 
 		if (quitGame) {
 			clearScreen();
@@ -51,18 +67,22 @@ public class Game {
 
 	/**
 	 * generate options for user
-	 * @param scanner the scanner object
-	 * @param player the current player
+	 * 
+	 * @param scanner        the scanner object
+	 * @param player         the current player
 	 * @param unownedSquares the list of unowned squares
-	 * @return a boolean for whether the user finished their turn or not. If false, the player quit the game. If true, the player finished their turn
+	 * @return a boolean for whether the user finished their turn or not. If false,
+	 *         the player quit the game. If true, the player finished their turn
 	 */
 	public static boolean generateOptionsMenu(Scanner scanner, Player player, ArrayList<Square> unownedSquares) {
-		//TODO split this method up as it's getting too large
+		// TODO split this method up as it's getting too large
+		//local vars
 		int userOption = 0;
 		boolean turnFinished = false;
 		boolean rolled = false;
 		int menuNum;
 		HashMap<Integer, Integer> menuOptions = new HashMap<>();
+		//initialise menu options
 		String[] allMenu = new String[7];
 		allMenu[0] = "Display Board State";
 		allMenu[1] = "Roll Dice";
@@ -75,7 +95,8 @@ public class Game {
 		do {
 			menuNum = 0;
 			clearScreen();
-
+			
+			//decide if player is on a system square(i.e any square except position 0 or 6)
 			boolean onSysSq = true;
 			if (player.getPosition() == 0 || player.getPosition() == 6) {
 				onSysSq = false;
@@ -83,28 +104,28 @@ public class Game {
 			SystemSquare ss = null;
 			System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
 			Square landed = unownedSquares.get(player.getPosition());
-
+			
+			//decide if square landed on is owned by current player or another player
 			if (landed == null) {
 				Pair<Player, SystemSquare> squareAndOwner = getSquareAndOwner(player.getPosition());
 				String squareName = squareAndOwner.getSecond().getSquareName();
 				if (squareAndOwner.getFirst().equals(player)) {
+					//owned by current player
 					System.out.printf("You are on %s. You own it.\n", squareName);
 					ss = squareAndOwner.getSecond();
-				} else {
+				} else { //owned by another player -- update resources to show fine deduction
 					int cost = squareAndOwner.getSecond().getLandingCost();
 					try {
 						player.updateResources(-1 * cost);
 						clearScreen();
-						System.out.printf("%s's turn [%d units] (Paid %s %d units)\n",
-								player.getName(),
-								player.getPlayerResources(),
-								squareAndOwner.getFirst().getName(),
-								cost);
+						System.out.printf("%s's turn [%d units] (Paid %s %d units)\n", player.getName(),
+								player.getPlayerResources(), squareAndOwner.getFirst().getName(), cost);
 					} catch (IndexOutOfBoundsException e) {
 						System.out.println(e.getMessage());
-						//TODO handle player going bankrupt
+						// TODO handle player going bankrupt
 					}
-					System.out.printf("You are on %s. It is owned by %s.\n", squareName, squareAndOwner.getFirst().getName());
+					System.out.printf("You are on %s. It is owned by %s.\n", squareName,
+							squareAndOwner.getFirst().getName());
 				}
 			} else if (!onSysSq) {
 				System.out.printf("You are on %s. It can't be owned.\n", landed.getSquareName());
@@ -118,7 +139,7 @@ public class Game {
 
 			System.out.println("Menu");
 
-			//load options menu, with some skipped
+			// load options menu, with some skipped
 			for (int i = 0; i < allMenu.length; i++) {
 				if (i == 1 && rolled) {
 					continue;
@@ -129,7 +150,8 @@ public class Game {
 				if (i > 1 && i < 4 && (landed == null || !onSysSq)) {
 					continue;
 				}
-				if (i == 4 && (player.getOwnedElements().size() == 0 || player.getMinimumOwnedDevCost() > player.getPlayerResources())) {
+				if (i == 4 && (player.getOwnedElements().size() == 0
+						|| player.getMinimumOwnedDevCost() > player.getPlayerResources())) {
 					continue;
 				}
 				menuNum++;
@@ -142,18 +164,20 @@ public class Game {
 
 			clearScreen();
 
+			//output options menu
 			switch (menuOptions.get(userOption)) {
 			case 1:
 				displayBoardState();
 				loading();
 				break;
 			case 2:
+				//roll dice and traverse board
 				rolled = true;
 				int[] roll = rollDice();
 				System.out.printf("You rolled a %d and a %d.\nMoving %d spaces", roll[0], roll[1], roll[0] + roll[1]);
 				loading();
 				try {
-					player.updatePosition(roll[0]+roll[1]);
+					player.updatePosition(roll[0] + roll[1]);
 				} catch (IndexOutOfBoundsException e) {
 					System.out.print("You passed Go! Updating resources");
 					player.updateResources(GO_RESOURCES);
@@ -161,10 +185,11 @@ public class Game {
 				}
 				break;
 			case 3:
+				//purchase unowned square
 				if (ss != null) {
 					try {
 						player.purchaseSquare(ss);
-						//replace square with null
+						// replace square with null
 						unownedSquares.set(player.getPosition(), null);
 						System.out.print("Purchasing " + ss.getSquareName());
 						loading();
@@ -172,24 +197,25 @@ public class Game {
 					} catch (IndexOutOfBoundsException e) {
 						System.out.print("You cannot purchase this element. It will be auctioned");
 						loading();
-						//don't break to allow auction case to be executed
-						//TODO could change to hide purchase option when resources are too low
+						// don't break to allow auction case to be executed
+						// TODO could change to hide purchase option when resources are too low
 					}
 				}
 			case 4:
+				//auction an unowned square 
 				if (ss != null) {
 					player.auctionSquare(players, ss);
-					//replace square with null
+					// replace square with null
 					unownedSquares.set(player.getPosition(), null);
 					loading();
 				}
-				//TODO automatically auction when resources low?
+				// TODO automatically auction when resources low?
 				break;
 			case 5:
 				if (ss != null) {
 					developMenu(scanner, player);
 				}
-				//TODO hide this option when resources too low
+				// TODO hide this option when resources too low
 				break;
 			case 6:
 				turnFinished = true;
@@ -213,6 +239,9 @@ public class Game {
 		return roll;
 	}
 
+	/**
+	 * Loading screen containing slight pause
+	 */
 	public static void loading() {
 		try {
 			for (int i = 0; i <= 3; i++) {
@@ -225,6 +254,11 @@ public class Game {
 		System.out.println();
 	}
 
+	/**
+	 * Displays personalised welcome message
+	 * @param players
+	 * @return
+	 */
 	public static StringBuilder welcomeMessage(List<Player> players) {
 		StringBuilder welcome = new StringBuilder();
 		for (int i = players.size(); i > 0; i--) {
@@ -240,9 +274,12 @@ public class Game {
 		return welcome;
 	}
 
+	/**
+	 * Displays current state of the board(i.e. which elements are owned by which players)
+	 */
 	public static void displayBoardState() {
 		for (Player player : players) {
-			System.out.printf("%s (pos. %d) ", player.getName(), player.getPosition()+1);
+			System.out.printf("%s (pos. %d) ", player.getName(), player.getPosition() + 1);
 			if (player.getOwnedElements().size() == 0) {
 				System.out.print("[No owned elements]");
 			} else {
@@ -250,7 +287,7 @@ public class Game {
 				for (int i = 0; i < player.getOwnedElements().size(); i++) {
 					SystemSquare e = player.getOwnedElements().get(i);
 					System.out.print(e.getSquareName());
-					System.out.printf(" (pos. %d, dev. %d)",e.getPosition()+1, e.getDevelopment());
+					System.out.printf(" (pos. %d, dev. %d)", e.getPosition() + 1, e.getDevelopment());
 					if (i < player.getOwnedElements().size() - 1) {
 						System.out.print(", ");
 					}
@@ -261,6 +298,11 @@ public class Game {
 		}
 	}
 
+	/**
+	 * Gets a square and its owner.
+	 * @param position - current position of player
+	 * @return Pair - player and system square
+	 */
 	static Pair<Player, SystemSquare> getSquareAndOwner(int position) {
 		SystemSquare squareMatch = null;
 		Player playerMatch = null;
@@ -276,19 +318,22 @@ public class Game {
 		return new Pair<>(playerMatch, squareMatch);
 	}
 
+	/**
+	 * Allows Players to choose any of their owned elements to develop.
+	 * @param scanner
+	 * @param player
+	 */
 	public static void developMenu(Scanner scanner, Player player) {
-		//TODO player should be able to exit menu
+		// TODO player should be able to exit menu
+		//output resources
 		ArrayList<SystemSquare> squares = player.getOwnedElements();
 		System.out.printf("You have %d units\n", player.getPlayerResources());
 		System.out.println("Please enter a square to develop. Type # to cancel.");
 		int count = 1;
 		boolean valid = false;
 		for (SystemSquare square : squares) {
-			System.out.printf("%d. %s [%d] - %d units per dev.",
-					count++,
-					square.getSquareName(),
-					square.getDevelopment(),
-					square.getCostPerDevelopment());
+			System.out.printf("%d. %s [%d] - %d units per dev.", count++, square.getSquareName(),
+					square.getDevelopment(), square.getCostPerDevelopment());
 		}
 		System.out.print("\n");
 		int squareNum = scanMenuInput(scanner, squares.size(), true);
@@ -314,6 +359,13 @@ public class Game {
 		}
 	}
 
+	/**
+	 * Scans menu input and allows user to enter '#' to cancel selection
+	 * @param scanner
+	 * @param menuUpperLimit
+	 * @param reversible
+	 * @return
+	 */
 	public static int scanMenuInput(Scanner scanner, int menuUpperLimit, boolean reversible) {
 		boolean valid = false;
 		int userOption = 0;
@@ -337,6 +389,9 @@ public class Game {
 		return userOption;
 	}
 
+	/**
+	 * Clears console of any text
+	 */
 	public static void clearScreen() {
 		try {
 			final String os = System.getProperty("os.name");
