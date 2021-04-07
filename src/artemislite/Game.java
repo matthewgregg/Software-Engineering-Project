@@ -35,12 +35,13 @@ public class Game {
 		int playerCount = 0;
 		do {
 			playerCount++;
-			Player player = players.get(playerCount - 1);
 			if (playerCount > players.size()) {
 				playerCount = 1;
 			}
+			Player player = players.get(playerCount - 1);
 			quitGame = !generateOptionsMenu(scanner, player, squares);
 		} while (!isGameOver && !quitGame);
+		//TODO is there a different ending if a player goes bankrupt
 
 		if (quitGame) {
 			clearScreen();
@@ -94,8 +95,11 @@ public class Game {
 					try {
 						player.updateResources(-1 * cost);
 						clearScreen();
-						System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
-						System.out.printf("Paid %s %d units", ownedSquare.getFirst().getName(), cost);
+						System.out.printf("%s's turn [%d units] (Paid %s %d units)\n",
+								player.getName(),
+								player.getPlayerResources(),
+								ownedSquare.getFirst().getName(),
+								cost);
 					} catch (IndexOutOfBoundsException e) {
 						System.out.println(e.getMessage());
 						//TODO handle player going bankrupt
@@ -262,7 +266,7 @@ public class Game {
 					SystemSquare e = player.getOwnedElements().get(i);
 					System.out.print(e.getSquareName());
 					System.out.printf(" (pos. %d, dev. %d)",e.getPosition()+1, e.getDevelopment());
-					if (i > 1) {
+					if (i < player.getOwnedElements().size() - 1) {
 						System.out.print(", ");
 					}
 				}
