@@ -21,6 +21,7 @@ public class Game {
 	private static List<Player> players;
 	private static final Scanner scanner = new Scanner(System.in);
 	private static ArrayList<Square> unownedSquares = null;
+	private static boolean paid = false;
 	// scanner cannot be closed and then reused
 
 	SetupGame gameSetup = new SetupGame();
@@ -78,7 +79,6 @@ public class Game {
 		int userOption = 0;
 		boolean turnFinished = false;
 		boolean rolled = false;
-		boolean paid = false;
 		boolean auctioned = false;
 		boolean purchased = false;
 		int menuNum;
@@ -101,58 +101,19 @@ public class Game {
 			if (player.getPosition() == 0 || player.getPosition() == 6) {
 				onSysSq = false;
 			}
-			SystemSquare ss = null;
-			Square landed = unownedSquares.get(player.getPosition());
+			Square landedSquare = unownedSquares.get(player.getPosition());
+			SystemSquare ss = userStatus(player, landedSquare, onSysSq);
 
-			System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
 
-			//decide if square landed on is owned by current player or another player
-			if (landed == null) {
-				Pair<Player, SystemSquare> squareAndOwner = getSquareAndOwner(player.getPosition());
-				String squareName = squareAndOwner.getSecond().getSquareName();
-				if (squareAndOwner.getFirst().equals(player)) {
-					System.out.printf("You are on %s. You own it.\n", squareName);
-					ss = squareAndOwner.getSecond();
-				} else {
-					//owned by another player -- update resources to show fine deduction
-					int cost = squareAndOwner.getSecond().getLandingCost();
-					try {
-						if (!paid) {
-							player.addResources(-1 * cost);
-							paid = true;
-							clearScreen();
-							System.out.printf("%s's turn [%d units] (Paid %s %d units)\n",
-									player.getName(),
-									player.getPlayerResources(),
-									squareAndOwner.getFirst().getName(),
-									cost);
-						}
-					} catch (IndexOutOfBoundsException e) {
-						System.out.println(e.getMessage());
-						turnFinished = true;
-						//TODO handle player going bankrupt (throw exception?)
-					}
-					System.out.printf("You are on %s. It is owned by %s.\n", squareName, squareAndOwner.getFirst().getName());
-				}
-			} else if (!onSysSq) {
-				System.out.printf("You are on %s. It can't be owned.\n", landed.getSquareName());
-			} else {
-				Square square = unownedSquares.get(player.getPosition());
-				if (square instanceof SystemSquare) {
-					System.out.printf("You are on %s. It is not owned. You can buy it for %d units.\n", square.getSquareName(), ((SystemSquare) square).getBaseCost());
-					ss = (SystemSquare) square;
-				}
-			}
-
-			if (onSysSq && ss != null && landed != null && !purchased && ss.getBaseCost() > player.getPlayerResources()) {
-				System.out.printf("\n%s doesn't have enough resources to buy %s.\nAuctioning element", player.getName(), ss.getSquareName());
+			if (onSysSq && ss != null && landedSquare != null && !purchased && ss.getBaseCost() > player.getPlayerResources()) {
+				System.out.printf("\nYou doesn't have enough resources to buy %s.\nAuctioning element", ss.getSquareName());
 				loading(5);
 				auctionSquare(scanner, players, ss, player);
 				auctioned = true;
 				paid = true;
 				loading(3);
 				clearScreen();
-				//TODO make L104 to L145 a method and call it again here
+				userStatus(player, landedSquare, onSysSq);
 			}
 
 			System.out.println("Menu");
@@ -165,7 +126,7 @@ public class Game {
 				if (i > 1 && i < 6 && !rolled) {
 					continue;
 				}
-				if (i > 1 && i < 4 && (landed == null || !onSysSq)) {
+				if (i > 1 && i < 4 && (landedSquare == null || !onSysSq)) {
 					continue;
 				}
 				if (i == 2 && (player.getPlayerResources() < ss.getBaseCost())) {
@@ -343,6 +304,48 @@ public class Game {
 			}
 		}
 		return new Pair<>(playerMatch, squareMatch);
+	}
+
+	public static SystemSquare userStatus(Player player, Square landedSquare, boolean onSysSq) {
+		System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
+
+		//decide if square landed on is owned by current player or another player
+		if (landedSquare == null) {
+			Pair<Player, SystemSquare> squareAndOwner = getSquareAndOwner(player.getPosition());
+			String squareName = squareAndOwner.getSecond().getSquareName();
+			if (squareAndOwner.getFirst().equals(player)) {
+				System.out.printf("You are on %s. You own it.\n", squareName);
+				return squareAndOwner.getSecond();
+			} else {
+				//owned by another player -- update resources to show fine deduction
+				int cost = squareAndOwner.getSecond().getLandingCost();
+				try {
+					if (!paid) {
+						player.addResources(-1 * cost);
+						paid = true;
+						clearScreen();
+						System.out.printf("%s's turn [%d units] (Paid %s %d units)\n",
+								player.getName(),
+								player.getPlayerResources(),
+								squareAndOwner.getFirst().getName(),
+								cost);
+					}
+				} catch (IndexOutOfBoundsException e) {
+					throw new IndexOutOfBoundsException();
+					//TODO handle player going bankrupt (throw exception?)
+				}
+				System.out.printf("You are on %s. It is owned by %s.\n", squareName, squareAndOwner.getFirst().getName());
+			}
+		} else if (!onSysSq) {
+			System.out.printf("You are on %s. It can't be owned.\n", landedSquare.getSquareName());
+		} else {
+			Square square = unownedSquares.get(player.getPosition());
+			if (square instanceof SystemSquare) {
+				System.out.printf("You are on %s. It is not owned. You can buy it for %d units.\n", square.getSquareName(), ((SystemSquare) square).getBaseCost());
+				return (SystemSquare) square;
+			}
+		}
+		return null;
 	}
 
 	/**
