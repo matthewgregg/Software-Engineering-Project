@@ -130,16 +130,16 @@ public class SetupGame {
 				200,
 				new int[]{10, 20, 30, 90, 150});
 
-		Square sq2 = new Square("Nothing", 11, "Missed launch window");
-
 		SystemSquare ss5 = new SystemSquare("Square 5",
-				6,
+				5,
 				"System 1",
 				SystemName.SYSTEM_NAME_2,
 				2,
 				300,
 				200,
 				new int[]{10, 20, 30, 90, 150});
+
+		Square sq2 = new Square("Nothing", 6, "Missed launch window");
 
 		SystemSquare ss6 = new SystemSquare("Square 6",
 				7,
@@ -186,19 +186,12 @@ public class SetupGame {
 				200,
 				new int[]{10, 20, 30, 90, 150});
 
-		Collections.addAll(squares, sq1, ss1, ss2, ss3, ss4, sq2, ss5, ss6, ss7, ss8, ss9, ss10);
+		Collections.addAll(squares, sq1, ss1, ss2, ss3, ss4, ss5, sq2, ss6, ss7, ss8, ss9, ss10);
+		squares.sort(new ComparePosition());
 		return squares;
 	}
 
 	public void displayGameRules() {
 
-	}
-
-	public ArrayList<Square> getSquares() {
-		return squares;
-	}
-
-	public void setSquares(ArrayList<Square> squares) {
-		this.squares = squares;
 	}
 }
