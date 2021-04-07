@@ -57,6 +57,7 @@ public class Game {
 			}
 			Player player = players.get(playerCount - 1);
 			quitGame = !generateOptionsMenu(scanner, player);
+			paid = false;
 		} while (!isGameOver && !quitGame);
 		//TODO is there a different ending if a player goes bankrupt
 
