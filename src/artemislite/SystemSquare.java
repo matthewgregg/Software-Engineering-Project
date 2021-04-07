@@ -159,6 +159,22 @@ public class SystemSquare extends Square {
     }
 
     /**
+     *
+     * @return the minimum development
+     */
+    public int getMinDevelopment() {
+        return MIN_DEVELOPMENT;
+    }
+
+    /**
+     *
+     * @return the maximum development
+     */
+    public int getMaxDevelopment() {
+        return MAX_DEVELOPMENT;
+    }
+
+    /**
      * @param landingCost the landingCost to set
      */
     public void setLandingCost(int[] landingCost) throws IllegalArgumentException {

@@ -85,26 +85,26 @@ public class Game {
 			Square landed = unownedSquares.get(player.getPosition());
 
 			if (landed == null) {
-				Pair<Player, SystemSquare> ownedSquare = getSquareAndOwner(player.getPosition());
-				String squareName = ownedSquare.getSecond().getSquareName();
-				if (ownedSquare.getFirst().equals(player)) {
+				Pair<Player, SystemSquare> squareAndOwner = getSquareAndOwner(player.getPosition());
+				String squareName = squareAndOwner.getSecond().getSquareName();
+				if (squareAndOwner.getFirst().equals(player)) {
 					System.out.printf("You are on %s. You own it.\n", squareName);
-					ss = ownedSquare.getSecond();
+					ss = squareAndOwner.getSecond();
 				} else {
-					int cost = ownedSquare.getSecond().getLandingCost();
+					int cost = squareAndOwner.getSecond().getLandingCost();
 					try {
 						player.updateResources(-1 * cost);
 						clearScreen();
 						System.out.printf("%s's turn [%d units] (Paid %s %d units)\n",
 								player.getName(),
 								player.getPlayerResources(),
-								ownedSquare.getFirst().getName(),
+								squareAndOwner.getFirst().getName(),
 								cost);
 					} catch (IndexOutOfBoundsException e) {
 						System.out.println(e.getMessage());
 						//TODO handle player going bankrupt
 					}
-					System.out.printf("You are on %s. It is owned by %s.\n", squareName, ownedSquare.getFirst().getName());
+					System.out.printf("You are on %s. It is owned by %s.\n", squareName, squareAndOwner.getFirst().getName());
 				}
 			} else if (!onSysSq) {
 				System.out.printf("You are on %s. It can't be owned.\n", landed.getSquareName());
@@ -129,28 +129,16 @@ public class Game {
 				if (i > 1 && i < 4 && (landed == null || !onSysSq)) {
 					continue;
 				}
+				if (i == 4 && (player.getOwnedElements().size() == 0 || player.getMinimumOwnedDevCost() > player.getPlayerResources())) {
+					continue;
+				}
 				menuNum++;
 				System.out.println(menuNum + ". " + allMenu[i]);
 				menuOptions.put(menuNum, i + 1);
 			}
 			System.out.println("Enter option");
 
-			boolean valid = false;
-
-			do {
-				String option;
-				try {
-					option = scanner.nextLine();
-					if (Integer.parseInt(option) >= 1 && Integer.parseInt(option) <= menuNum) {
-						valid = true;
-						userOption = Integer.parseInt(option);
-					} else {
-						throw new NumberFormatException();
-					}
-				} catch (NumberFormatException e) {
-					System.out.printf("Please enter a number between 1 and %d.\n", menuNum);
-				}
-			} while (!valid);
+			userOption = scanMenuInput(scanner, menuNum);
 
 			clearScreen();
 
@@ -199,12 +187,9 @@ public class Game {
 				break;
 			case 5:
 				if (ss != null) {
-					//TODO currently only develops the element the player is on
-					player.developElement(ss);
-					System.out.print("Developing");
-					loading();
+					developMenu(scanner, player);
 				}
-				//TODO hide this options when resources too low
+				//TODO hide this option when resources too low
 				break;
 			case 6:
 				turnFinished = true;
@@ -289,6 +274,59 @@ public class Game {
 			}
 		}
 		return new Pair<>(playerMatch, squareMatch);
+	}
+
+	public static void developMenu(Scanner scanner, Player player) {
+		//TODO player should be able to exit menu
+		ArrayList<SystemSquare> squares = player.getOwnedElements();
+		System.out.printf("You have %d units\n", player.getPlayerResources());
+		System.out.println("Please enter a square to develop.");
+		int count = 1;
+		boolean valid = false;
+		for (SystemSquare square : squares) {
+			System.out.printf("%d. %s [%d] - %d units per dev.",
+					count++,
+					square.getSquareName(),
+					square.getDevelopment(),
+					square.getCostPerDevelopment());
+		}
+		System.out.print("\n");
+		int squareNum = scanMenuInput(scanner, squares.size()) - 1;
+		SystemSquare chosenSquare = squares.get(squareNum);
+		System.out.println("Please enter how many developments to add");
+		int dev = 0;
+		do {
+			try {
+				dev = scanMenuInput(scanner, chosenSquare.getMaxDevelopment());
+				player.developElement(chosenSquare, dev);
+				valid = true;
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("You don't have enough resources to do that. Enter a different number.");
+			}
+		} while (!valid);
+
+		System.out.printf("Developing %s with %d development", chosenSquare.getSquareName(), dev);
+		loading();
+	}
+
+	public static int scanMenuInput(Scanner scanner, int menuUpperLimit) {
+		boolean valid = false;
+		int userOption = 0;
+		do {
+			String option;
+			try {
+				option = scanner.nextLine();
+				if (Integer.parseInt(option) >= 1 && Integer.parseInt(option) <= menuUpperLimit) {
+					valid = true;
+					userOption = Integer.parseInt(option);
+				} else {
+					throw new NumberFormatException();
+				}
+			} catch (NumberFormatException e) {
+				System.out.printf("Please enter a number between 1 and %d.\n", menuUpperLimit);
+			}
+		} while (!valid);
+		return userOption;
 	}
 
 	public static void clearScreen() {

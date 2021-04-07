@@ -107,9 +107,10 @@ public class Player extends Actor {
      * develops a square
      * @param square the square to be developed
      */
-    public void developElement(SystemSquare square) throws IllegalArgumentException, IndexOutOfBoundsException {
-        square.setDevelopment(1+square.getDevelopment());
-        this.updateResources(-1 * square.getCostPerDevelopment());
+    public void developElement(SystemSquare square, int devIncrease) throws IllegalArgumentException, IndexOutOfBoundsException {
+        this.updateResources(-devIncrease * square.getCostPerDevelopment());
+        square.setDevelopment(devIncrease+square.getDevelopment());
+        //TODO the player still pays even if an exception is thrown (if the development is greater than max), because the exception occurs after the line is executed
     }
 
     /**
@@ -129,5 +130,19 @@ public class Player extends Actor {
      */
     public void auctionSquare(List<Player> players, SystemSquare square) {
         // TODO auction square
+    }
+
+    /**
+     * get the cost of the cheapest development
+     * @return the cost of the cheapest development
+     */
+    public int getMinimumOwnedDevCost() {
+        int lowest = this.ownedElements.get(0).getCostPerDevelopment();
+        for (SystemSquare ss : this.ownedElements) {
+            if (ss.getCostPerDevelopment() < lowest) {
+                lowest = ss.getCostPerDevelopment();
+            }
+        }
+        return lowest;
     }
 }
