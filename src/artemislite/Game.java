@@ -20,9 +20,10 @@ public class Game {
 	private static final Random rand = new Random();
 	private static List<Player> players;
 	private static final Scanner scanner = new Scanner(System.in);
+	//scanner cannot be closed and then reused
 	private static ArrayList<Square> unownedSquares = null;
+	//make this var local instead
 	private static boolean paid = false;
-	// scanner cannot be closed and then reused
 
 	SetupGame gameSetup = new SetupGame();
 
@@ -153,7 +154,7 @@ public class Game {
 				case 1:
 					//display which elements are owned by who
 					displayBoardState();
-					loading(3);
+					loading(5);
 					break;
 				case 2:
 					//roll dice and move player
@@ -361,7 +362,7 @@ public class Game {
 		int count = 1;
 		boolean valid = false;
 		for (SystemSquare square : squares) {
-			System.out.printf("%d. %s [%d] - %d units per dev.\n",
+			System.out.printf("%d. %s [%d] - %d units per dev.",
 					count++,
 					square.getSquareName(),
 					square.getDevelopment(),
