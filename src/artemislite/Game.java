@@ -77,7 +77,7 @@ public class Game {
 			clearScreen();
 
 			boolean onSysSq = true;
-			if (player.getPosition() == 0 || player.getPosition() == 5) {
+			if (player.getPosition() == 0 || player.getPosition() == 6) {
 				onSysSq = false;
 			}
 			SystemSquare ss = null;
@@ -138,7 +138,7 @@ public class Game {
 			}
 			System.out.println("Enter option");
 
-			userOption = scanMenuInput(scanner, menuNum);
+			userOption = scanMenuInput(scanner, menuNum, false);
 
 			clearScreen();
 
@@ -280,7 +280,7 @@ public class Game {
 		//TODO player should be able to exit menu
 		ArrayList<SystemSquare> squares = player.getOwnedElements();
 		System.out.printf("You have %d units\n", player.getPlayerResources());
-		System.out.println("Please enter a square to develop.");
+		System.out.println("Please enter a square to develop. Type # to cancel.");
 		int count = 1;
 		boolean valid = false;
 		for (SystemSquare square : squares) {
@@ -291,32 +291,40 @@ public class Game {
 					square.getCostPerDevelopment());
 		}
 		System.out.print("\n");
-		int squareNum = scanMenuInput(scanner, squares.size()) - 1;
-		SystemSquare chosenSquare = squares.get(squareNum);
-		System.out.println("Please enter how many developments to add");
-		int dev = 0;
-		do {
-			try {
-				dev = scanMenuInput(scanner, chosenSquare.getMaxDevelopment());
-				player.developElement(chosenSquare, dev);
-				valid = true;
-			} catch (IndexOutOfBoundsException e) {
-				System.out.println("You don't have enough resources to do that. Enter a different number.");
-			}
-		} while (!valid);
-
-		System.out.printf("Developing %s with %d development", chosenSquare.getSquareName(), dev);
-		loading();
+		int squareNum = scanMenuInput(scanner, squares.size(), true);
+		if (squareNum != -1) {
+			SystemSquare chosenSquare = squares.get(squareNum - 1);
+			System.out.println("Please enter how many developments to add. Type # to cancel.");
+			int dev = 0;
+			do {
+				try {
+					dev = scanMenuInput(scanner, chosenSquare.getMaxDevelopment(), true);
+					if (dev != -1) {
+						player.developElement(chosenSquare, dev);
+						valid = true;
+						System.out.printf("Developing %s with %d development", chosenSquare.getSquareName(), dev);
+						loading();
+					} else {
+						break;
+					}
+				} catch (IndexOutOfBoundsException e) {
+					System.out.println("You don't have enough resources to do that. Enter a different number.");
+				}
+			} while (!valid);
+		}
 	}
 
-	public static int scanMenuInput(Scanner scanner, int menuUpperLimit) {
+	public static int scanMenuInput(Scanner scanner, int menuUpperLimit, boolean reversible) {
 		boolean valid = false;
 		int userOption = 0;
 		do {
 			String option;
 			try {
 				option = scanner.nextLine();
-				if (Integer.parseInt(option) >= 1 && Integer.parseInt(option) <= menuUpperLimit) {
+				if (reversible && option.equals("#")) {
+					valid = true;
+					userOption = -1;
+				} else if (Integer.parseInt(option) >= 1 && Integer.parseInt(option) <= menuUpperLimit) {
 					valid = true;
 					userOption = Integer.parseInt(option);
 				} else {
