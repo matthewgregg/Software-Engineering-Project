@@ -2,7 +2,6 @@ package artemislite;
 
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * represents a player in the system
@@ -94,7 +93,7 @@ public class Player extends Actor {
      * updates a player's resources
      * @param delta the change in resources
      */
-    public void updateResources(int delta) throws IndexOutOfBoundsException {
+    public void addResources(int delta) throws IndexOutOfBoundsException {
         int res = this.playerResources + delta;
         if (res >= 0) {
             setPlayerResources(this.playerResources + delta);
@@ -107,9 +106,10 @@ public class Player extends Actor {
      * develops a square
      * @param square the square to be developed
      */
-    public void developElement(SystemSquare square) throws IllegalArgumentException, IndexOutOfBoundsException {
-        square.setDevelopment(1+square.getDevelopment());
-        this.updateResources(-1 * square.getCostPerDevelopment());
+    public void developElement(SystemSquare square, int devIncrease) throws IllegalArgumentException, IndexOutOfBoundsException {
+        this.addResources(-devIncrease * square.getCostPerDevelopment());
+        square.setDevelopment(devIncrease+square.getDevelopment());
+        //TODO the player still pays even if an exception is thrown (if the development is greater than max), because the exception occurs after the line is executed
     }
 
     /**
@@ -119,15 +119,20 @@ public class Player extends Actor {
     public void purchaseSquare(SystemSquare square) throws IndexOutOfBoundsException {
         this.ownedElements.add(square);
         //this.setPlayerResources(this.playerResources - square.getBaseCost());
-        this.updateResources(-1 * square.getBaseCost());
+        this.addResources(-1 * square.getBaseCost());
     }
 
     /**
-     * auctions a square
-     * @param players all players
-     * @param square the square to auction
+     * get the cost of the cheapest development
+     * @return the cost of the cheapest development
      */
-    public void auctionSquare(List<Player> players, SystemSquare square) {
-        // TODO auction square
+    public int getMinimumOwnedDevCost() {
+        int lowest = this.ownedElements.get(0).getCostPerDevelopment();
+        for (SystemSquare ss : this.ownedElements) {
+            if (ss.getCostPerDevelopment() < lowest) {
+                lowest = ss.getCostPerDevelopment();
+            }
+        }
+        return lowest;
     }
 }
