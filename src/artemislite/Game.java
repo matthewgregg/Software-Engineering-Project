@@ -24,6 +24,7 @@ public class Game {
 	private static ArrayList<Square> unownedSquares = null;
 	// TODO if second player lands on same square as first player and buys it, the first player pays the second on their turn
 	private static boolean paid = false;
+	private static boolean auctioned = false;
 	
 	private static ArrayList<SystemName> systemNames;
 
@@ -64,7 +65,9 @@ public class Game {
 			}
 			Player player = players.get(playerCount - 1);
 			quitGame = !generateOptionsMenu(scanner, player);
+			//reset global vars on new turn
 			paid = false;
+			auctioned = false;
 		} while (!isGameOver && !quitGame);
 		// TODO is there a different ending if a player goes bankrupt
 
@@ -88,7 +91,6 @@ public class Game {
 		int userOption = 0;
 		boolean turnFinished = false;
 		boolean rolled = false;
-		boolean auctioned = false;
 		boolean purchased = false;
 		int menuNum;
 		HashMap<Integer, Integer> menuOptions = new HashMap<>();
@@ -112,22 +114,6 @@ public class Game {
 			}
 			Square landedSquare = unownedSquares.get(player.getPosition());
 			SystemSquare ss = userStatus(player, landedSquare, onSysSq);
-			//if on a SystemSquare and the square isn't null (owned by another player) and not purchased (not owned by current player)
-			// and the cost is more than current player's resources and at least one player has enough resources to buy it
-			if (onSysSq && ss != null
-					&& !purchased
-					&& ss.getBaseCost() > player.getPlayerResources()
-					&& isAuctionable(ss, player)) {
-				System.out.printf("\nYou doesn't have enough resources to buy %s.\nAuctioning element",
-						ss.getSquareName());
-				loading(5);
-				auctionSquare(scanner, players, ss, player);
-				auctioned = true;
-				paid = true;
-				loading(3);
-				clearScreen();
-				userStatus(player, landedSquare, onSysSq);
-			}
 
 			System.out.println("Menu");
 
@@ -146,11 +132,11 @@ public class Game {
 					continue;
 				}
 				//skip purchase
-				if (i == 2 && (player.getPlayerResources() < ss.getBaseCost())) {
+				if (i == 2 && ss!=null && (player.getPlayerResources() < ss.getBaseCost())) {
 					continue;
 				}
 				//skip auction
-				if (i == 3 && (auctioned || !isAuctionable(ss, player))) {
+				if (i == 3 && ss!=null && (auctioned || !isAuctionable(ss, player))) {
 					continue;
 				}
 				//skip develop
@@ -160,7 +146,9 @@ public class Game {
 					continue;
 				}
 				//skip finish turn
-				if (i == 5 && player.getPlayerResources() > ss.getBaseCost() && !purchased && isAuctionable(ss, player)) {
+				//if user is on a unowned system square and has enough resources and haven't purchased it yet, and the square is auctionable
+				// and the auction hasn't occurred yet
+				if (i == 5 && onSysSq && landedSquare != null && ss!=null && player.getPlayerResources() >= ss.getBaseCost() && !purchased && isAuctionable(ss, player) && !auctioned) {
 					continue;
 				}
 				menuNum++;
@@ -340,6 +328,13 @@ public class Game {
 		return new Pair<>(playerMatch, squareMatch);
 	}
 
+	/**
+	 * prints user message
+ 	 * @param player
+	 * @param landedSquare
+	 * @param onSysSq
+	 * @return systemsquare if the square is a system square
+	 */
 	public static SystemSquare userStatus(Player player, Square landedSquare, boolean onSysSq) {
 		System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
 
@@ -349,7 +344,6 @@ public class Game {
 			String squareName = squareAndOwner.getSecond().getSquareName();
 			if (squareAndOwner.getFirst().equals(player)) {
 				System.out.printf("You are on %s. You own it.\n", squareName);
-				return squareAndOwner.getSecond();
 			} else {
 				// owned by another player -- update resources to show fine deduction
 				int cost = squareAndOwner.getSecond().getLandingCost();
@@ -368,14 +362,31 @@ public class Game {
 				System.out.printf("You are on %s. It is owned by %s.\n", squareName,
 						squareAndOwner.getFirst().getName());
 			}
+			return squareAndOwner.getSecond();
 		} else if (!onSysSq) {
 			System.out.printf("You are on %s. It can't be owned.\n", landedSquare.getSquareName());
 		} else {
 			Square square = unownedSquares.get(player.getPosition());
 			if (square instanceof SystemSquare) {
-				System.out.printf("You are on %s. It is not owned. You can buy it for %d units.\n",
-						square.getSquareName(), ((SystemSquare) square).getBaseCost());
-				return (SystemSquare) square;
+				SystemSquare ss = (SystemSquare) square;
+				if (player.getPlayerResources() >= ss.getBaseCost()) {
+					System.out.printf("You are on %s. It is not owned. You can buy it for %d units.\n",
+							square.getSquareName(), ss.getBaseCost());
+				} else if (isAuctionable(ss, player) && !auctioned) {
+					System.out.printf("You are on %s but don't have enough resources to buy it.\nAuctioning element",
+							ss.getSquareName());
+					loading(5);
+					auctionSquare(scanner, players, ss, player);
+					auctioned = true;
+					paid = true;
+					loading(3);
+					clearScreen();
+					userStatus(player, landedSquare, onSysSq);
+				} else {
+					System.out.printf("You are on %s but don't have enough resources to buy it.\n",
+							ss.getSquareName());
+				}
+				return ss;
 			}
 		}
 		return null;
