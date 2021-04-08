@@ -22,7 +22,6 @@ public class Game {
 	private static final Scanner scanner = new Scanner(System.in);
 	// scanner cannot be closed and then reused
 	private static ArrayList<Square> unownedSquares = null;
-	// TODO if second player lands on same square as first player and buys it, the first player pays the second on their turn
 	private static boolean paid = false;
 	private static boolean auctioned = false;
 	
@@ -352,7 +351,7 @@ public class Game {
 			} else {
 				// owned by another player -- update resources to show fine deduction
 				int cost = squareAndOwner.getSecond().getLandingCost();
-				if (!paid) {
+				if (!paid && rolled) {
 					player.addResources(-1 * cost);
 					paid = true;
 					clearScreen();
