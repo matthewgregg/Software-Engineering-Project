@@ -3,14 +3,11 @@ package artemislite;
 import org.junit.jupiter.api.Test;
 
 import javax.naming.InvalidNameException;
-
 import java.util.ArrayList;
 import java.util.Collections;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerTest {
-
     SystemName systemName1 = SystemName.SYSTEM_NAME_1;
     SystemName systemName2 = SystemName.SYSTEM_NAME_2;
     SystemName systemName3 = SystemName.SYSTEM_NAME_3;
