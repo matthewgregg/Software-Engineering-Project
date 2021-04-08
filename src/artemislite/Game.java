@@ -48,10 +48,11 @@ public class Game {
 
 		System.out.println(welcomeMessage(players));
 		try {
-			Thread.sleep(5500);
+			//Thread.sleep(5500);
 			//TODO Would displayGameRules be better as a menu option so they can review rules at any time?
+			//TODO yes probably
 			gameSetup.displayGameRules(systemNames);
-			Thread.sleep(3000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			System.out.println("Thread error");
 		}
@@ -81,7 +82,7 @@ public class Game {
 	 * @return a boolean for whether the user finished their turn or not. If false,
 	 *         the player quit the game. If true, the player finished their turn
 	 */
-	public static boolean generateOptionsMenu(Scanner scanner, Player player) {
+	public static boolean generateOptionsMenu(Scanner scanner, Player player) throws IndexOutOfBoundsException {
 		// TODO split this method up as it's getting too large
 		// local vars
 		int userOption = 0;
@@ -132,27 +133,36 @@ public class Game {
 
 			// load options menu, with some skipped
 			for (int i = 0; i < allMenu.length; i++) {
+				//skip roll dice
 				if (i == 1 && rolled) {
 					continue;
 				}
+				//skip purchase, auction, develop, finish turn
 				if (i > 1 && i < 6 && !rolled) {
 					continue;
 				}
+				//skip roll dice, purchase, auction, develop
 				if (i > 1 && i < 4 && (landedSquare == null || !onSysSq)) {
 					continue;
 				}
+				//skip purchase
 				if (i == 2 && (player.getPlayerResources() < ss.getBaseCost())) {
 					continue;
 				}
+				//skip auction
 				if (i == 3 && (auctioned || !isAuctionable(ss, player))) {
 					continue;
 				}
+				//skip develop
 				if (i == 4 && (player.getOwnedElements().size() == 0
 						|| player.getMinimumOwnedDevCost() > player.getPlayerResources()
 						|| player.getCompletedSystems() == null)) {
 					continue;
 				}
-				//TODO you can't finish turn without purchasing or auctioning
+				//skip finish turn
+				if (i == 5 && player.getPlayerResources() > ss.getBaseCost() && !purchased && isAuctionable(ss, player)) {
+					continue;
+				}
 				menuNum++;
 				System.out.println(menuNum + ". " + allMenu[i]);
 				menuOptions.put(menuNum, i + 1);
@@ -177,6 +187,7 @@ public class Game {
 				loading(3);
 				try {
 					player.updatePosition(roll[0] + roll[1]);
+					//TODO sometimes exception occurs as the player is moved to a position > 11
 				} catch (IndexOutOfBoundsException e) {
 					System.out.print("You passed Go! Updating resources");
 					player.addResources(GO_RESOURCES);
@@ -275,11 +286,11 @@ public class Game {
 				welcome.insert(0, ", ");
 			}
 		}
+		welcome.insert(0, "Welcome to ArtemisLite, ");
 		welcome.append(
 				". \nThis virtual board game is inspired by Nasa's real life Artemis Mission...\n"
 				+ "You can help send the first woman and next man to the moon.\n\n"
 				+ "After that, next stop Mars!\n");
-		welcome.insert(0, "Welcome to ArtemisLite, ");
 		return welcome;
 	}
 

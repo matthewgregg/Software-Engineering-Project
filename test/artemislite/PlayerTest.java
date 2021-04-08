@@ -130,6 +130,10 @@ class PlayerTest {
     @Test
     void testGetCompletedSystemInvalid() throws InvalidNameException {
         player = new Player(1, "Test Player");
+
+        //test for player with no squares
+        assertNull(player.getCompletedSystems());
+
         //test for player with single square
         player.purchaseSquare(ss1);
         assertNull(player.getCompletedSystems());
