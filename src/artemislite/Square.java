@@ -22,10 +22,24 @@ public class Square {
     }
 
     /**
+     * @param squareName the squareName to set
+     */
+    public void setSquareName(String squareName) {
+        this.squareName = squareName;
+    }
+
+    /**
      * @return the position
      */
     public int getPosition() {
         return position;
+    }
+
+    /**
+     * @param position the position to set
+     */
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     /**
@@ -35,6 +49,12 @@ public class Square {
         return message;
     }
 
+    /**
+     * @param message the message to set
+     */
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     /**
      * prints the squares message
