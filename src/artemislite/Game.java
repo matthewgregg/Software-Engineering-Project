@@ -111,9 +111,12 @@ public class Game {
 			}
 			Square landedSquare = unownedSquares.get(player.getPosition());
 			SystemSquare ss = userStatus(player, landedSquare, onSysSq);
-
-			if (onSysSq && ss != null && landedSquare != null && !purchased
-					&& ss.getBaseCost() > player.getPlayerResources()) {
+			//if on a SystemSquare and the square isn't null (owned by another player) and not purchased (not owned by current player)
+			// and the cost is more than current player's resources and at least one player has enough resources to buy it
+			if (onSysSq && ss != null
+					&& !purchased
+					&& ss.getBaseCost() > player.getPlayerResources()
+					&& isAuctionable(ss, player)) {
 				System.out.printf("\nYou doesn't have enough resources to buy %s.\nAuctioning element",
 						ss.getSquareName());
 				loading(5);
@@ -142,7 +145,6 @@ public class Game {
 					continue;
 				}
 				if (i == 3 && (auctioned || !isAuctionable(ss, player))) {
-					//TODO exception occurs if all players can't buy square
 					continue;
 				}
 				if (i == 4 && (player.getOwnedElements().size() == 0
