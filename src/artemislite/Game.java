@@ -141,7 +141,7 @@ public class Game {
 				}
 				//skip develop
 				if (i == 4 && (player.getOwnedElements().size() == 0
-						|| player.getMinimumOwnedDevCost() > player.getPlayerResources()
+						|| player.getMinimumOwnedDevCost() >= player.getPlayerResources()
 						|| player.getCompletedSystems() == null)) {
 					continue;
 				}
@@ -278,7 +278,7 @@ public class Game {
 		welcome.append(
 				". \nThis virtual board game is inspired by Nasa's real life Artemis Mission...\n"
 				+ "You can help send the first woman and next man to the moon.\n\n"
-				+ "After that, next stop Mars!\n");
+				+ "After that, next stop Mars!");
 		return welcome;
 	}
 
