@@ -423,11 +423,12 @@ public class Game {
 	}
 
 	/**
-	 * auctions a square
+	 * Auctions a square to other players
 	 * @param players all players
 	 * @param square the square to auction
 	 */
 	public static boolean auctionSquare(Scanner scanner, List<Player> players, SystemSquare square, Player player) {
+		//create vars and remove player from bidders list
 		ArrayList<Player> bidders = new ArrayList<>(players);
 		bidders.remove(player);
 		int highestBid = square.getBaseCost();
@@ -439,6 +440,7 @@ public class Game {
 			StringBuilder names = new StringBuilder();
 			ArrayList<Player> removedBidders = new ArrayList<>();
 			for (Player bidder : bidders) {
+				//remove anyone with too few resources
 				if (bidder.getPlayerResources() < highestBid) {
 					removedBidders.add(bidder);
 				} else {
@@ -451,6 +453,7 @@ public class Game {
 			for (Player bidder : bidders) {
 				clearScreen();
 				System.out.printf("Bidding on %s, starting at %d. (Eligible bidders: %s)\n", square.getSquareName(), square.getBaseCost(), strNames);
+				//check if current bidder is the highest bidder - break if so
 				if (bidder.getPlayerResources() > highestBid) {
 					if (bidder.equals(highestBidder) || rejectedCount == bidders.size()) {
 						biddingEnded = true;
@@ -460,6 +463,7 @@ public class Game {
 						System.out.printf("%s is the highest bidder at %d units\n", highestBidder.getName(), highestBid);
 					}
 					System.out.printf("%s, please enter your bid or # to skip.\n", bidder.getName());
+	
 					int bid = Game.scanIntInput(scanner,
 							square.getBaseCost() + (highestBid == square.getBaseCost() ? 0 : 1),
 							bidder.getPlayerResources(),
@@ -467,14 +471,17 @@ public class Game {
 					if (bid > prevBid) {
 						highestBid = bid;
 						highestBidder = bidder;
+						//increment rejected count to prevent infinite loop if no one bids
 					} else if (bid == -1) {
 						rejectedCount++;
 					}
+					//set current bid to previous user's bid for next iteration
 					prevBid = bid;
 				}
 			}
 		} while (!biddingEnded);
 
+		//purchase square and update resources for highest bidder
 		if (highestBidder != null) {
 			System.out.printf("%s has won %s", highestBidder.getName(), square.getSquareName());
 			highestBidder.addResources(square.getBaseCost() - highestBid);
@@ -487,6 +494,12 @@ public class Game {
 		}
 	}
 
+	/**
+	 * Determines if a square is to be auctioned 
+	 * @param ss
+	 * @param player
+	 * @return
+	 */
 	public static boolean isAuctionable(SystemSquare ss, Player player) {
 		ArrayList<Player> bidders = new ArrayList<>(players);
 		bidders.remove(player);
