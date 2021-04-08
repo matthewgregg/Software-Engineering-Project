@@ -24,14 +24,7 @@ public class Game {
 	private static ArrayList<Square> unownedSquares = null;
 	private static boolean paid = false;
 	private static boolean auctioned = false;
-	
-	private static ArrayList<SystemName> systemNames;
 
-	/**
-	 * Main method ArtemisLite.
-	 * 
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		clearScreen();
 		boolean isGameOver = false;
@@ -51,7 +44,7 @@ public class Game {
 			//Thread.sleep(5500);
 			//TODO Would displayGameRules be better as a menu option so they can review rules at any time?
 			//TODO yes probably
-			gameSetup.displayGameRules(systemNames);
+			gameSetup.displayGameRules();
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			System.out.println("Thread error");
@@ -90,9 +83,8 @@ public class Game {
 	 *         the player quit the game. If true, the player finished their turn
 	 */
 	public static boolean generateOptionsMenu(Scanner scanner, Player player) throws IndexOutOfBoundsException {
-		// TODO split this method up as it's getting too large
 		// local vars
-		int userOption = 0;
+		int userOption;
 		boolean turnFinished = false;
 		boolean rolled = false;
 		boolean purchased = false;
@@ -145,7 +137,7 @@ public class Game {
 				}
 				//skip develop
 				if (i == 4 && (player.getOwnedElements().size() == 0
-						|| player.getMinimumOwnedDevCost() >= player.getPlayerResources()
+						|| player.getMinimumOwnedDevCost() > player.getPlayerResources()
 						|| player.getCompletedSystems() == null)) {
 					continue;
 				}
@@ -180,6 +172,7 @@ public class Game {
 				try {
 					player.updatePosition(roll[0] + roll[1]);
 					//TODO sometimes exception occurs as the player is moved to a position > 11
+					// possibly fixed
 				} catch (IndexOutOfBoundsException e) {
 					System.out.print("You passed Go! Updating resources");
 					player.addResources(GO_RESOURCES);
@@ -334,9 +327,9 @@ public class Game {
 
 	/**
 	 * prints user message
- 	 * @param player
-	 * @param landedSquare
-	 * @param onSysSq
+ 	 * @param player the player
+	 * @param landedSquare the square they've landed on
+	 * @param onSysSq whether the user is on a system square or not
 	 * @return systemsquare if the square is a system square
 	 */
 	public static SystemSquare userStatus(Player player, Square landedSquare, boolean onSysSq, boolean rolled) throws IndexOutOfBoundsException {
@@ -434,7 +427,7 @@ public class Game {
 						break;
 					}
 				} catch (IndexOutOfBoundsException e) {
-					System.out.println("You don't have enough resources to do that. Enter a different number.\n");
+					System.out.println("You don't have enough resources to do that. Enter a different number.");
 				}
 			} while (!valid);
 		}
@@ -475,11 +468,10 @@ public class Game {
 
 	/**
 	 * Auctions a square to other players
-	 * 
-	 * @param players all players
+	 *  @param players all players
 	 * @param square  the square to auction
 	 */
-	public static boolean auctionSquare(Scanner scanner, List<Player> players, SystemSquare square, Player player) {
+	public static void auctionSquare(Scanner scanner, List<Player> players, SystemSquare square, Player player) {
 		// create vars and remove player from bidders list
 		ArrayList<Player> bidders = new ArrayList<>(players);
 		bidders.remove(player);
@@ -540,19 +532,17 @@ public class Game {
 			highestBidder.addResources(square.getBaseCost() - highestBid);
 			highestBidder.purchaseSquare(square);
 			unownedSquares.set(player.getPosition(), null);
-			return true;
 		} else {
 			System.out.printf("Nobody wanted %s", square.getSquareName());
-			return false;
 		}
 	}
 
 	/**
 	 * Determines if a square is to be auctioned
 	 * 
-	 * @param ss
-	 * @param player
-	 * @return
+	 * @param ss the system square
+	 * @param player the current player
+	 * @return whether the square can be auctioned or not
 	 */
 	public static boolean isAuctionable(SystemSquare ss, Player player) {
 		ArrayList<Player> bidders = new ArrayList<>(players);
