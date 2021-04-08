@@ -39,11 +39,10 @@ public abstract class Actor {
      */
     public void updatePosition(int delta) {
         if (this.position + delta <= 11) {
-            setPosition(position + delta);
+            setPosition(this.position + delta);
         } else {
             setPosition(((this.position + delta + 1) % 12) - 1);
             throw new IndexOutOfBoundsException();
         }
-
     }
 }
