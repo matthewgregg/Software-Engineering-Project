@@ -1,8 +1,5 @@
 package artemislite;
 
-import javax.naming.ConfigurationException;
-import java.util.ArrayList;
-
 /**
  * represents a square on the board that belongs to a system
  */
@@ -184,18 +181,4 @@ public class SystemSquare extends Square {
             throw new IllegalArgumentException();
         }
     }
-    
-    // TODO  - to fix the System Square enum
-	public static String capitaliseWord(String str) {
-		
-		String words[] = str.split("\\s");
-		String formattedWords = "";
-		
-		for(String w : words) {
-			String first = w.substring(0, 1);
-			String afterfirst = w.substring(1);
-			formattedWords += first.toUpperCase()+afterfirst.toLowerCase()+" ";
-		}
-		return formattedWords.trim();
-	}
 }

@@ -1,6 +1,5 @@
 package artemislite;
 
-import javax.naming.ConfigurationException;
 import javax.naming.InvalidNameException;
 import java.util.*;
 
@@ -176,10 +175,10 @@ public class SetupGame {
 		return squares;
 	}
 
-	public void displayGameRules(List systemNames) {
-		/*
-		systemNames = new ArrayList<>();
-
+	public void displayGameRules() {
+		ArrayList<String> systemNames = stringifyEnum(SystemName.class);
+		System.out.println(Arrays.toString(systemNames.toArray()));
+/*
 		System.out.println("OK Space Cadets, let's firstly outline the rules before we get started.");
 		try {
 			Thread.sleep(2000);
@@ -211,5 +210,31 @@ public class SetupGame {
 			System.out.println("Thread error");
 		}
 		*/
+	}
+
+	/**
+	 *
+	 * @param en the enum class to be stringified
+	 * @return array of stringified enums
+	 */
+	public <E extends Enum<E>> ArrayList<String> stringifyEnum(Class<E> en) {
+
+		EnumSet<E> enums = EnumSet.allOf(en);
+		ArrayList<String> strEnums = new ArrayList<>();
+		StringBuilder str = new StringBuilder();
+		//enums.iterator().forEachRemaining(str::append);
+
+		for (E e : enums) {
+			String[] words = e.name().toLowerCase().split("_");
+			StringBuilder formattedWords = new StringBuilder();
+
+			for (String w : words) {
+				String first = w.substring(0, 1);
+				String next = w.substring(1);
+				formattedWords.append(first.toUpperCase()).append(next.toLowerCase()).append(" ");
+			}
+			strEnums.add(formattedWords.toString().trim());
+		}
+		return strEnums;
 	}
 }
