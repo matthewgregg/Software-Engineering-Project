@@ -22,14 +22,10 @@ public class Game {
 	private static final Scanner scanner = new Scanner(System.in);
 	// scanner cannot be closed and then reused
 	private static ArrayList<Square> unownedSquares = null;
-	// make this var local instead
+	// TODO if second player lands on same square as first player and buys it, the first player pays the second on their turn
 	private static boolean paid = false;
 	
 	private static ArrayList<SystemName> systemNames;
-
-
-	// TODO is this accessible anywhere? Moved to Main for now 
-//	SetupGame gameSetup = new SetupGame();
 
 	/**
 	 * Main method ArtemisLite.
@@ -146,12 +142,15 @@ public class Game {
 					continue;
 				}
 				if (i == 3 && (auctioned || !isAuctionable(ss, player))) {
+					//TODO exception occurs if all players can't buy square
 					continue;
 				}
 				if (i == 4 && (player.getOwnedElements().size() == 0
-						|| player.getMinimumOwnedDevCost() > player.getPlayerResources())) {
+						|| player.getMinimumOwnedDevCost() > player.getPlayerResources()
+						|| player.getCompletedSystems() == null)) {
 					continue;
 				}
+				//TODO you can't finish turn without purchasing or auctioning
 				menuNum++;
 				System.out.println(menuNum + ". " + allMenu[i]);
 				menuOptions.put(menuNum, i + 1);
@@ -209,11 +208,9 @@ public class Game {
 					paid = true;
 					loading(3);
 				}
-				// TODO automatically auction when resources low?
 				break;
 			case 5:
 				// develop player's square
-				// TODO check if player owns system first
 				developMenu(scanner, player);
 				break;
 			case 6:
@@ -379,15 +376,19 @@ public class Game {
 	 */
 	public static void developMenu(Scanner scanner, Player player) {
 		ArrayList<SystemSquare> squares = player.getOwnedElements();
+		ArrayList<SystemName> systems = player.getCompletedSystems();
+
+		//remove incomplete systems using predicate
+		squares.removeIf(s -> !systems.contains(s.getSystemName()));
+
 		System.out.printf("You have %d units\n", player.getPlayerResources());
 		System.out.println("Please enter a square to develop. Type # to cancel.");
 		int count = 1;
 		boolean valid = false;
 		for (SystemSquare square : squares) {
-			System.out.printf("%d. %s [%d] - %d units per dev.", count++, square.getSquareName(),
+			System.out.printf("%d. %s [%d] - %d units per dev.\n", count++, square.getSquareName(),
 					square.getDevelopment(), square.getCostPerDevelopment());
 		}
-		System.out.print("\n");
 		int squareNum = scanIntInput(scanner, 1, squares.size(), true);
 		if (squareNum != -1) {
 			SystemSquare chosenSquare = squares.get(squareNum - 1);
@@ -534,41 +535,6 @@ public class Game {
 			}
 		}
 		return playersTooExpensive < bidders.size();
-	}
-
-	/**
-	 * checks if a player has at least one entire system
-	 * @param player the player
-	 * @return the systems or null
-	 */
-	public static ArrayList<SystemName> getCompletedSystem(Player player) {
-		//only allow unique values
-		Set<SystemName> ownedSystems = new HashSet<>();
-
-		for (int i = 0; i < player.getOwnedElements().size(); i++) {
-			int num = player.getOwnedElements().get(i).getSystemType();
-			SystemName initSys = player.getOwnedElements().get(i).getSystemName();
-			ownedSystems.add(initSys);
-			for (int j = i + 1; j < i + num; j++) {
-				SystemName sys = player.getOwnedElements().get(j).getSystemName();
-				if (sys.equals(initSys)) {
-					ownedSystems.add(sys);
-					i++;
-				} else {
-					ownedSystems.clear();
-					//updates i to skip uncompleted system
-					i = j;
-					//ends inner loop
-					j = i + num;
-
-				}
-			}
-		}
-		if (ownedSystems.size() == 0) {
-			return null;
-		} else {
-			return new ArrayList<>(ownedSystems);
-		}
 	}
 
 	/**
