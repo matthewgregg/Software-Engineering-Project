@@ -537,6 +537,41 @@ public class Game {
 	}
 
 	/**
+	 * checks if a player has at least one entire system
+	 * @param player the player
+	 * @return the systems or null
+	 */
+	public static ArrayList<SystemName> getCompletedSystem(Player player) {
+		//only allow unique values
+		Set<SystemName> ownedSystems = new HashSet<>();
+
+		for (int i = 0; i < player.getOwnedElements().size(); i++) {
+			int num = player.getOwnedElements().get(i).getSystemType();
+			SystemName initSys = player.getOwnedElements().get(i).getSystemName();
+			ownedSystems.add(initSys);
+			for (int j = i + 1; j < i + num; j++) {
+				SystemName sys = player.getOwnedElements().get(j).getSystemName();
+				if (sys.equals(initSys)) {
+					ownedSystems.add(sys);
+					i++;
+				} else {
+					ownedSystems.clear();
+					//updates i to skip uncompleted system
+					i = j;
+					//ends inner loop
+					j = i + num;
+
+				}
+			}
+		}
+		if (ownedSystems.size() == 0) {
+			return null;
+		} else {
+			return new ArrayList<>(ownedSystems);
+		}
+	}
+
+	/**
 	 * Clears console of any text
 	 */
 	public static void clearScreen() {

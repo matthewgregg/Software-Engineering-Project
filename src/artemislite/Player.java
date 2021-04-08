@@ -2,6 +2,8 @@ package artemislite;
 
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * represents a player in the system
@@ -12,7 +14,7 @@ public class Player extends Actor {
     private static final String INVALID_PLAYER_ID = "Invalid player ID";
     private final int playerID;
     private final String name;
-    private final ArrayList<SystemSquare> ownedElements = new ArrayList<>();
+    private final SortedSet<SystemSquare> ownedElements = new TreeSet<>(new ComparePosition());
     private int playerResources;
 
     /**
@@ -63,7 +65,7 @@ public class Player extends Actor {
      * @return the ownedElements
      */
     public ArrayList<SystemSquare> getOwnedElements() {
-        return ownedElements;
+        return new ArrayList<>(ownedElements);
     }
 
     /**
@@ -127,12 +129,15 @@ public class Player extends Actor {
      * @return the cost of the cheapest development
      */
     public int getMinimumOwnedDevCost() {
+        /*
         int lowest = this.ownedElements.get(0).getCostPerDevelopment();
         for (SystemSquare ss : this.ownedElements) {
             if (ss.getCostPerDevelopment() < lowest) {
                 lowest = ss.getCostPerDevelopment();
             }
         }
-        return lowest;
+         */
+        //the first square will always have the lowest development cost
+        return this.ownedElements.first().getCostPerDevelopment();
     }
 }
