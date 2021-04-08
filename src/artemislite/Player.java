@@ -1,9 +1,8 @@
 package artemislite;
 
 import javax.naming.ConfigurationException;
-import java.util.ArrayList;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import javax.naming.InvalidNameException;
+import java.util.*;
 
 /**
  * represents a player in the system
@@ -22,10 +21,10 @@ public class Player extends Actor {
      * @param playerID the playerID
      * @param name the player's name
      */
-    public Player(int playerID, String name) throws ConfigurationException {
+    public Player(int playerID, String name) throws InvalidNameException {
         super(0);
         if (name.equalsIgnoreCase("quit")) {
-            throw new ConfigurationException();
+            throw new InvalidNameException();
         } else {
             this.playerID = playerID;
         }
@@ -139,5 +138,47 @@ public class Player extends Actor {
          */
         //the first square will always have the lowest development cost
         return this.ownedElements.first().getCostPerDevelopment();
+    }
+
+    /**
+     * checks if a player has at least one entire system
+     * @return the systems or null
+     */
+    public ArrayList<SystemName> getCompletedSystems() {
+        //only allow unique values
+        Set<SystemName> ownedSystems = new HashSet<>();
+
+        for (int i = 0; i < getOwnedElements().size(); i++) {
+            int squaresInSys = getOwnedElements().get(i).getSystemType();
+            SystemName initSys = getOwnedElements().get(i).getSystemName();
+            ownedSystems.add(initSys);
+
+            //this is 1 larger than the number of squares to check
+            int squaresToCheckLimit = Math.min(i+squaresInSys, getOwnedElements().size());
+
+            //skip check if single square or if there are fewer squares left to check than are in the system
+            if (getOwnedElements().size() == 1 || squaresInSys > getOwnedElements().size() - i) {
+                ownedSystems.remove(initSys);
+                squaresToCheckLimit = i + 1;
+            }
+
+            for (int j = i + 1; j < squaresToCheckLimit; j++) {
+                SystemName sys = getOwnedElements().get(j).getSystemName();
+                if (sys.equals(initSys)) {
+                    i++;
+                } else {
+                    ownedSystems.remove(initSys);
+                    //updates i to skip uncompleted system
+                    i = j - 1;
+                    //ends inner loop
+                    j = i + squaresInSys;
+                }
+            }
+        }
+        if (ownedSystems.size() == 0) {
+            return null;
+        } else {
+            return new ArrayList<>(ownedSystems);
+        }
     }
 }
