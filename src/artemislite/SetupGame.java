@@ -1,6 +1,7 @@
 package artemislite;
 
 import javax.naming.ConfigurationException;
+import javax.naming.InvalidNameException;
 import java.util.*;
 
 /**
@@ -64,9 +65,9 @@ public class SetupGame {
 						players.add(player);
 						validPlayerName = true;
 					} else {
-						throw new ConfigurationException();
+						throw new InvalidNameException();
 					}
-				} catch (ConfigurationException e) {
+				} catch (InvalidNameException e) {
 					System.out.printf("%s is not a valid name. Try again.\n", name);
 				}
 			} while (!validPlayerName);
@@ -176,6 +177,7 @@ public class SetupGame {
 	}
 
 	public void displayGameRules(List systemNames) {
+		/*
 		systemNames = new ArrayList<>();
 
 		System.out.println("OK Space Cadets, let's firstly outline the rules before we get started.");
@@ -208,6 +210,6 @@ public class SetupGame {
 		} catch (InterruptedException e) {
 			System.out.println("Thread error");
 		}
-
+		*/
 	}
 }
