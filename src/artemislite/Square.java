@@ -8,9 +8,6 @@ public class Square {
     private int position;
     private String message;
 
-    public Square() {
-    }
-
     public Square(String squareName, int position, String message) {
         this.squareName = squareName;
         this.position = position;

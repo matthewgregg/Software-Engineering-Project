@@ -200,6 +200,7 @@ public class Game {
 					break;
 				case 5:
 					//develop player's square
+					//TODO check if player owns system first
 					developMenu(scanner, player);
 					break;
 				case 6:
