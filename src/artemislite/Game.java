@@ -42,7 +42,7 @@ public class Game {
 		clearScreen();
 
 		System.out.print(welcomeMessage(players));
-		loading(5);
+		loading(5, true);
 		System.out.println();
 		int playerCount = 0;
 		do {
@@ -162,14 +162,14 @@ public class Game {
 			case 2:
 				// display which elements are owned by who
 				displayBoardState();
-				loading(5);
+				loading(5, true);
 				break;
 			case 3:
 				// roll dice and move player
 				rolled = true;
 				int[] roll = rollDice();
 				System.out.printf("You rolled a %d and a %d.\nMoving %d spaces", roll[0], roll[1], roll[0] + roll[1]);
-				loading(3);
+				loading(3, true);
 				try {
 					player.updatePosition(roll[0] + roll[1]);
 					// TODO sometimes exception occurs as the player is moved to a position > 11
@@ -177,7 +177,7 @@ public class Game {
 				} catch (IndexOutOfBoundsException e) {
 					System.out.print("You passed Go! Updating resources");
 					player.addResources(GO_RESOURCES);
-					loading(3);
+					loading(3, true);
 				}
 				break;
 			case 4:
@@ -189,11 +189,11 @@ public class Game {
 						unownedSquares.set(player.getPosition(), null);
 						System.out.print("Purchasing " + ss.getSquareName());
 						purchased = true;
-						loading(3);
+						loading(3, true);
 						break;
 					} catch (IndexOutOfBoundsException e) {
 						System.out.print("You cannot purchase this element. It will be auctioned");
-						loading(3);
+						loading(3, true);
 						// don't break to allow auction case to be executed. This block shouldn't
 						// normally be executed
 					}
@@ -205,7 +205,7 @@ public class Game {
 					auctioned = true;
 					// so the user doesn't have to pay the winner
 					paid = true;
-					loading(3);
+					loading(3, true);
 				}
 				break;
 			case 6:
@@ -244,11 +244,13 @@ public class Game {
 	 * 
 	 * @param time the time to delay
 	 */
-	public static void loading(int time) {
+	public static void loading(int time, boolean withDots) {
 		try {
 			for (int i = 0; i <= time; i++) {
 				Thread.sleep(1000);
-				System.out.print(".");
+				if (withDots) {
+					System.out.print(".");
+				}
 			}
 		} catch (InterruptedException e) {
 			System.out.println("Thread error");
@@ -371,11 +373,11 @@ public class Game {
 				} else if (isAuctionable(ss, player) && !auctioned && rolled) {
 					System.out.printf("You are on %s but don't have enough resources to buy it.\nAuctioning element",
 							ss.getSquareName());
-					loading(5);
+					loading(5, true);
 					auctionSquare(scanner, players, ss, player);
 					auctioned = true;
 					paid = true;
-					loading(3);
+					loading(3, true);
 					clearScreen();
 					userStatus(player, landedSquare, true, true);
 				} else if (rolled) {
@@ -421,7 +423,7 @@ public class Game {
 						player.developElement(chosenSquare, dev);
 						valid = true;
 						System.out.printf("Developing %s with %d development(s)", chosenSquare.getSquareName(), dev);
-						loading(3);
+						loading(3, true);
 					} else {
 						break;
 					}
@@ -620,7 +622,7 @@ public class Game {
 		if (option > 0) {
 			for (String s : getList.get(option)) {
 				System.out.println(s);
-				loading(2);
+				loading(3, false);
 			}
 			System.out.print("Press enter to return to main menu");
 			scanner.nextLine();
