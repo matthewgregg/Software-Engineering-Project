@@ -61,7 +61,6 @@ public class Game {
 		// TODO is there a different ending if a player goes bankrupt
 
 		if (quitGame) {
-			clearScreen();
 			System.out.printf("Game is over! %s ended the game\n", players.get(playerCount - 1).getName());
 		}
 	}
@@ -213,6 +212,7 @@ public class Game {
 					break;
 				case 8:
 					// quit game
+					clearScreen();
 					break;
 				default:
 					break;
@@ -547,7 +547,7 @@ public class Game {
 			System.out.println(
 					"When it's your go, pick what you'd like to do from the menu.\n e.g. Roll the dice to move along the board.\n");
 			Thread.sleep(4000);
-			System.out.println("You'll each be alloted some Space Points(currency of the solar system) to start out.\n"
+			System.out.println("You'll each be allotted some Space Points(currency of the solar system) to start out.\n"
 					+ "Use your points to purchase a square that you land on or pay other players when you land on their square.\n"
 					+ "If you don't want to buy the square you land on, it will be auctioned to the other players.\n");
 			Thread.sleep(10000);
@@ -591,14 +591,14 @@ public class Game {
 	 */
 	public static <E extends Enum<E>> String stringifyEnum(E en) {
 		String[] words = en.name().toLowerCase().split("_");
-		StringBuilder formattedWords = new StringBuilder();
+		StringBuilder stringify = new StringBuilder();
 
 		for (String w : words) {
 			String first = w.substring(0, 1);
-			String next = w.substring(1);
-			formattedWords.append(first.toUpperCase()).append(next.toLowerCase()).append(" ");
+			String rest = w.substring(1);
+			stringify.append(first.toUpperCase()).append(rest.toLowerCase()).append(" ");
 		}
-		return formattedWords.toString().trim();
+		return stringify.toString().trim();
 	}
 
 	/**
