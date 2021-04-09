@@ -39,16 +39,8 @@ public class Game {
 
 		clearScreen();
 
-		System.out.println(welcomeMessage(players));
-		try {
-			//Thread.sleep(5500);
-			//TODO Would displayGameRules be better as a menu option so they can review rules at any time?
-			//TODO yes probably
-			gameSetup.displayGameRules();
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			System.out.println("Thread error");
-		}
+		System.out.print(welcomeMessage(players));
+		loading(5);
 		int playerCount = 0;
 		do {
 			playerCount++;
@@ -91,14 +83,15 @@ public class Game {
 		int menuNum;
 		HashMap<Integer, Integer> menuOptions = new HashMap<>();
 		// initialise menu options
-		String[] allMenu = new String[7];
-		allMenu[0] = "Display Board State";
-		allMenu[1] = "Roll Dice";
-		allMenu[2] = "Purchase Square";
-		allMenu[3] = "Auction Element";
-		allMenu[4] = "Develop Element";
-		allMenu[5] = "Finish Turn";
-		allMenu[6] = "Quit Game";
+		String[] allMenu = new String[8];
+		allMenu[0] = "Rules";
+		allMenu[1] = "Display Board State";
+		allMenu[2] = "Roll Dice";
+		allMenu[3] = "Purchase Square";
+		allMenu[4] = "Auction Element";
+		allMenu[5] = "Develop Element";
+		allMenu[6] = "Finish Turn";
+		allMenu[7] = "Quit Game";
 
 		do {
 			menuNum = 0;
@@ -116,27 +109,27 @@ public class Game {
 			// load options menu, with some skipped
 			for (int i = 0; i < allMenu.length; i++) {
 				//skip roll dice
-				if (i == 1 && rolled) {
+				if (i == 2 && rolled) {
 					continue;
 				}
 				//skip purchase, auction, develop, finish turn
-				if (i > 1 && i < 6 && !rolled) {
+				if (i > 2 && i < 7 && !rolled) {
 					continue;
 				}
 				//skip roll dice, purchase, auction, develop
-				if (i > 1 && i < 4 && (landedSquare == null || !onSysSq)) {
+				if (i > 2 && i < 5 && (landedSquare == null || !onSysSq)) {
 					continue;
 				}
 				//skip purchase
-				if (i == 2 && ss!=null && (player.getPlayerResources() < ss.getBaseCost())) {
+				if (i == 3 && ss!=null && (player.getPlayerResources() < ss.getBaseCost())) {
 					continue;
 				}
 				//skip auction
-				if (i == 3 && ss!=null && (auctioned || !isAuctionable(ss, player))) {
+				if (i == 4 && ss!=null && (auctioned || !isAuctionable(ss, player))) {
 					continue;
 				}
 				//skip develop
-				if (i == 4 && (player.getOwnedElements().size() == 0
+				if (i == 5 && (player.getOwnedElements().size() == 0
 						|| player.getMinimumOwnedDevCost() > player.getPlayerResources()
 						|| player.getCompletedSystems() == null)) {
 					continue;
@@ -144,7 +137,7 @@ public class Game {
 				//skip finish turn
 				//if user is on a unowned system square and has enough resources and haven't purchased it yet, and the square is auctionable
 				// and the auction hasn't occurred yet
-				if (i == 5 && onSysSq && landedSquare != null && ss!=null && player.getPlayerResources() >= ss.getBaseCost() && !purchased && isAuctionable(ss, player) && !auctioned) {
+				if (i == 6 && onSysSq && landedSquare != null && ss!=null && player.getPlayerResources() >= ss.getBaseCost() && !purchased && isAuctionable(ss, player) && !auctioned) {
 					continue;
 				}
 				menuNum++;
@@ -158,69 +151,71 @@ public class Game {
 			clearScreen();
 			// output options menu
 			switch (menuOptions.get(userOption)) {
-			case 1:
-				// display which elements are owned by who
-				displayBoardState();
-				loading(5);
-				break;
-			case 2:
-				// roll dice and move player
-				rolled = true;
-				int[] roll = rollDice();
-				System.out.printf("You rolled a %d and a %d.\nMoving %d spaces", roll[0], roll[1], roll[0] + roll[1]);
-				loading(3);
-				try {
-					player.updatePosition(roll[0] + roll[1]);
-					//TODO sometimes exception occurs as the player is moved to a position > 11
-					// possibly fixed
-				} catch (IndexOutOfBoundsException e) {
-					System.out.print("You passed Go! Updating resources");
-					player.addResources(GO_RESOURCES);
+				case 1:
+					displayGameRules(scanner);
+					break;
+				case 2:
+					// display which elements are owned by who
+					displayBoardState();
+					loading(5);
+					break;
+				case 3:
+					// roll dice and move player
+					rolled = true;
+					int[] roll = rollDice();
+					System.out.printf("You rolled a %d and a %d.\nMoving %d spaces", roll[0], roll[1], roll[0] + roll[1]);
 					loading(3);
-				}
-				break;
-			case 3:
-				// purchase unowned square
-				if (ss != null) {
 					try {
-						player.purchaseSquare(ss);
-						// replace square with null
-						unownedSquares.set(player.getPosition(), null);
-						System.out.print("Purchasing " + ss.getSquareName());
-						purchased = true;
-						loading(3);
-						break;
+						player.updatePosition(roll[0] + roll[1]);
+						//TODO sometimes exception occurs as the player is moved to a position > 11
+						// possibly fixed
 					} catch (IndexOutOfBoundsException e) {
-						System.out.print("You cannot purchase this element. It will be auctioned");
+						System.out.print("You passed Go! Updating resources");
+						player.addResources(GO_RESOURCES);
 						loading(3);
-						// don't break to allow auction case to be executed. This block shouldn't
-						// normally be executed
 					}
-				}
-			case 4:
-				// auction unowned square
-				if (ss != null) {
-					auctionSquare(scanner, players, ss, player);
-					auctioned = true;
-					// so the user doesn't have to pay the winner
-					paid = true;
-					loading(3);
-				}
-				break;
-			case 5:
-				// develop player's square
-				developMenu(scanner, player);
-				break;
-			case 6:
-				// end turn
-				turnFinished = true;
-				break;
-			case 7:
-				// quit game
-				break;
-			default:
-				break;
-
+					break;
+				case 4:
+					// purchase unowned square
+					if (ss != null) {
+						try {
+							player.purchaseSquare(ss);
+							// replace square with null
+							unownedSquares.set(player.getPosition(), null);
+							System.out.print("Purchasing " + ss.getSquareName());
+							purchased = true;
+							loading(3);
+							break;
+						} catch (IndexOutOfBoundsException e) {
+							System.out.print("You cannot purchase this element. It will be auctioned");
+							loading(3);
+							// don't break to allow auction case to be executed. This block shouldn't
+							// normally be executed
+						}
+					}
+				case 5:
+					// auction unowned square
+					if (ss != null) {
+						auctionSquare(scanner, players, ss, player);
+						auctioned = true;
+						// so the user doesn't have to pay the winner
+						paid = true;
+						loading(3);
+					}
+					break;
+				case 6:
+					// develop player's square
+					developMenu(scanner, player);
+					break;
+				case 7:
+					// end turn
+					turnFinished = true;
+					break;
+				case 8:
+					// quit game
+					break;
+				default:
+					break;
 			}
 		} while (!turnFinished && userOption != menuNum);
 		return turnFinished;
@@ -275,7 +270,7 @@ public class Game {
 		welcome.append(
 				". \nThis virtual board game is inspired by Nasa's real life Artemis Mission...\n"
 				+ "You can help send the first woman and next man to the moon.\n\n"
-				+ "After that, next stop Mars!");
+				+ "After that, next stop Mars");
 		return welcome;
 	}
 
@@ -535,6 +530,75 @@ public class Game {
 		} else {
 			System.out.printf("Nobody wanted %s", square.getSquareName());
 		}
+	}
+
+	/**
+	 * displays the game rules
+	 */
+	public static void displayGameRules(Scanner scanner) {
+		ArrayList<String> systemNames = stringifyEnum(SystemName.class);
+		System.out.println(Arrays.toString(systemNames.toArray()));
+/*
+		System.out.println("OK Space Cadets, let's firstly outline the rules before we get started.");
+		try {
+			Thread.sleep(2000);
+			System.out.println("You'll firstly roll dice to decide who goes first");
+			Thread.sleep(2000);
+			System.out.println(
+					"When it's your go, pick what you'd like to do from the menu.\n e.g. Roll the dice to move along the board.\n");
+			Thread.sleep(4000);
+			System.out.println("You'll each be alloted some Space Points(currency of the solar system) to start out.\n"
+					+ "Use your points to purchase a square that you land on or pay other players when you land on their square.\n"
+					+ "If you don't want to buy the square you land on, it will be auctioned to the other players.\n");
+			Thread.sleep(10000);
+			// TODO alter magic number 4
+			System.out.println("The board has 12 squares in total grouped into 4 systems.");
+			Thread.sleep(2000);
+			// TODO dynamically print system names... Use iterator?
+			// System.out.println(systemNames.toString());
+			System.out.println(
+					"Systems and their squares get more expensive the further you are along the board...\n"
+					+ "...but there's also bigger rewards should another player land on your square.\n"
+							+ "Once you own a whole system, you can pay to add a development.\n");
+			Thread.sleep(6000);
+			System.out.println("All systems must be developed to complete the mission and win the game.\n"
+					+ "Should any player go 'Bankrupt' by running out of Space Points, the game ends and the mission has failed.\n");
+			Thread.sleep(6000);
+			// TODO Does this make sense? They're playing against each other and ALSO as a
+			// team...
+		} catch (InterruptedException e) {
+			System.out.println("Thread error");
+		}
+		*/
+	}
+
+	/**
+	 *
+	 * @param en the enum class to be stringified
+	 * @return array of stringified enums
+	 */
+	public static <E extends Enum<E>> ArrayList<String> stringifyEnum(Class<E> en) {
+		EnumSet<E> enums = EnumSet.allOf(en);
+		ArrayList<String> strEnums = new ArrayList<>();
+		enums.iterator().forEachRemaining(s -> strEnums.add(stringifyEnum(s)));
+		return strEnums;
+	}
+
+	/**
+	 *
+	 * @param en the enum to be stringified
+	 * @return the enum as a user friendly string
+	 */
+	public static <E extends Enum<E>> String stringifyEnum(E en) {
+		String[] words = en.name().toLowerCase().split("_");
+		StringBuilder formattedWords = new StringBuilder();
+
+		for (String w : words) {
+			String first = w.substring(0, 1);
+			String next = w.substring(1);
+			formattedWords.append(first.toUpperCase()).append(next.toLowerCase()).append(" ");
+		}
+		return formattedWords.toString().trim();
 	}
 
 	/**
