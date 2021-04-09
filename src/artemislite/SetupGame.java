@@ -220,12 +220,7 @@ public class SetupGame {
 	public static <E extends Enum<E>> ArrayList<String> stringifyEnum(Class<E> en) {
 		EnumSet<E> enums = EnumSet.allOf(en);
 		ArrayList<String> strEnums = new ArrayList<>();
-		StringBuilder str = new StringBuilder();
-		//enums.iterator().forEachRemaining(str::append);
-
-		for (E e : enums) {
-			strEnums.add(stringifyEnum(e));
-		}
+		enums.iterator().forEachRemaining(s -> strEnums.add(stringifyEnum(s)));
 		return strEnums;
 	}
 
