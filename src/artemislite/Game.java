@@ -152,7 +152,7 @@ public class Game {
 			// output options menu
 			switch (menuOptions.get(userOption)) {
 				case 1:
-					displayGameRules();
+					displayGameRules(scanner);
 					break;
 				case 2:
 					// display which elements are owned by who
@@ -532,7 +532,10 @@ public class Game {
 		}
 	}
 
-	public static void displayGameRules() {
+	/**
+	 * displays the game rules
+	 */
+	public static void displayGameRules(Scanner scanner) {
 		ArrayList<String> systemNames = stringifyEnum(SystemName.class);
 		System.out.println(Arrays.toString(systemNames.toArray()));
 /*
