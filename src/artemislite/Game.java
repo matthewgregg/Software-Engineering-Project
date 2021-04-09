@@ -1,6 +1,8 @@
 package artemislite;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Represents the game , including setup of players and board, rolling dice,
@@ -40,7 +42,7 @@ public class Game {
 		clearScreen();
 
 		System.out.print(welcomeMessage(players));
-		loading(5);
+		loading(5, true);
 		System.out.println();
 		int playerCount = 0;
 		do {
@@ -160,14 +162,14 @@ public class Game {
 			case 2:
 				// display which elements are owned by who
 				displayBoardState();
-				loading(5);
+				loading(5, true);
 				break;
 			case 3:
 				// roll dice and move player
 				rolled = true;
 				int[] roll = rollDice();
 				System.out.printf("You rolled a %d and a %d.\nMoving %d spaces", roll[0], roll[1], roll[0] + roll[1]);
-				loading(3);
+				loading(3, true);
 				try {
 					player.updatePosition(roll[0] + roll[1]);
 					// TODO sometimes exception occurs as the player is moved to a position > 11
@@ -175,7 +177,7 @@ public class Game {
 				} catch (IndexOutOfBoundsException e) {
 					System.out.print("You passed Go! Updating resources");
 					player.addResources(GO_RESOURCES);
-					loading(3);
+					loading(3, true);
 				}
 				break;
 			case 4:
@@ -187,11 +189,11 @@ public class Game {
 						unownedSquares.set(player.getPosition(), null);
 						System.out.print("Purchasing " + ss.getSquareName());
 						purchased = true;
-						loading(3);
+						loading(3, true);
 						break;
 					} catch (IndexOutOfBoundsException e) {
 						System.out.print("You cannot purchase this element. It will be auctioned");
-						loading(3);
+						loading(3, true);
 						// don't break to allow auction case to be executed. This block shouldn't
 						// normally be executed
 					}
@@ -203,7 +205,7 @@ public class Game {
 					auctioned = true;
 					// so the user doesn't have to pay the winner
 					paid = true;
-					loading(3);
+					loading(3, true);
 				}
 				break;
 			case 6:
@@ -242,11 +244,13 @@ public class Game {
 	 * 
 	 * @param time the time to delay
 	 */
-	public static void loading(int time) {
+	public static void loading(int time, boolean withDots) {
 		try {
 			for (int i = 0; i <= time; i++) {
 				Thread.sleep(1000);
-				System.out.print(".");
+				if (withDots) {
+					System.out.print(".");
+				}
 			}
 		} catch (InterruptedException e) {
 			System.out.println("Thread error");
@@ -369,11 +373,11 @@ public class Game {
 				} else if (isAuctionable(ss, player) && !auctioned && rolled) {
 					System.out.printf("You are on %s but don't have enough resources to buy it.\nAuctioning element",
 							ss.getSquareName());
-					loading(5);
+					loading(5, true);
 					auctionSquare(scanner, players, ss, player);
 					auctioned = true;
 					paid = true;
-					loading(3);
+					loading(3, true);
 					clearScreen();
 					userStatus(player, landedSquare, true, true);
 				} else if (rolled) {
@@ -419,7 +423,7 @@ public class Game {
 						player.developElement(chosenSquare, dev);
 						valid = true;
 						System.out.printf("Developing %s with %d development(s)", chosenSquare.getSquareName(), dev);
-						loading(3);
+						loading(3, true);
 					} else {
 						break;
 					}
@@ -542,45 +546,47 @@ public class Game {
 	 */
 	public static void displayGameRules(Scanner scanner) {
 
-		System.out.println("RULES MENU:");
+		System.out.println("Rules\nEnter a number or # to return to the main menu.\n");
 		// initialise menu options
 		String[] rulesMenu = new String[5];
-		rulesMenu[0] = "ALL game rules\n\nOr, skip to...\n";
+		rulesMenu[0] = "All Game Rules";
 		rulesMenu[1] = "Just the Basics";
 		rulesMenu[2] = "Buying and Selling";
-		rulesMenu[3] = "Devlopment Rules";
+		rulesMenu[3] = "Development Rules";
 		rulesMenu[4] = "Ending the Game Rules";
 
 		// output menu
 		int counter = 1;
 		for (String ruleOptions : rulesMenu) {
-			System.out.println(counter++ + ". " + ruleOptions);
+			System.out.printf("%d. %s\n", counter++, ruleOptions);
 		}
 		System.out.println("Enter option");
-		clearScreen();
 
 		// instantiate arrayLists
 		ArrayList<String> systemNames = stringifyEnum(SystemName.class);
+
 		ArrayList<String> basicGameRules = new ArrayList<>();
 		ArrayList<String> buyingSellingRules = new ArrayList<>();
 		ArrayList<String> developmentRules = new ArrayList<>();
 		ArrayList<String> endingRules = new ArrayList<>();
 
 		// basic game structure rules
-		//TODO implement thisV somewhere
+		//TODO implement this somewhere
 //		basicGameRules.add("Roll dice to decide who goes first");
 		basicGameRules.add("Basic Game Rules:");
 		basicGameRules
-				.add("The aim is to help Nasa complete it's mission by fully developing all mission-critical Systems");
+				.add("The aim is to help NASA complete its mission by fully developing all mission-critical Systems");
 		basicGameRules.add("When it's your go, pick what you'd like to do from the menu.");
 		basicGameRules.add("e.g. Roll the dice to move along the board.");
+
 		// buying and selling
-		buyingSellingRules.add("Rules for Buying and Seliing:");
+		buyingSellingRules.add("Rules for Buying and Selling:");
 		buyingSellingRules.add("You'll each be allotted some Space Points(currency of the solar system) to start out.");
 		buyingSellingRules.add(
 				"Use your points to purchase a square that you land on or pay other players when you land on their square.");
 		buyingSellingRules
 				.add("If you don't want to buy the square you land on, it will be auctioned to the other players.");
+
 		// developing systems
 		developmentRules.add("Rules for Developing Systems:");
 		developmentRules.add("The board has 12 squares in total grouped into " + systemNames.size() + " systems: "
@@ -589,65 +595,39 @@ public class Game {
 		developmentRules.add("There's also bigger rewards should another player land on your square.");
 		developmentRules.add(
 				"Once you own a whole system, you can pay to add a development, but only if you can pass a mini-challenge first!");
+
 		// ending the game
 		endingRules.add("Rules for Ending the Game:");
 		endingRules.add("All systems must be developed to complete the mission and win the game.");
 		endingRules.add(
 				"Should any player go 'Bankrupt' by running out of Space Points, the game ends and the mission has failed.");
 
-		// instantiate iterators
-		Iterator<String> basicIter = basicGameRules.iterator();
-		Iterator<String> buySellIter = buyingSellingRules.iterator();
-		Iterator<String> devIter = developmentRules.iterator();
-		Iterator<String> endIter = endingRules.iterator();
-
 		// join separate arrayLists into one
-		List<String> combinedRuleSets = new ArrayList<String>();
-		combinedRuleSets.addAll(basicGameRules);
-		combinedRuleSets.addAll(buyingSellingRules);
-		combinedRuleSets.addAll(developmentRules);
-		combinedRuleSets.addAll(endingRules);
-		Iterator<String> combinedIter = combinedRuleSets.iterator();
+		List<String> combinedRuleSets = Stream.of(basicGameRules,
+				buyingSellingRules,
+				developmentRules,
+				endingRules).flatMap(Collection::stream).collect(Collectors.toList());
 
-		switch (scanIntInput(scanner, 1, 6, true)) {
-		case 1:
-			// output all rules
-			while (combinedIter.hasNext()) {
-				System.out.println(combinedIter.next());
-				loading(2);
-			}
-			break;
-		case 2:
-			// output basic rules only
-			while (basicIter.hasNext()) {
-				System.out.println(basicIter.next());
-				loading(2);
-				break;
-			}
-		case 3:
-			// output buying and selling rules only
-			while (buySellIter.hasNext()) {
-				System.out.println(buySellIter.next());
-				loading(2);
-			}
-			break;
-		case 4:
-			// output development rules only
-			while (devIter.hasNext()) {
-				System.out.println(devIter.next());
-				loading(2);
-			}
-			break;
-		case 5:
-			// output end of game rules only
-			while (endIter.hasNext()) {
-				System.out.println(endIter.next());
-				loading(2);
-			}
-			break;
-		default:
-		}
+		// create hashmap of user input and corresponding list 
+		HashMap<Integer, List<String>> getList = new HashMap<>();
+		getList.put(1, combinedRuleSets);
+		getList.put(2, basicGameRules);
+		getList.put(3, buyingSellingRules);
+		getList.put(4, developmentRules);
+		getList.put(5, endingRules);
+
+		int option = scanIntInput(scanner, 1, rulesMenu.length, true);
 		clearScreen();
+
+		if (option > 0) {
+			for (String s : getList.get(option)) {
+				System.out.print(s);
+				loading(2, false);
+			}
+			System.out.print("\nPress enter to return to main menu");
+			scanner.nextLine();
+			clearScreen();
+		}
 	}
 
 	/**
