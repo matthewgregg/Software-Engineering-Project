@@ -9,7 +9,8 @@ public class SystemSquare extends Square {
     private static final String INVALID_SYSTEM_NAME = "Invalid system name";
     private static final String MAX_DEVELOPMENT_REACHED = "Element fully developed";
 
-    private SystemName systemName;
+    private SystemName systemNameEnum;
+    private String systemNameString;
     private int systemType;
     private int minigameDifficulty;
     private int baseCost;
@@ -35,7 +36,7 @@ public class SystemSquare extends Square {
                         int costPerDevelopment,
                         int[] landingCost) throws IllegalArgumentException {
         super(squareName, position, message);
-        this.systemName = systemName;
+        setSystemName(systemName);
         this.minigameDifficulty = minigameDifficulty;
         this.baseCost = baseCost;
         this.costPerDevelopment = costPerDevelopment;
@@ -48,15 +49,20 @@ public class SystemSquare extends Square {
     /**
      * @return the systemName
      */
-    public SystemName getSystemName() {
-        return systemName;
+    public String getSystemNameString() {
+        return systemNameString;
+    }
+
+    public SystemName getSystemNameEnum() {
+        return systemNameEnum;
     }
 
     /**
-     * @param systemName the systemName to set
+     * @param systemNameString the systemName to set
      */
-    public void setSystemName(SystemName systemName) {
-        this.systemName = systemName;
+    public void setSystemName(SystemName systemNameString) {
+        this.systemNameEnum = systemNameString;
+        this.systemNameString = SetupGame.stringifyEnum(systemNameString);
     }
 
     /**
@@ -70,7 +76,7 @@ public class SystemSquare extends Square {
      * sets the system type
      */
     public void setSystemType() throws IllegalArgumentException {
-        switch (systemName) {
+        switch (systemNameEnum) {
             case SYSTEM_NAME_1:
             case SYSTEM_NAME_4:
                 this.systemType = 2; break;

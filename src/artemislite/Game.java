@@ -401,7 +401,7 @@ public class Game {
 		ArrayList<SystemName> systems = player.getCompletedSystems();
 
 		//remove incomplete systems using predicate
-		squares.removeIf(s -> !systems.contains(s.getSystemName()));
+		squares.removeIf(s -> !systems.contains(s.getSystemNameString()));
 
 		System.out.printf("You have %d units\n", player.getPlayerResources());
 		System.out.println("Please enter a square to develop. Type # to cancel.");

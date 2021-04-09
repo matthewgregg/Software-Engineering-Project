@@ -217,24 +217,32 @@ public class SetupGame {
 	 * @param en the enum class to be stringified
 	 * @return array of stringified enums
 	 */
-	public <E extends Enum<E>> ArrayList<String> stringifyEnum(Class<E> en) {
-
+	public static <E extends Enum<E>> ArrayList<String> stringifyEnum(Class<E> en) {
 		EnumSet<E> enums = EnumSet.allOf(en);
 		ArrayList<String> strEnums = new ArrayList<>();
 		StringBuilder str = new StringBuilder();
 		//enums.iterator().forEachRemaining(str::append);
 
 		for (E e : enums) {
-			String[] words = e.name().toLowerCase().split("_");
-			StringBuilder formattedWords = new StringBuilder();
-
-			for (String w : words) {
-				String first = w.substring(0, 1);
-				String next = w.substring(1);
-				formattedWords.append(first.toUpperCase()).append(next.toLowerCase()).append(" ");
-			}
-			strEnums.add(formattedWords.toString().trim());
+			strEnums.add(stringifyEnum(e));
 		}
 		return strEnums;
+	}
+
+	/**
+	 *
+	 * @param en the enum to be stringified
+	 * @return the enum as a user friendly string
+	 */
+	public static <E extends Enum<E>> String stringifyEnum(E en) {
+		String[] words = en.name().toLowerCase().split("_");
+		StringBuilder formattedWords = new StringBuilder();
+
+		for (String w : words) {
+			String first = w.substring(0, 1);
+			String next = w.substring(1);
+			formattedWords.append(first.toUpperCase()).append(next.toLowerCase()).append(" ");
+		}
+		return formattedWords.toString().trim();
 	}
 }
