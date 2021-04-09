@@ -546,7 +546,7 @@ public class Game {
 	 */
 	public static void displayGameRules(Scanner scanner) {
 
-		System.out.println("Rulebook\nEnter a number or # to return to the main menu.\n");
+		System.out.println("Rules\nEnter a number or # to return to the main menu.\n");
 		// initialise menu options
 		String[] rulesMenu = new String[5];
 		rulesMenu[0] = "All Game Rules";
@@ -575,12 +575,12 @@ public class Game {
 //		basicGameRules.add("Roll dice to decide who goes first");
 		basicGameRules.add("Basic Game Rules:");
 		basicGameRules
-				.add("The aim is to help Nasa complete it's mission by fully developing all mission-critical Systems");
+				.add("The aim is to help NASA complete its mission by fully developing all mission-critical Systems");
 		basicGameRules.add("When it's your go, pick what you'd like to do from the menu.");
 		basicGameRules.add("e.g. Roll the dice to move along the board.");
 
 		// buying and selling
-		buyingSellingRules.add("Rules for Buying and Seliing:");
+		buyingSellingRules.add("Rules for Buying and Selling:");
 		buyingSellingRules.add("You'll each be allotted some Space Points(currency of the solar system) to start out.");
 		buyingSellingRules.add(
 				"Use your points to purchase a square that you land on or pay other players when you land on their square.");
@@ -621,10 +621,10 @@ public class Game {
 
 		if (option > 0) {
 			for (String s : getList.get(option)) {
-				System.out.println(s);
-				loading(3, false);
+				System.out.print(s);
+				loading(2, false);
 			}
-			System.out.print("Press enter to return to main menu");
+			System.out.print("\nPress enter to return to main menu");
 			scanner.nextLine();
 			clearScreen();
 		}
