@@ -198,7 +198,7 @@ public class SetupGame {
 			// System.out.println(systemNames.toString());
 			System.out.println(
 					"Systems and their squares get more expensive the further you are along the board...\n"
-					+ "...but there's also bigger rewards should another player land on your square.​\n"
+					+ "...but there's also bigger rewards should another player land on your square.\n"
 							+ "Once you own a whole system, you can pay to add a development.\n");
 			Thread.sleep(6000);
 			System.out.println("All systems must be developed to complete the mission and win the game.\n"
