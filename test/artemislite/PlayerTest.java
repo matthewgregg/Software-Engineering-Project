@@ -8,10 +8,10 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerTest {
-    SystemName systemName1 = SystemName.SYSTEM_NAME_1;
-    SystemName systemName2 = SystemName.SYSTEM_NAME_2;
-    SystemName systemName3 = SystemName.SYSTEM_NAME_3;
-    SystemName systemName4 = SystemName.SYSTEM_NAME_4;
+    SystemName systemName1 = SystemName.GATEWAY_AND_LUNAR_LANDER;
+    SystemName systemName2 = SystemName.ORION_SPACECRAFT;
+    SystemName systemName3 = SystemName.SPACE_LAUNCH_CONTROL;
+    SystemName systemName4 = SystemName.EXPLORATION_GROUND_COMPLEX;
     int[] devCost = new int[]{0,0,0,0,0};
     int baseCost = 0;
     int costPerDev = 0;
@@ -134,7 +134,7 @@ class PlayerTest {
         //test for player with no squares
         assertNull(player.getCompletedSystems());
 
-        //test for player with single square
+        //test for player with one square
         player.purchaseSquare(ss1);
         assertNull(player.getCompletedSystems());
 
@@ -146,13 +146,16 @@ class PlayerTest {
         player.purchaseSquare(ss6);
         assertNull(player.getCompletedSystems());
 
-        //single square of each type
+        //four squares (single square of each type)
         player.purchaseSquare(ss9);
         assertNull(player.getCompletedSystems());
 
-        //test for player with one less than complete system
+        //tests for player with one less than complete system
+        //five squares
         player.purchaseSquare(ss4);
         assertNull(player.getCompletedSystems());
+
+        //six squares
         player.purchaseSquare(ss7);
         assertNull(player.getCompletedSystems());
     }
