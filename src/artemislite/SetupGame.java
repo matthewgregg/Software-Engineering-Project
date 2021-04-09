@@ -76,9 +76,9 @@ public class SetupGame {
 
 	public static ArrayList<Square> setupBoard() {
 		ArrayList<Square> squares = new ArrayList<>();
-		Square sq1 = new Square("Go", 0, "Pass Go, Collect 200! or something ...");
+		Square sq1 = new Square("Mission Control", 0, "Pass Go, Collect 200! or something ...");
 
-		SystemSquare ss1 = new SystemSquare("Square 1",
+		SystemSquare ss1 = new SystemSquare("Moon Gateway Station",
 				1,
 				"System 1",
 				SystemName.GATEWAY_AND_LUNAR_LANDER,
@@ -87,7 +87,7 @@ public class SetupGame {
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
-		SystemSquare ss2 = new SystemSquare("Square 2",
+		SystemSquare ss2 = new SystemSquare("Lunar Payload Services",
 				2,
 				"System 1",
 				SystemName.GATEWAY_AND_LUNAR_LANDER,
@@ -96,7 +96,7 @@ public class SetupGame {
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
-		SystemSquare ss3 = new SystemSquare("Square 3",
+		SystemSquare ss3 = new SystemSquare("Onward to Lunar Surface",
 				3,
 				"System 1",
 				SystemName.ORION_SPACECRAFT,
@@ -105,7 +105,7 @@ public class SetupGame {
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
-		SystemSquare ss4 = new SystemSquare("Square 4",
+		SystemSquare ss4 = new SystemSquare("Navigation Control",
 				4,
 				"System 1",
 				SystemName.ORION_SPACECRAFT,
@@ -114,7 +114,7 @@ public class SetupGame {
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
-		SystemSquare ss5 = new SystemSquare("Square 5",
+		SystemSquare ss5 = new SystemSquare("Abort Launch",
 				5,
 				"System 1",
 				SystemName.ORION_SPACECRAFT,
@@ -125,7 +125,7 @@ public class SetupGame {
 
 		Square sq2 = new Square("Nothing", 6, "Missed launch window");
 
-		SystemSquare ss6 = new SystemSquare("Square 6",
+		SystemSquare ss6 = new SystemSquare("Core Stage Depleted",
 				7,
 				"System 1",
 				SystemName.SPACE_LAUNCH_CONTROL,
@@ -134,7 +134,7 @@ public class SetupGame {
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
-		SystemSquare ss7 = new SystemSquare("Square 7",
+		SystemSquare ss7 = new SystemSquare("Spun Stage",
 				8,
 				"System 1",
 				SystemName.SPACE_LAUNCH_CONTROL,
@@ -143,7 +143,7 @@ public class SetupGame {
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
-		SystemSquare ss8 = new SystemSquare("Square 8",
+		SystemSquare ss8 = new SystemSquare("SLS Booster Testing",
 				9,
 				"System 1",
 				SystemName.SPACE_LAUNCH_CONTROL,
@@ -152,7 +152,7 @@ public class SetupGame {
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
-		SystemSquare ss9 = new SystemSquare("Square 9",
+		SystemSquare ss9 = new SystemSquare("Astronaut Training",
 				10,
 				"System 1",
 				SystemName.EXPLORATION_GROUND_COMPLEX,
@@ -161,7 +161,7 @@ public class SetupGame {
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
-		SystemSquare ss10 = new SystemSquare("Square 10",
+		SystemSquare ss10 = new SystemSquare("Launch Facilities Upgrades",
 				11,
 				"System 1",
 				SystemName.EXPLORATION_GROUND_COMPLEX,
@@ -169,6 +169,8 @@ public class SetupGame {
 				300,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
+		
+	
 
 		Collections.addAll(squares, sq1, ss1, ss2, ss3, ss4, ss5, sq2, ss6, ss7, ss8, ss9, ss10);
 		squares.sort(new ComparePosition());
