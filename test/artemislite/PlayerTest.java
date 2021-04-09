@@ -8,10 +8,10 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerTest {
-    SystemName systemName1 = SystemName.GATEWAY_AND_LUNAR_LANDER;
+    SystemName systemName1 = SystemName.EXPLORATION_GROUND_SYSTEM;
     SystemName systemName2 = SystemName.ORION_SPACECRAFT;
-    SystemName systemName3 = SystemName.SPACE_LAUNCH_CONTROL;
-    SystemName systemName4 = SystemName.EXPLORATION_GROUND_COMPLEX;
+    SystemName systemName3 = SystemName.GATEWAY_OUTPOST;
+    SystemName systemName4 = SystemName.LUNAR_LANDER;
     int[] devCost = new int[]{0,0,0,0,0};
     int baseCost = 0;
     int costPerDev = 0;

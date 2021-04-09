@@ -77,11 +77,11 @@ public class SystemSquare extends Square {
      */
     public void setSystemType() throws IllegalArgumentException {
         switch (systemNameEnum) {
-            case GATEWAY_AND_LUNAR_LANDER:
-            case EXPLORATION_GROUND_COMPLEX:
+            case EXPLORATION_GROUND_SYSTEM:
+            case LUNAR_LANDER:
                 this.systemType = 2; break;
             case ORION_SPACECRAFT:
-            case SPACE_LAUNCH_CONTROL:
+            case GATEWAY_OUTPOST:
                 this.systemType = 3; break;
             default: throw new IllegalArgumentException(INVALID_SYSTEM_NAME);
         }

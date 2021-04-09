@@ -75,13 +75,13 @@ public class Player extends Actor {
         if (this.playerID >= MIN_PLAYER_ID && this.playerID <= MAX_PLAYER_ID) {
             switch(this.playerID) {
                 case 1:
-                    return "One";
+                    return "Commander";
                 case 2:
-                    return "Two";
+                    return "Command Module Pilot";
                 case 3:
-                    return "Three";
+                    return "Lunar Module Pilot";
                 case 4:
-                    return "Four";
+                    return "Docking Module Pilot";
             }
         } else {
             throw new IllegalArgumentException(INVALID_PLAYER_ID);
