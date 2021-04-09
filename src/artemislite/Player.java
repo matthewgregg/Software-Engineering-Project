@@ -1,6 +1,5 @@
 package artemislite;
 
-import javax.naming.ConfigurationException;
 import javax.naming.InvalidNameException;
 import java.util.*;
 
@@ -108,8 +107,14 @@ public class Player extends Actor {
      * @param square the square to be developed
      */
     public void developElement(SystemSquare square, int devIncrease) throws IllegalArgumentException, IndexOutOfBoundsException {
-        this.addResources(-devIncrease * square.getCostPerDevelopment());
-        square.setDevelopment(devIncrease+square.getDevelopment());
+        try {
+            this.addResources(-devIncrease * square.getCostPerDevelopment());
+            square.setDevelopment(devIncrease+square.getDevelopment());
+        } catch (IllegalArgumentException e) {
+            //undo payment
+            this.addResources(devIncrease * square.getCostPerDevelopment());
+            throw new IllegalArgumentException();
+        }
         //TODO the player still pays even if an exception is thrown (if the development is greater than max), because the exception occurs after the line is executed
     }
 
@@ -150,7 +155,7 @@ public class Player extends Actor {
 
         for (int i = 0; i < getOwnedElements().size(); i++) {
             int squaresInSys = getOwnedElements().get(i).getSystemType();
-            SystemName initSys = getOwnedElements().get(i).getSystemName();
+            SystemName initSys = getOwnedElements().get(i).getSystemNameEnum();
             ownedSystems.add(initSys);
 
             //this is 1 larger than the number of squares to check
@@ -163,7 +168,7 @@ public class Player extends Actor {
             }
 
             for (int j = i + 1; j < squaresToCheckLimit; j++) {
-                SystemName sys = getOwnedElements().get(j).getSystemName();
+                SystemName sys = getOwnedElements().get(j).getSystemNameEnum();
                 if (sys.equals(initSys)) {
                     i++;
                 } else {
