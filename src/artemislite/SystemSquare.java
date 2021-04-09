@@ -62,7 +62,7 @@ public class SystemSquare extends Square {
      */
     public void setSystemName(SystemName systemNameString) {
         this.systemNameEnum = systemNameString;
-        this.systemNameString = SetupGame.stringifyEnum(systemNameString);
+        this.systemNameString = Game.stringifyEnum(systemNameString);
     }
 
     /**
