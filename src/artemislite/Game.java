@@ -41,6 +41,7 @@ public class Game {
 
 		System.out.print(welcomeMessage(players));
 		loading(5);
+		System.out.println();
 		int playerCount = 0;
 		do {
 			playerCount++;
@@ -51,10 +52,10 @@ public class Game {
 			try {
 				quitGame = !generateOptionsMenu(scanner, player);
 			} catch (IndexOutOfBoundsException e) {
-				//player went bankrupt
+				// player went bankrupt
 				quitGame = true;
 			}
-			//reset global vars on new turn
+			// reset global vars on new turn
 			paid = false;
 			auctioned = false;
 		} while (!isGameOver && !quitGame);
@@ -103,40 +104,43 @@ public class Game {
 			Square landedSquare = unownedSquares.get(player.getPosition());
 			SystemSquare ss = userStatus(player, landedSquare, onSysSq, rolled);
 
-			System.out.println("Menu");
+			System.out.println("\nMENU");
 
 			// load options menu, with some skipped
 			for (int i = 0; i < allMenu.length; i++) {
-				//skip roll dice
+				// skip roll dice
 				if (i == 2 && rolled) {
 					continue;
 				}
-				//skip purchase, auction, develop, finish turn
+				// skip purchase, auction, develop, finish turn
 				if (i > 2 && i < 7 && !rolled) {
 					continue;
 				}
-				//skip roll dice, purchase, auction, develop
+				// skip roll dice, purchase, auction, develop
 				if (i > 2 && i < 5 && (landedSquare == null || !onSysSq)) {
 					continue;
 				}
-				//skip purchase
-				if (i == 3 && ss!=null && (player.getPlayerResources() < ss.getBaseCost())) {
+				// skip purchase
+				if (i == 3 && ss != null && (player.getPlayerResources() < ss.getBaseCost())) {
 					continue;
 				}
-				//skip auction
-				if (i == 4 && ss!=null && (auctioned || !isAuctionable(ss, player))) {
+				// skip auction
+				if (i == 4 && ss != null && (auctioned || !isAuctionable(ss, player))) {
 					continue;
 				}
-				//skip develop
+				// skip develop
 				if (i == 5 && (player.getOwnedElements().size() == 0
 						|| player.getMinimumOwnedDevCost() > player.getPlayerResources()
 						|| player.getCompletedSystems() == null)) {
 					continue;
 				}
-				//skip finish turn
-				//if user is on a unowned system square and has enough resources and haven't purchased it yet, and the square is auctionable
+				// skip finish turn
+				// if user is on a unowned system square and has enough resources and haven't
+				// purchased it yet, and the square is auctionable
 				// and the auction hasn't occurred yet
-				if (i == 6 && onSysSq && landedSquare != null && ss!=null && player.getPlayerResources() >= ss.getBaseCost() && !purchased && isAuctionable(ss, player) && !auctioned) {
+				if (i == 6 && onSysSq && landedSquare != null && ss != null
+						&& player.getPlayerResources() >= ss.getBaseCost() && !purchased && isAuctionable(ss, player)
+						&& !auctioned) {
 					continue;
 				}
 				menuNum++;
@@ -150,72 +154,72 @@ public class Game {
 			clearScreen();
 			// output options menu
 			switch (menuOptions.get(userOption)) {
-				case 1:
-					displayGameRules(scanner);
-					break;
-				case 2:
-					// display which elements are owned by who
-					displayBoardState();
-					loading(5);
-					break;
-				case 3:
-					// roll dice and move player
-					rolled = true;
-					int[] roll = rollDice();
-					System.out.printf("You rolled a %d and a %d.\nMoving %d spaces", roll[0], roll[1], roll[0] + roll[1]);
+			case 1:
+				displayGameRules(scanner);
+				break;
+			case 2:
+				// display which elements are owned by who
+				displayBoardState();
+				loading(5);
+				break;
+			case 3:
+				// roll dice and move player
+				rolled = true;
+				int[] roll = rollDice();
+				System.out.printf("You rolled a %d and a %d.\nMoving %d spaces", roll[0], roll[1], roll[0] + roll[1]);
+				loading(3);
+				try {
+					player.updatePosition(roll[0] + roll[1]);
+					// TODO sometimes exception occurs as the player is moved to a position > 11
+					// possibly fixed
+				} catch (IndexOutOfBoundsException e) {
+					System.out.print("You passed Go! Updating resources");
+					player.addResources(GO_RESOURCES);
 					loading(3);
+				}
+				break;
+			case 4:
+				// purchase unowned square
+				if (ss != null) {
 					try {
-						player.updatePosition(roll[0] + roll[1]);
-						//TODO sometimes exception occurs as the player is moved to a position > 11
-						// possibly fixed
+						player.purchaseSquare(ss);
+						// replace square with null
+						unownedSquares.set(player.getPosition(), null);
+						System.out.print("Purchasing " + ss.getSquareName());
+						purchased = true;
+						loading(3);
+						break;
 					} catch (IndexOutOfBoundsException e) {
-						System.out.print("You passed Go! Updating resources");
-						player.addResources(GO_RESOURCES);
+						System.out.print("You cannot purchase this element. It will be auctioned");
 						loading(3);
+						// don't break to allow auction case to be executed. This block shouldn't
+						// normally be executed
 					}
-					break;
-				case 4:
-					// purchase unowned square
-					if (ss != null) {
-						try {
-							player.purchaseSquare(ss);
-							// replace square with null
-							unownedSquares.set(player.getPosition(), null);
-							System.out.print("Purchasing " + ss.getSquareName());
-							purchased = true;
-							loading(3);
-							break;
-						} catch (IndexOutOfBoundsException e) {
-							System.out.print("You cannot purchase this element. It will be auctioned");
-							loading(3);
-							// don't break to allow auction case to be executed. This block shouldn't
-							// normally be executed
-						}
-					}
-				case 5:
-					// auction unowned square
-					if (ss != null) {
-						auctionSquare(scanner, players, ss, player);
-						auctioned = true;
-						// so the user doesn't have to pay the winner
-						paid = true;
-						loading(3);
-					}
-					break;
-				case 6:
-					// develop player's square
-					developMenu(scanner, player);
-					break;
-				case 7:
-					// end turn
-					turnFinished = true;
-					break;
-				case 8:
-					// quit game
-					clearScreen();
-					break;
-				default:
-					break;
+				}
+			case 5:
+				// auction unowned square
+				if (ss != null) {
+					auctionSquare(scanner, players, ss, player);
+					auctioned = true;
+					// so the user doesn't have to pay the winner
+					paid = true;
+					loading(3);
+				}
+				break;
+			case 6:
+				// develop player's square
+				developMenu(scanner, player);
+				break;
+			case 7:
+				// end turn
+				turnFinished = true;
+				break;
+			case 8:
+				// quit game
+				clearScreen();
+				break;
+			default:
+				break;
 			}
 		} while (!turnFinished && userOption != menuNum);
 		return turnFinished;
@@ -267,10 +271,8 @@ public class Game {
 			}
 		}
 		welcome.insert(0, "Welcome to ArtemisLite, ");
-		welcome.append(
-				". \nThis virtual board game is inspired by Nasa's real life Artemis Mission...\n"
-				+ "You can help send the first woman and next man to the moon.\n\n"
-				+ "After that, next stop Mars");
+		welcome.append(". \nThis virtual board game is inspired by Nasa's real life Artemis Mission...\n"
+				+ "You can help send the first woman and next man to the moon.\n\n" + "After that, next stop Mars");
 		return welcome;
 	}
 
@@ -322,12 +324,14 @@ public class Game {
 
 	/**
 	 * prints user message
- 	 * @param player the player
+	 * 
+	 * @param player       the player
 	 * @param landedSquare the square they've landed on
-	 * @param onSysSq whether the user is on a system square or not
+	 * @param onSysSq      whether the user is on a system square or not
 	 * @return systemsquare if the square is a system square
 	 */
-	public static SystemSquare userStatus(Player player, Square landedSquare, boolean onSysSq, boolean rolled) throws IndexOutOfBoundsException {
+	public static SystemSquare userStatus(Player player, Square landedSquare, boolean onSysSq, boolean rolled)
+			throws IndexOutOfBoundsException {
 		System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
 
 		// decide if square landed on is owned by current player or another player
@@ -361,7 +365,7 @@ public class Game {
 					if (rolled) {
 						string += " You can buy it for " + ss.getBaseCost() + " units.";
 					}
-					System.out.print(string+"\n");
+					System.out.print(string + "\n");
 				} else if (isAuctionable(ss, player) && !auctioned && rolled) {
 					System.out.printf("You are on %s but don't have enough resources to buy it.\nAuctioning element",
 							ss.getSquareName());
@@ -373,11 +377,9 @@ public class Game {
 					clearScreen();
 					userStatus(player, landedSquare, true, true);
 				} else if (rolled) {
-					System.out.printf("You are on %s but don't have enough resources to buy it.\n",
-							ss.getSquareName());
+					System.out.printf("You are on %s but don't have enough resources to buy it.\n", ss.getSquareName());
 				} else {
-					System.out.printf("You are on %s.\n",
-							ss.getSquareName());
+					System.out.printf("You are on %s.\n", ss.getSquareName());
 				}
 				return ss;
 			}
@@ -395,7 +397,7 @@ public class Game {
 		ArrayList<SystemSquare> squares = player.getOwnedElements();
 		ArrayList<SystemName> systems = player.getCompletedSystems();
 
-		//remove incomplete systems using predicate
+		// remove incomplete systems using predicate
 		squares.removeIf(s -> !systems.contains(s.getSystemNameEnum()));
 
 		System.out.printf("You have %d units\n", player.getPlayerResources());
@@ -463,7 +465,8 @@ public class Game {
 
 	/**
 	 * Auctions a square to other players
-	 *  @param players all players
+	 * 
+	 * @param players all players
 	 * @param square  the square to auction
 	 */
 	public static void auctionSquare(Scanner scanner, List<Player> players, SystemSquare square, Player player) {
@@ -533,43 +536,118 @@ public class Game {
 	}
 
 	/**
-	 * displays the game rules
+	 * Outputs game rules as requested by user via an options menu
+	 * 
+	 * @param scanner
 	 */
 	public static void displayGameRules(Scanner scanner) {
-		ArrayList<String> systemNames = stringifyEnum(SystemName.class);
-		System.out.println(Arrays.toString(systemNames.toArray()));
-/*
-		System.out.println("OK Space Cadets, let's firstly outline the rules before we get started.");
-		try {
-			Thread.sleep(2000);
-			System.out.println("You'll firstly roll dice to decide who goes first");
-			Thread.sleep(2000);
-			System.out.println(
-					"When it's your go, pick what you'd like to do from the menu.\n e.g. Roll the dice to move along the board.\n");
-			Thread.sleep(4000);
-			System.out.println("You'll each be allotted some Space Points(currency of the solar system) to start out.\n"
-					+ "Use your points to purchase a square that you land on or pay other players when you land on their square.\n"
-					+ "If you don't want to buy the square you land on, it will be auctioned to the other players.\n");
-			Thread.sleep(10000);
-			// TODO alter magic number 4
-			System.out.println("The board has 12 squares in total grouped into 4 systems.");
-			Thread.sleep(2000);
-			// TODO dynamically print system names... Use iterator?
-			// System.out.println(systemNames.toString());
-			System.out.println(
-					"Systems and their squares get more expensive the further you are along the board...\n"
-					+ "...but there's also bigger rewards should another player land on your square.\n"
-							+ "Once you own a whole system, you can pay to add a development.\n");
-			Thread.sleep(6000);
-			System.out.println("All systems must be developed to complete the mission and win the game.\n"
-					+ "Should any player go 'Bankrupt' by running out of Space Points, the game ends and the mission has failed.\n");
-			Thread.sleep(6000);
-			// TODO Does this make sense? They're playing against each other and ALSO as a
-			// team...
-		} catch (InterruptedException e) {
-			System.out.println("Thread error");
+
+		System.out.println("RULES MENU:");
+		// initialise menu options
+		String[] rulesMenu = new String[5];
+		rulesMenu[0] = "ALL game rules\n\nOr, skip to...\n";
+		rulesMenu[1] = "Just the Basics";
+		rulesMenu[2] = "Buying and Selling";
+		rulesMenu[3] = "Devlopment Rules";
+		rulesMenu[4] = "Ending the Game Rules";
+
+		// output menu
+		int counter = 1;
+		for (String ruleOptions : rulesMenu) {
+			System.out.println(counter++ + ". " + ruleOptions);
 		}
-		*/
+		System.out.println("Enter option");
+		clearScreen();
+
+		// instantiate arrayLists
+		ArrayList<String> systemNames = stringifyEnum(SystemName.class);
+		ArrayList<String> basicGameRules = new ArrayList<>();
+		ArrayList<String> buyingSellingRules = new ArrayList<>();
+		ArrayList<String> developmentRules = new ArrayList<>();
+		ArrayList<String> endingRules = new ArrayList<>();
+
+		// basic game structure rules
+		//TODO implement thisV somewhere
+//		basicGameRules.add("Roll dice to decide who goes first");
+		basicGameRules.add("Basic Game Rules:");
+		basicGameRules
+				.add("The aim is to help Nasa complete it's mission by fully developing all mission-critical Systems");
+		basicGameRules.add("When it's your go, pick what you'd like to do from the menu.");
+		basicGameRules.add("e.g. Roll the dice to move along the board.");
+		// buying and selling
+		buyingSellingRules.add("Rules for Buying and Seliing:");
+		buyingSellingRules.add("You'll each be allotted some Space Points(currency of the solar system) to start out.");
+		buyingSellingRules.add(
+				"Use your points to purchase a square that you land on or pay other players when you land on their square.");
+		buyingSellingRules
+				.add("If you don't want to buy the square you land on, it will be auctioned to the other players.");
+		// developing systems
+		developmentRules.add("Rules for Developing Systems:");
+		developmentRules.add("The board has 12 squares in total grouped into " + systemNames.size() + " systems: "
+				+ Arrays.toString(systemNames.toArray()));
+		developmentRules.add("Systems and their squares get more expensive the further you are along the board...");
+		developmentRules.add("There's also bigger rewards should another player land on your square.");
+		developmentRules.add(
+				"Once you own a whole system, you can pay to add a development, but only if you can pass a mini-challenge first!");
+		// ending the game
+		endingRules.add("Rules for Ending the Game:");
+		endingRules.add("All systems must be developed to complete the mission and win the game.");
+		endingRules.add(
+				"Should any player go 'Bankrupt' by running out of Space Points, the game ends and the mission has failed.");
+
+		// instantiate iterators
+		Iterator<String> basicIter = basicGameRules.iterator();
+		Iterator<String> buySellIter = buyingSellingRules.iterator();
+		Iterator<String> devIter = developmentRules.iterator();
+		Iterator<String> endIter = endingRules.iterator();
+
+		// join separate arrayLists into one
+		List<String> combinedRuleSets = new ArrayList<String>();
+		combinedRuleSets.addAll(basicGameRules);
+		combinedRuleSets.addAll(buyingSellingRules);
+		combinedRuleSets.addAll(developmentRules);
+		combinedRuleSets.addAll(endingRules);
+		Iterator<String> combinedIter = combinedRuleSets.iterator();
+
+		switch (scanIntInput(scanner, 1, 6, true)) {
+		case 1:
+			// output all rules
+			while (combinedIter.hasNext()) {
+				System.out.println(combinedIter.next());
+				loading(2);
+			}
+			break;
+		case 2:
+			// output basic rules only
+			while (basicIter.hasNext()) {
+				System.out.println(basicIter.next());
+				loading(2);
+				break;
+			}
+		case 3:
+			// output buying and selling rules only
+			while (buySellIter.hasNext()) {
+				System.out.println(buySellIter.next());
+				loading(2);
+			}
+			break;
+		case 4:
+			// output development rules only
+			while (devIter.hasNext()) {
+				System.out.println(devIter.next());
+				loading(2);
+			}
+			break;
+		case 5:
+			// output end of game rules only
+			while (endIter.hasNext()) {
+				System.out.println(endIter.next());
+				loading(2);
+			}
+			break;
+		default:
+		}
+		clearScreen();
 	}
 
 	/**
@@ -604,7 +682,7 @@ public class Game {
 	/**
 	 * Determines if a square is to be auctioned
 	 * 
-	 * @param ss the system square
+	 * @param ss     the system square
 	 * @param player the current player
 	 * @return whether the square can be auctioned or not
 	 */
