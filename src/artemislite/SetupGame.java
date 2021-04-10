@@ -83,7 +83,7 @@ public class SetupGame {
 				"System 1",
 				SystemName.EXPLORATION_GROUND_SYSTEM,
 				2,
-				300,
+				80,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
@@ -92,7 +92,7 @@ public class SetupGame {
 				"System 1",
 				SystemName.EXPLORATION_GROUND_SYSTEM,
 				2,
-				300,
+				100,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
@@ -101,7 +101,7 @@ public class SetupGame {
 				"System 1",
 				SystemName.ORION_SPACECRAFT,
 				2,
-				300,
+				120,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
@@ -110,7 +110,7 @@ public class SetupGame {
 				"System 1",
 				SystemName.ORION_SPACECRAFT,
 				2,
-				300,
+				120,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
@@ -119,7 +119,7 @@ public class SetupGame {
 				"System 1",
 				SystemName.ORION_SPACECRAFT,
 				2,
-				300,
+				140,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
@@ -130,7 +130,7 @@ public class SetupGame {
 				"System 1",
 				SystemName.GATEWAY_OUTPOST,
 				2,
-				300,
+				160,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
@@ -139,7 +139,7 @@ public class SetupGame {
 				"System 1",
 				SystemName.GATEWAY_OUTPOST,
 				2,
-				300,
+				160,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
@@ -148,7 +148,7 @@ public class SetupGame {
 				"System 1",
 				SystemName.GATEWAY_OUTPOST,
 				2,
-				300,
+				180,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
@@ -157,7 +157,7 @@ public class SetupGame {
 				"System 1",
 				SystemName.LUNAR_LANDER,
 				2,
-				300,
+				200,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 
@@ -166,7 +166,7 @@ public class SetupGame {
 				"System 1",
 				SystemName.LUNAR_LANDER,
 				2,
-				300,
+				220,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
 		
