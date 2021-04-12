@@ -116,7 +116,7 @@ class PlayerTest {
 
     @Test
     void testGetCompletedSystemValid() throws InvalidNameException, BankruptcyException {
-        player = new Player(1, "Test Player");
+        player = new Player("Test Player");
         Collections.addAll(squares, ss1, ss2, ss3, ss4, ss5, ss6, ss7, ss8, ss9, ss10);
 
         for (SystemSquare ss : squares) {
@@ -132,7 +132,7 @@ class PlayerTest {
 
     @Test
     void testGetCompletedSystemInvalid() throws InvalidNameException, BankruptcyException {
-        player = new Player(1, "Test Player");
+        player = new Player("Test Player");
         Collections.addAll(squares, ss1, ss3, ss4, ss6, ss7, ss9);
 
         assertNull(player.getCompletedSystems());

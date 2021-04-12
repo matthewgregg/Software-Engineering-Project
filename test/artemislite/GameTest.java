@@ -14,9 +14,9 @@ import static java.lang.System.lineSeparator;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameTest {
-    Player player1 = new Player(1, "1");
-    Player player2 = new Player(2, "2");
-    Player player3 = new Player(3, "3");
+    Player player1 = new Player("1");
+    Player player2 = new Player("2");
+    Player player3 = new Player("3");
 
     ArrayList<Player> playerArr = new ArrayList<>();
 
