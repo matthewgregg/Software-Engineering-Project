@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import javax.naming.InvalidNameException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerTest {
@@ -107,12 +110,12 @@ class PlayerTest {
             costPerDev,
             devCost);
 
-    ArrayList<SystemSquare> squares = new ArrayList<>();
+    SortedSet<SystemSquare> squares = new TreeSet<>(new ComparePosition());
 
     Player player;
 
     @Test
-    void testGetCompletedSystemValid() throws InvalidNameException {
+    void testGetCompletedSystemValid() throws InvalidNameException, BankruptcyException {
         player = new Player(1, "Test Player");
         Collections.addAll(squares, ss1, ss2, ss3, ss4, ss5, ss6, ss7, ss8, ss9, ss10);
 
@@ -128,35 +131,31 @@ class PlayerTest {
     }
 
     @Test
-    void testGetCompletedSystemInvalid() throws InvalidNameException {
+    void testGetCompletedSystemInvalid() throws InvalidNameException, BankruptcyException {
         player = new Player(1, "Test Player");
+        Collections.addAll(squares, ss1, ss3, ss4, ss6, ss7, ss9);
 
-        //test for player with no squares
         assertNull(player.getCompletedSystems());
 
-        //test for player with one square
-        player.purchaseSquare(ss1);
-        assertNull(player.getCompletedSystems());
+        for (SystemSquare ss : squares) {
+            player.purchaseSquare(ss);
+            assertNull(player.getCompletedSystems());
+        }
 
-        //test for player with two squares
-        player.purchaseSquare(ss3);
-        assertNull(player.getCompletedSystems());
+        ArrayList<SystemSquare> squares2 = new ArrayList<>();
+        Collections.addAll(squares2, ss2, ss5, ss8, ss10);
+        squares.addAll(squares2);
 
-        //three squares
-        player.purchaseSquare(ss6);
-        assertNull(player.getCompletedSystems());
-
-        //four squares (single square of each type)
-        player.purchaseSquare(ss9);
-        assertNull(player.getCompletedSystems());
-
-        //tests for player with one less than complete system
-        //five squares
-        player.purchaseSquare(ss4);
-        assertNull(player.getCompletedSystems());
-
-        //six squares
-        player.purchaseSquare(ss7);
-        assertNull(player.getCompletedSystems());
+        for (SystemSquare ss : squares2) {
+            Player player2 = player;
+            player2.purchaseSquare(ss);
+            for (SystemSquare s : squares) {
+                s.setMortgaged(true);
+                assertNull(player2.getCompletedSystems());
+                if (!squares2.contains(s)) {
+                    s.setMortgaged(false);
+                }
+            }
+        }
     }
 }
