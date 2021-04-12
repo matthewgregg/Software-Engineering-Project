@@ -24,13 +24,14 @@ public class Game {
 	private static final Random rand = new Random();
 	// scanner cannot be closed and then reused
 	private static final Scanner scanner = new Scanner(System.in);
-	private static final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
+	private static List<Player> players;
 	private static final List<Square> squares = Collections.unmodifiableList(SetupGame.setupBoard());
 
 	public static void main(String[] args) {
 		clearScreen();
 		System.out.print(welcomeMessage());
 		loading(5, true);
+		players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
 
 		boolean quitGame = false;
 		boolean bankruptcy = false;

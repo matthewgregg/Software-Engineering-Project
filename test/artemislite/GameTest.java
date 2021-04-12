@@ -1,12 +1,13 @@
 package artemislite;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.naming.InvalidNameException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -55,8 +56,15 @@ class GameTest {
     GameTest() throws InvalidNameException {
     }
 
-    @Test
-    void testSellElementValid() throws BankruptcyException {
+    void testSellElementValid() throws BankruptcyException, IllegalAccessException, NoSuchFieldException {
+        ArrayList<Player> players = new ArrayList<>();
+        players.add(player1);
+        players.add(player2);
+
+        Field field = Game.class.getDeclaredField("players");
+        field.setAccessible(true);
+        field.set(Game.class, players);
+
         int cost = 100;
 
         InputStream inBackup = System.in;

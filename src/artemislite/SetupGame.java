@@ -8,10 +8,8 @@ import java.util.*;
  *
  */
 public class SetupGame {
-
 	private static final int MIN_PLAYERS = 2;
 	private static final int MAX_PLAYERS = 4;
-	private ArrayList<Square> squares;
 
 	public static List<Player> playerCreation(Scanner scanner) {
 

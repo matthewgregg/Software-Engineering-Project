@@ -3,10 +3,7 @@ package artemislite;
 import org.junit.jupiter.api.Test;
 
 import javax.naming.InvalidNameException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -142,19 +139,21 @@ class PlayerTest {
             assertNull(player.getCompletedSystems());
         }
 
-        ArrayList<SystemSquare> squares2 = new ArrayList<>();
-        Collections.addAll(squares2, ss2, ss5, ss8, ss10);
-        squares.addAll(squares2);
+        ArrayList<SystemSquare> finalSystemSquare = new ArrayList<>();
+        Collections.addAll(finalSystemSquare, ss2, ss5, ss8, ss10);
+        squares.addAll(finalSystemSquare);
 
-        for (SystemSquare ss : squares2) {
-            Player player2 = player;
+        Player player2 = null;
+        for (SystemSquare ss : finalSystemSquare) {
+            player2 = new Player("Player2");
             player2.purchaseSquare(ss);
+            assertNull(player2.getCompletedSystems());
             for (SystemSquare s : squares) {
+                player2.purchaseSquare(s);
                 s.setMortgaged(true);
+                //set the finalSystemSquare to mortgaged if it matches the square name in squares (ie system completed)
+                ss.setMortgaged(finalSystemSquare.stream().noneMatch(e -> e.getSquareName().equals(s.getSquareName())));
                 assertNull(player2.getCompletedSystems());
-                if (!squares2.contains(s)) {
-                    s.setMortgaged(false);
-                }
             }
         }
     }

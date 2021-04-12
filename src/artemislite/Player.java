@@ -176,20 +176,25 @@ public class Player extends Actor {
     public ArrayList<SystemName> getCompletedSystems() {
         //only allow unique values
         Set<SystemName> ownedSystems = new HashSet<>();
+        int size = getOwnedElements().size();
 
-        for (int i = 0; i < getOwnedElements().size(); i++) {
+        for (int i = 0; i < size; i++) {
             int squaresInSys = getOwnedElements().get(i).getSystemType();
             SystemSquare s = getOwnedElements().get(i);
             SystemName initSys = s.getSystemNameEnum();
             ownedSystems.add(initSys);
 
-            //this is 1 larger than the number of squares to check
+            //this is 1 position greater than the number of squares to check as the operator in the inner loop is <
             int squaresToCheckLimit = Math.min(i+squaresInSys, getOwnedElements().size());
 
             //skip check if single square or if there are fewer squares left to check than are in the system
-            if (getOwnedElements().size() == 1 || squaresInSys > getOwnedElements().size() - i || s.isMortgaged()) {
+            if (size == 1 || squaresInSys > size - i || s.isMortgaged()) {
                 ownedSystems.remove(initSys);
+                int tempsq = squaresToCheckLimit;
+                //end inner loop
                 squaresToCheckLimit = i + 1;
+                //skip outer loop to next system if mortgaged or to end if not
+                i = s.isMortgaged() ? tempsq : size;
             }
 
             for (int j = i + 1; j < squaresToCheckLimit; j++) {
