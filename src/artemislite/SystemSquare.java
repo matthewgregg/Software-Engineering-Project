@@ -19,6 +19,8 @@ public class SystemSquare extends Square {
     private boolean squareOwned;
     private int development;
     private int[] landingCost;
+    private boolean isMortgaged;
+    private boolean isOwned;
 
     /**
      * constructor with arguments
@@ -40,9 +42,11 @@ public class SystemSquare extends Square {
         this.minigameDifficulty = minigameDifficulty;
         this.baseCost = baseCost;
         this.costPerDevelopment = costPerDevelopment;
-        setLandingCost(landingCost);
         this.squareOwned = false;
         this.development = 0;
+        setLandingCost(landingCost);
+        this.isMortgaged = false;
+        this.isOwned = false;
         setSystemType();
     }
 
@@ -155,6 +159,17 @@ public class SystemSquare extends Square {
     }
 
     /**
+     * @param landingCost the landingCost to set
+     */
+    public void setLandingCost(int[] landingCost) throws IllegalArgumentException {
+        if (landingCost.length == MAX_DEVELOPMENT + 1) {
+            this.landingCost = landingCost;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    /**
      * @return the landingCost
      */
     public int getLandingCost() {
@@ -178,13 +193,30 @@ public class SystemSquare extends Square {
     }
 
     /**
-     * @param landingCost the landingCost to set
+     * @return the isMortgaged
      */
-    public void setLandingCost(int[] landingCost) throws IllegalArgumentException {
-        if (landingCost.length >= MIN_DEVELOPMENT && landingCost.length <= MAX_DEVELOPMENT + 1) {
-            this.landingCost = landingCost;
-        } else {
-            throw new IllegalArgumentException();
-        }
+    public boolean isMortgaged() {
+        return isMortgaged;
+    }
+
+    /**
+     * @param mortgaged the isMortgaged to set
+     */
+    public void setMortgaged(boolean mortgaged) {
+        isMortgaged = mortgaged;
+    }
+
+    /**
+     * @return the isOwned
+     */
+    public boolean isOwned() {
+        return isOwned;
+    }
+
+    /**
+     * @param owned the isOwned to set
+     */
+    public void setOwned(boolean owned) {
+        isOwned = owned;
     }
 }
