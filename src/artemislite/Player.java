@@ -22,13 +22,14 @@ public class Player extends Actor {
      */
     public Player(int playerID, String name) throws InvalidNameException {
         super(0);
-        if (name.equalsIgnoreCase("quit")) {
+        final String[] INVALID_NAMES = new String[]{"", "quit"};
+        if (Arrays.asList(INVALID_NAMES).contains(name)) {
             throw new InvalidNameException();
         } else {
             this.playerID = playerID;
+            this.name = name;
+            this.playerResources = 500;
         }
-        this.name = name;
-        this.playerResources = 500;
     }
     
     /**
@@ -93,12 +94,12 @@ public class Player extends Actor {
      * updates a player's resources
      * @param delta the change in resources
      */
-    public void addResources(int delta) throws IndexOutOfBoundsException {
+    public void addResources(int delta) throws BankruptcyException {
         int res = this.playerResources + delta;
         if (res >= 0) {
             setPlayerResources(this.playerResources + delta);
         } else {
-            throw new IndexOutOfBoundsException("You've gone bankrupt");
+            throw new BankruptcyException("You've gone bankrupt");
         }
     }
 
@@ -106,26 +107,50 @@ public class Player extends Actor {
      * develops a square
      * @param square the square to be developed
      */
-    public void developElement(SystemSquare square, int devIncrease) throws IllegalArgumentException, IndexOutOfBoundsException {
+    public void developElement(SystemSquare square, int devDelta) throws IllegalArgumentException, BankruptcyException {
         try {
-            this.addResources(-devIncrease * square.getCostPerDevelopment());
-            square.setDevelopment(devIncrease+square.getDevelopment());
+            this.addResources(devDelta * square.getCostPerDevelopment() * -1 * (int) (devDelta > 0 ? 1 : 0.5));
+            square.setDevelopment(devDelta+square.getDevelopment());
         } catch (IllegalArgumentException e) {
             //undo payment
-            this.addResources(devIncrease * square.getCostPerDevelopment());
+            this.addResources(devDelta * square.getCostPerDevelopment());
             throw new IllegalArgumentException();
         }
-        //TODO the player still pays even if an exception is thrown (if the development is greater than max), because the exception occurs after the line is executed
     }
 
     /**
      * purchases a square
      * @param square the square to be purchased
      */
-    public void purchaseSquare(SystemSquare square) throws IndexOutOfBoundsException {
+    public void purchaseSquare(SystemSquare square) throws BankruptcyException {
+        this.ownedElements.add(square);
+        square.setOwned(true);
+        //this.setPlayerResources(this.playerResources - square.getBaseCost());
+        if (!square.isMortgaged()) {
+            this.addResources(-1 * square.getBaseCost());
+        } else {
+            this.addResources((int) -1.1 * square.getBaseCost());
+            square.setMortgaged(false);
+        }
+    }
+
+    /**
+     * purchases a square
+     * @param square the square to be purchased
+     */
+    public void purchaseSquare(SystemSquare square, int cost) throws BankruptcyException {
         this.ownedElements.add(square);
         //this.setPlayerResources(this.playerResources - square.getBaseCost());
-        this.addResources(-1 * square.getBaseCost());
+        this.addResources(-1 * cost);
+    }
+
+    /**
+     * removes a square from a players collection
+     * @param square the square to remove
+     */
+    public void removeSquare(SystemSquare square) {
+        this.ownedElements.remove(square);
+        square.setOwned(false);
     }
 
     /**
@@ -155,21 +180,23 @@ public class Player extends Actor {
 
         for (int i = 0; i < getOwnedElements().size(); i++) {
             int squaresInSys = getOwnedElements().get(i).getSystemType();
-            SystemName initSys = getOwnedElements().get(i).getSystemNameEnum();
+            SystemSquare s = getOwnedElements().get(i);
+            SystemName initSys = s.getSystemNameEnum();
             ownedSystems.add(initSys);
 
             //this is 1 larger than the number of squares to check
             int squaresToCheckLimit = Math.min(i+squaresInSys, getOwnedElements().size());
 
             //skip check if single square or if there are fewer squares left to check than are in the system
-            if (getOwnedElements().size() == 1 || squaresInSys > getOwnedElements().size() - i) {
+            if (getOwnedElements().size() == 1 || squaresInSys > getOwnedElements().size() - i || s.isMortgaged()) {
                 ownedSystems.remove(initSys);
                 squaresToCheckLimit = i + 1;
             }
 
             for (int j = i + 1; j < squaresToCheckLimit; j++) {
-                SystemName sys = getOwnedElements().get(j).getSystemNameEnum();
-                if (sys.equals(initSys)) {
+                SystemSquare s2 = getOwnedElements().get(j);
+                SystemName sys = s2.getSystemNameEnum();
+                if (sys.equals(initSys) && !s2.isMortgaged()) {
                     i++;
                 } else {
                     ownedSystems.remove(initSys);
@@ -185,5 +212,31 @@ public class Player extends Actor {
         } else {
             return new ArrayList<>(ownedSystems);
         }
+    }
+
+    /**
+     * find out whether the user has any mortgagable elements
+     * @return whether the player has at least one element that can be mortgaged
+     */
+    public boolean hasMortgagableElements() {
+        for (SystemSquare s : this.getOwnedElements()) {
+            if (s.getDevelopment() == 0 && !s.isMortgaged()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * find out whether the user has any developments
+     * @return whether the player has at least one development
+     */
+    public boolean hasDevelopments() {
+        for (SystemSquare s : this.getOwnedElements()) {
+            if (s.getDevelopment() > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }
