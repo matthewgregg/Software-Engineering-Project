@@ -3,10 +3,8 @@ package artemislite;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.naming.InvalidNameException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -15,59 +13,60 @@ import static java.lang.System.lineSeparator;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameTest {
-    Player player1 = new Player("1");
-    Player player2 = new Player("2");
+    List<Player> players;
+    Player player1, player2;
+    SystemSquare ss1, ss2, ss3;
+    SystemName systemName1, systemName2;
+    int[] devCost;
+    int baseCost, costPerDev, difficulty;
 
-    SystemName systemName1 = SystemName.EXPLORATION_GROUND_SYSTEM;
-    SystemName systemName2 = SystemName.ORION_SPACECRAFT;
-    int[] devCost = new int[]{0,0,0,0,0};
-    int baseCost = 0;
-    int costPerDev = 0;
-    int difficulty = 0;
-
-    SystemSquare ss1 = new SystemSquare("Square 1",
-            1,
-            "System 1",
-            systemName1,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
-
-    SystemSquare ss2 = new SystemSquare("Square 2",
-            2,
-            "System 1",
-            systemName1,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
-
-    SystemSquare ss3 = new SystemSquare("Square 3",
-            3,
-            "System 1",
-            systemName2,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
-
-
-    GameTest() throws InvalidNameException {
-    }
-
-    void testSellElementValid() throws BankruptcyException, IllegalAccessException, NoSuchFieldException {
-        ArrayList<Player> players = new ArrayList<>();
+    @BeforeEach
+    void setUp() throws Exception {
+        players = new ArrayList<>();
+        player1 = new Player("Player 1");
+        player2 = new Player("Player 2");
         players.add(player1);
         players.add(player2);
 
-        Field field = Game.class.getDeclaredField("players");
-        field.setAccessible(true);
-        field.set(Game.class, players);
+        systemName1 = SystemName.EXPLORATION_GROUND_SYSTEM;
+        systemName2 = SystemName.ORION_SPACECRAFT;
+        devCost = new int[]{0, 0, 0, 0, 0};
+        baseCost = 0;
+        costPerDev = 0;
+        difficulty = 0;
 
+        ss1 = new SystemSquare("Square 1",
+                1,
+                "System 1",
+                systemName1,
+                difficulty,
+                baseCost,
+                costPerDev,
+                devCost);
+
+        ss2 = new SystemSquare("Square 2",
+                2,
+                "System 1",
+                systemName1,
+                difficulty,
+                baseCost,
+                costPerDev,
+                devCost);
+
+        ss3 = new SystemSquare("Square 3",
+                3,
+                "System 1",
+                systemName2,
+                difficulty,
+                baseCost,
+                costPerDev,
+                devCost);
+    }
+
+    @Test
+    void testSellElementValid() throws BankruptcyException {
         int cost = 100;
 
-        InputStream inBackup = System.in;
         ByteArrayInputStream inResources = new ByteArrayInputStream(("1" + lineSeparator() + "1" + lineSeparator() + "1" + lineSeparator() + cost + lineSeparator()).getBytes());
         System.setIn(inResources);
         Scanner scanner = new Scanner(inResources);
@@ -75,7 +74,7 @@ class GameTest {
 
         player1.purchaseSquare(ss1);
         player1.purchaseSquare(ss2);
-        Game.sellElement(scanner, player1);
+        Game.sellElement(scanner, player1, players);
         assertEquals(res + cost, player1.getPlayerResources());
         assertTrue(player2.getOwnedElements().contains(ss1));
 
@@ -83,12 +82,11 @@ class GameTest {
         System.setIn(inElement);
         scanner = new Scanner(inElement);
 
-        Game.sellElement(scanner, player2);
+        Game.sellElement(scanner, player2, players);
         assertTrue(player1.getOwnedElements().contains(ss1));
         assertFalse(player1.getOwnedElements().contains(ss2));
         assertTrue(player2.getOwnedElements().contains(ss2));
         assertFalse(player2.getOwnedElements().contains(ss1));
-        System.setIn(inBackup);
     }
 
     @Test

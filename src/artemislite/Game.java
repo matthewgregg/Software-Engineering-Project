@@ -23,15 +23,16 @@ public class Game {
 	private static final int GO_RESOURCES = 200;
 	private static final Random rand = new Random();
 	// scanner cannot be closed and then reused
-	private static final Scanner scanner = new Scanner(System.in);
-	private static List<Player> players;
+	public static Scanner scanner = new Scanner(System.in);
 	private static final List<Square> squares = Collections.unmodifiableList(SetupGame.setupBoard());
 
 	public static void main(String[] args) {
 		clearScreen();
-		System.out.print(welcomeMessage());
+
+		final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
+
+		System.out.print(welcomeMessage(players));
 		loading(5, true);
-		players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
 
 		boolean quitGame = false;
 		boolean bankruptcy = false;
@@ -44,7 +45,7 @@ public class Game {
 			}
 			Player player = players.get(playerCount - 1);
 			try {
-				quitGame = !generateOptionsMenu(scanner, player);
+				quitGame = !generateOptionsMenu(scanner, player, players);
 			} catch (BankruptcyException e) {
 				// player went bankrupt
 				bankruptcy = true;
@@ -71,7 +72,7 @@ public class Game {
 	 * @return a boolean for whether the user finished their turn or not. If false,
 	 *         the player quit the game. If true, the player finished their turn
 	 */
-	public static boolean generateOptionsMenu(Scanner scanner, Player player) throws BankruptcyException {
+	public static boolean generateOptionsMenu(Scanner scanner, Player player, final List<Player> players) throws BankruptcyException {
 		// local vars
 		int userOption;
 		boolean turnFinished = false;
@@ -100,7 +101,7 @@ public class Game {
 			clearScreen();
 
 			Square landedSquare = squares.get(player.getPosition());
-			Triplet<SystemSquare, Boolean, Boolean> triplet = generateSquareStatus(player, landedSquare, rolled, paid, auctioned);
+			Triplet<SystemSquare, Boolean, Boolean> triplet = generateSquareStatus(player, landedSquare, players, rolled, paid, auctioned);
 			SystemSquare ss = triplet.getFirst();
 			paid = triplet.getSecond();
 			auctioned = triplet.getThird();
@@ -126,7 +127,7 @@ public class Game {
 					continue;
 				}
 				// skip auction
-				if (i == 4 && ss != null && (auctioned || !isAuctionable(ss, player))) {
+				if (i == 4 && ss != null && (auctioned || !isAuctionable(ss, player, players))) {
 					continue;
 				}
 				// skip develop
@@ -148,7 +149,7 @@ public class Game {
 				// purchased it yet, and the square is auctionable
 				// and the auction hasn't occurred yet
 				if (i == 8 && ss != null && !ss.isOwned()
-						&& player.getPlayerResources() >= ss.getBaseCost() && !purchased && isAuctionable(ss, player)
+						&& player.getPlayerResources() >= ss.getBaseCost() && !purchased && isAuctionable(ss, player, players)
 						&& !auctioned) {
 					continue;
 				}
@@ -168,7 +169,7 @@ public class Game {
 				break;
 			case 2:
 				// display which elements are owned by who
-				displayBoardState();
+				displayBoardState(players);
 				loading(5, true);
 				break;
 			case 3:
@@ -196,7 +197,7 @@ public class Game {
 			case 5:
 				// auction unowned square
 				assert ss != null;
-				auctionSquare(scanner, ss, player);
+				auctionSquare(scanner, ss, player, players);
 				auctioned = true;
 				// so the user doesn't have to pay the winner
 				paid = true;
@@ -262,16 +263,13 @@ public class Game {
 	 *
 	 * @return the message
 	 */
-	public static StringBuilder welcomeMessage() {
+	public static StringBuilder welcomeMessage(final List<Player> players) {
 		StringBuilder welcome = new StringBuilder("Welcome to ArtemisLite, ");
 		welcome.append(players.stream().limit(players.size() - 1).map(Player::getName).collect(Collectors.joining(", ")));
 		welcome.append(" and ").append(players.get(players.size() - 1).getName());
-		welcome.append("""
-				.\s
-				This virtual board game is inspired by Nasa's real life Artemis Mission...
-				You can help send the first woman and next man to the moon.
-
-				After that, next stop Mars""");
+		welcome.append(".\nThis virtual board game is inspired by Nasa's real life Artemis Mission..." +
+				"\nYou can help send the first woman and next man to the moon." +
+				"\n\nAfter that, next stop Mars");
 		return welcome;
 	}
 
@@ -279,7 +277,7 @@ public class Game {
 	 * Displays current state of the board(i.e. which elements are owned by which
 	 * players)
 	 */
-	public static void displayBoardState() {
+	public static void displayBoardState(final List<Player> players) {
 		for (Player player : players) {
 			System.out.printf("%s (pos. %d) ", player.getName(), player.getPosition() + 1);
 			if (player.getOwnedElements().size() == 0) {
@@ -306,7 +304,7 @@ public class Game {
 	 * @param rolled		whether the current user has rolled or not
 	 * @return systemsquare if the square is a system square
 	 */
-	public static Triplet<SystemSquare, Boolean, Boolean> generateSquareStatus(Player player, Square landedSquare, boolean rolled, boolean paid, boolean auctioned) throws BankruptcyException {
+	public static Triplet<SystemSquare, Boolean, Boolean> generateSquareStatus(Player player, Square landedSquare, final List<Player> players, boolean rolled, boolean paid, boolean auctioned) throws BankruptcyException {
 		System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
 
 		Square square = squares.get(player.getPosition());
@@ -335,24 +333,24 @@ public class Game {
 					string += " You can buy it for " + ss.getBaseCost() + " units.";
 				}
 				System.out.print(string + "\n");
-			} else if (isAuctionable(ss, player) && !auctioned && rolled) {
+			} else if (isAuctionable(ss, player, players) && !auctioned && rolled) {
 				System.out.printf("You are on %s but don't have enough resources to buy it.\nAuctioning element", ss.getSquareName());
 				loading(5, true);
-				auctionSquare(scanner, ss, player);
+				auctionSquare(scanner, ss, player, players);
 				auctioned = true;
 				paid = true;
 				loading(3, true);
 				clearScreen();
-				generateSquareStatus(player, landedSquare, true, true, true);
+				generateSquareStatus(player, landedSquare, players, true, true, true);
 			} else if (rolled) {
 				System.out.printf("You are on %s but don't have enough resources to buy it.\n", ss.getSquareName());
 			} else {
 				System.out.printf("You are on %s.\n", ss.getSquareName());
 			}
-			return new Triplet<SystemSquare, Boolean, Boolean>(ss, paid, auctioned);
+			return new Triplet<>(ss, paid, auctioned);
 		} else {
 			System.out.printf("You are on %s. It can't be owned.\n", landedSquare.getSquareName());
-			return new Triplet<SystemSquare, Boolean, Boolean>(null, paid, auctioned);
+			return new Triplet<>(null, paid, auctioned);
 		}
 	}
 
@@ -437,7 +435,7 @@ public class Game {
 	 *
 	 * @param square  the square to auction
 	 */
-	public static void auctionSquare(Scanner scanner, SystemSquare square, Player player) throws BankruptcyException {
+	public static void auctionSquare(Scanner scanner, SystemSquare square, Player player, final List<Player> players) throws BankruptcyException {
 		// copy players into new arraylist and remove player from bidders list
 		ArrayList<Player> bidders = new ArrayList<>(players);
 		bidders.remove(player);
@@ -524,7 +522,7 @@ public class Game {
 
 		// basic game structure rules
 		//TODO implement this somewhere
-//		basicGameRules.add("Roll dice to decide who goes first");
+		//basicGameRules.add("Roll dice to decide who goes first");
 		basicGameRules.add("Basic Game Rules:");
 		basicGameRules.add("The aim is to help NASA complete its mission by fully developing all mission-critical Systems");
 		basicGameRules.add("When it's your go, pick what you'd like to do from the menu.");
@@ -633,7 +631,7 @@ public class Game {
 	 * @param scanner the scanner
 	 * @param player the current player
 	 */
-	public static void sellElement(Scanner scanner, Player player) throws BankruptcyException {
+	public static void sellElement(Scanner scanner, Player player, final List<Player> players) throws BankruptcyException {
 		//TODO check if buyer has enough resources or has elements
 		ArrayList<Player> buyers = new ArrayList<>(players);
 		ArrayList<SystemSquare> undevelopedSquares = new ArrayList<>(player.getOwnedElements());
@@ -756,15 +754,9 @@ public class Game {
 	 * @return the enum as a user friendly string
 	 */
 	public static <E extends Enum<E>> String stringifyEnum(E en) {
-		String[] words = en.name().toLowerCase().split("_");
-		StringBuilder stringify = new StringBuilder();
-
-		for (String w : words) {
-			String first = w.substring(0, 1);
-			String rest = w.substring(1);
-			stringify.append(first.toUpperCase()).append(rest.toLowerCase()).append(" ");
-		}
-		return stringify.toString().trim();
+		return Arrays.stream(en.name().toLowerCase().split("_"))
+				.map(s -> s.substring(0, 1).toUpperCase() + s.substring(1))
+				.collect(Collectors.joining(" "));
 	}
 
 	/**
@@ -774,16 +766,8 @@ public class Game {
 	 * @param player the current player
 	 * @return whether the square can be auctioned or not
 	 */
-	public static boolean isAuctionable(SystemSquare ss, Player player) {
-		ArrayList<Player> bidders = new ArrayList<>(players);
-		bidders.remove(player);
-		int playersTooExpensive = 0;
-		for (Player bidder : bidders) {
-			if (bidder.getPlayerResources() < ss.getBaseCost()) {
-				playersTooExpensive++;
-			}
-		}
-		return playersTooExpensive < bidders.size();
+	public static boolean isAuctionable(SystemSquare ss, Player player, final List<Player> players) {
+		return players.stream().filter(p -> !p.equals(player)).anyMatch(b -> b.getPlayerResources() > ss.getBaseCost());
 	}
 
 	/**

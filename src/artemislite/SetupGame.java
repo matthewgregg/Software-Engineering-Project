@@ -12,7 +12,6 @@ public class SetupGame {
 	private static final int MAX_PLAYERS = 4;
 
 	public static List<Player> playerCreation(Scanner scanner) {
-
 		System.out.println("How many players? Enter a number between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
 		int numPlayers = Game.scanIntInput(scanner, 2, 4, false);
 
