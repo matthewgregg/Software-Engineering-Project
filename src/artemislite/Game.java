@@ -21,30 +21,22 @@ import java.util.stream.Stream;
 public class Game {
 	// global constants
 	private static final int GO_RESOURCES = 200;
-
 	private static final Random rand = new Random();
 	private static final Scanner scanner = new Scanner(System.in);
+	static final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
+	static final List<Square> squares = Collections.unmodifiableList(SetupGame.setupBoard());
+
 	// scanner cannot be closed and then reused
-	private static boolean paid = false;
-	private static boolean auctioned = false;
 
 	public static void main(String[] args) {
 		clearScreen();
-
-		final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
-
-		// squares will be moved to a player's array when purchased and replaced with
-		// null in this array
-		//TODO replace with isOwned bool in SystemSquare object. The array will then be unmodifiable like players
-		final List<Square> squares = Collections.unmodifiableList(SetupGame.setupBoard());
-
-		clearScreen();
-		System.out.print(welcomeMessage(players));
+		System.out.print(welcomeMessage());
 		loading(5, true);
 
 		boolean quitGame = false;
 		boolean bankruptcy = false;
 		int playerCount = 0;
+		boolean endGame;
 		do {
 			playerCount++;
 			if (playerCount > players.size()) {
@@ -52,15 +44,15 @@ public class Game {
 			}
 			Player player = players.get(playerCount - 1);
 			try {
-				quitGame = !generateOptionsMenu(scanner, player, players, squares);
+				quitGame = !generateOptionsMenu(scanner, player);
 			} catch (BankruptcyException e) {
 				// player went bankrupt
 				bankruptcy = true;
 			}
-			// reset global vars on new turn
-			paid = false;
-			auctioned = false;
-		} while (!isGameOver(players) && !quitGame && !bankruptcy);
+			endGame = players.stream()
+					.flatMap(p -> p.getOwnedElements().stream())
+					.filter(e -> e.getDevelopment() == 4).count() == 10;
+		} while (!endGame && !quitGame && !bankruptcy);
 
 		if (quitGame) {
 			System.out.printf("Game is over! %s quit the game.\n", players.get(playerCount - 1).getName());
@@ -79,12 +71,14 @@ public class Game {
 	 * @return a boolean for whether the user finished their turn or not. If false,
 	 *         the player quit the game. If true, the player finished their turn
 	 */
-	public static boolean generateOptionsMenu(Scanner scanner, Player player, List<Player> players, List<Square> squares) throws BankruptcyException {
+	public static boolean generateOptionsMenu(Scanner scanner, Player player) throws BankruptcyException {
 		// local vars
 		int userOption;
 		boolean turnFinished = false;
 		boolean rolled = false;
 		boolean purchased = false;
+		boolean paid = false;
+		boolean auctioned = false;
 		int menuNum;
 		HashMap<Integer, Integer> menuOptions = new HashMap<>();
 		// initialise menu options
@@ -97,8 +91,7 @@ public class Game {
 		allMenu[5] = "Buy Developments";
 		allMenu[6] = "Mortgage Element";
 		allMenu[7] = "Sell Developments";
-		//sell properties to bank (at half value)
-		//sell undeveloped square to another player or auction (player's choice)
+		//sell to another player
 		allMenu[8] = "Finish Turn";
 		allMenu[9] = "Quit Game";
 
@@ -107,7 +100,10 @@ public class Game {
 			clearScreen();
 
 			Square landedSquare = squares.get(player.getPosition());
-			SystemSquare ss = generateSquareStatus(player, landedSquare, players, squares, rolled);
+			Triplet<SystemSquare, boolean, boolean> triplet = generateSquareStatus(player, landedSquare, rolled, paid, auctioned);
+			SystemSquare ss = triplet.getFirst();
+			paid = triplet.getSecond();
+			auctioned = triplet.getThird();
 
 			System.out.println("\nMENU");
 
@@ -130,7 +126,7 @@ public class Game {
 					continue;
 				}
 				// skip auction
-				if (i == 4 && ss != null && (auctioned || !isAuctionable(ss, player, players))) {
+				if (i == 4 && ss != null && (auctioned || !isAuctionable(ss, player))) {
 					continue;
 				}
 				// skip develop
@@ -152,7 +148,7 @@ public class Game {
 				// purchased it yet, and the square is auctionable
 				// and the auction hasn't occurred yet
 				if (i == 8 && ss != null && !ss.isOwned()
-						&& player.getPlayerResources() >= ss.getBaseCost() && !purchased && isAuctionable(ss, player, players)
+						&& player.getPlayerResources() >= ss.getBaseCost() && !purchased && isAuctionable(ss, player)
 						&& !auctioned) {
 					continue;
 				}
@@ -172,7 +168,7 @@ public class Game {
 				break;
 			case 2:
 				// display which elements are owned by who
-				displayBoardState(players);
+				displayBoardState();
 				loading(5, true);
 				break;
 			case 3:
@@ -200,7 +196,7 @@ public class Game {
 			case 5:
 				// auction unowned square
 				assert ss != null;
-				auctionSquare(scanner, players, ss, player);
+				auctionSquare(scanner, ss, player);
 				auctioned = true;
 				// so the user doesn't have to pay the winner
 				paid = true;
@@ -263,11 +259,10 @@ public class Game {
 
 	/**
 	 * Displays personalised welcome message
-	 * 
-	 * @param players the players
+	 *
 	 * @return the message
 	 */
-	public static StringBuilder welcomeMessage(List<Player> players) {
+	public static StringBuilder welcomeMessage() {
 		StringBuilder welcome = new StringBuilder("Welcome to ArtemisLite, ");
 		welcome.append(players.stream().limit(players.size() - 1).map(Player::getName).collect(Collectors.joining(", ")));
 		welcome.append(" and ").append(players.get(players.size() - 1).getName());
@@ -284,7 +279,7 @@ public class Game {
 	 * Displays current state of the board(i.e. which elements are owned by which
 	 * players)
 	 */
-	public static void displayBoardState(List<Player> players) {
+	public static void displayBoardState() {
 		for (Player player : players) {
 			System.out.printf("%s (pos. %d) ", player.getName(), player.getPosition() + 1);
 			if (player.getOwnedElements().size() == 0) {
@@ -292,9 +287,9 @@ public class Game {
 			} else {
 				System.out.print("[");
 				String separator = "";
-				for (SystemSquare next : player.getOwnedElements()) {
-					System.out.println(next.getSquareName());
-					System.out.printf(" (pos. %d, dev. %d)%s", next.getPosition() + 1, next.getDevelopment(), separator);
+				for (SystemSquare s : player.getOwnedElements()) {
+					System.out.println(s.getSquareName());
+					System.out.printf(" (pos. %d, dev. %d)%s", s.getPosition() + 1, s.getDevelopment(), separator);
 					separator = ", ";
 				}
 				System.out.print("]");
@@ -308,11 +303,10 @@ public class Game {
 	 * 
 	 * @param player       	the player
 	 * @param landedSquare 	the square they've landed on
-	 * @param squares		all squares
 	 * @param rolled		whether the current user has rolled or not
 	 * @return systemsquare if the square is a system square
 	 */
-	public static SystemSquare generateSquareStatus(Player player, Square landedSquare, List<Player> players, List<Square> squares, boolean rolled) throws BankruptcyException {
+	public static Triplet<SystemSquare, boolean, boolean> generateSquareStatus(Player player, Square landedSquare, boolean rolled, boolean paid, boolean auctioned) throws BankruptcyException {
 		System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
 
 		Square square = squares.get(player.getPosition());
@@ -341,24 +335,24 @@ public class Game {
 					string += " You can buy it for " + ss.getBaseCost() + " units.";
 				}
 				System.out.print(string + "\n");
-			} else if (isAuctionable(ss, player, players) && !auctioned && rolled) {
+			} else if (isAuctionable(ss, player) && !auctioned && rolled) {
 				System.out.printf("You are on %s but don't have enough resources to buy it.\nAuctioning element", ss.getSquareName());
 				loading(5, true);
-				auctionSquare(scanner, players, ss, player);
+				auctionSquare(scanner, ss, player);
 				auctioned = true;
 				paid = true;
 				loading(3, true);
 				clearScreen();
-				generateSquareStatus(player, landedSquare, players, squares, true);
+				generateSquareStatus(player, landedSquare, true, true, true);
 			} else if (rolled) {
 				System.out.printf("You are on %s but don't have enough resources to buy it.\n", ss.getSquareName());
 			} else {
 				System.out.printf("You are on %s.\n", ss.getSquareName());
 			}
-			return ss;
+			return new Triplet<SystemSquare, boolean, boolean>(ss, paid, auctioned);
 		} else {
 			System.out.printf("You are on %s. It can't be owned.\n", landedSquare.getSquareName());
-			return null;
+			return new Triplet<SystemSquare, boolean, boolean>(null, paid, auctioned);
 		}
 	}
 
@@ -440,11 +434,10 @@ public class Game {
 
 	/**
 	 * Auctions a square to other players
-	 * 
-	 * @param players all players
+	 *
 	 * @param square  the square to auction
 	 */
-	public static void auctionSquare(Scanner scanner, List<Player> players, SystemSquare square, Player player) throws BankruptcyException {
+	public static void auctionSquare(Scanner scanner, SystemSquare square, Player player) throws BankruptcyException {
 		// copy players into new arraylist and remove player from bidders list
 		ArrayList<Player> bidders = new ArrayList<>(players);
 		bidders.remove(player);
@@ -539,7 +532,7 @@ public class Game {
 
 		// buying and selling
 		buyingSellingRules.add("Rules for Buying and Selling:");
-		buyingSellingRules.add("You'll each be allotted some Space Points(currency of the solar system) to start out.");
+		buyingSellingRules.add("You'll each be allotted some Space Points (the currency of the solar system) to start out.");
 		buyingSellingRules.add("Use your points to purchase a square that you land on or pay other players when you land on their square.");
 		buyingSellingRules.add("If you don't want to buy the square you land on, it will be auctioned to the other players.");
 
@@ -639,15 +632,14 @@ public class Game {
 	 * allows a player to sell an undeveloped element to another player for resources or elements
 	 * @param scanner the scanner
 	 * @param player the current player
-	 * @param players an arraylist of all players
 	 */
-	public static void sellElement(Scanner scanner, Player player, List<Player> players) throws BankruptcyException {
+	public static void sellElement(Scanner scanner, Player player) throws BankruptcyException {
 		//TODO check if buyer has enough resources or has elements
 		ArrayList<Player> buyers = new ArrayList<>(players);
 		ArrayList<SystemSquare> undevelopedSquares = new ArrayList<>(player.getOwnedElements());
 		undevelopedSquares.removeIf(s -> s.getDevelopment() != 0);
 		int count = 1;
-		System.out.println("Enter an element to sell. Enter # to cancel at any time.");
+		System.out.println("Enter an element(s) to sell. Select continue to finalise selection. Enter # to cancel at any time.");
 		for (SystemSquare s : undevelopedSquares) {
 			System.out.printf("%d. %s (%d)\n", count++, s.getSquareName(), s.getBaseCost());
 		}
@@ -747,24 +739,6 @@ public class Game {
 	}
 
 	/**
-	 * checks if all elements have been developed
-	 * @param players
-	 * @return
-	 */
-	public static boolean isGameOver(List<Player> players) {
-		int count = 0;
-		for (Player player : players) {
-			for (SystemSquare ss : player.getOwnedElements()) {
-				if (ss.getDevelopment() != 4) {
-					return false;
-				}
-				count++;
-			}
-		}
-		return count == 10;
-	}
-
-	/**
 	 *
 	 * @param en the enum class to be stringified
 	 * @return array of stringified enums
@@ -800,7 +774,7 @@ public class Game {
 	 * @param player the current player
 	 * @return whether the square can be auctioned or not
 	 */
-	public static boolean isAuctionable(SystemSquare ss, Player player, List<Player> players) {
+	public static boolean isAuctionable(SystemSquare ss, Player player) {
 		ArrayList<Player> bidders = new ArrayList<>(players);
 		bidders.remove(player);
 		int playersTooExpensive = 0;

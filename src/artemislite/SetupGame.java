@@ -25,7 +25,7 @@ public class SetupGame {
 
 		while (players.size() < numPlayers) {
 			do {
-				String name = "";
+				String name = null;
 				try {
 					name = scanner.nextLine();
 					// add new player to players if the name is unique
