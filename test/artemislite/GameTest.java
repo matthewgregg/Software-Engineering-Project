@@ -16,9 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameTest {
     Player player1 = new Player("1");
     Player player2 = new Player("2");
-    Player player3 = new Player("3");
-
-    ArrayList<Player> playerArr = new ArrayList<>();
 
     SystemName systemName1 = SystemName.EXPLORATION_GROUND_SYSTEM;
     SystemName systemName2 = SystemName.ORION_SPACECRAFT;
@@ -61,9 +58,6 @@ class GameTest {
     @Test
     void testSellElementValid() throws BankruptcyException {
         int cost = 100;
-
-        Collections.addAll(playerArr, player1, player2, player3);
-        List<Player> players = Collections.unmodifiableList(playerArr);
 
         InputStream inBackup = System.in;
         ByteArrayInputStream inResources = new ByteArrayInputStream(("1" + lineSeparator() + "1" + lineSeparator() + "1" + lineSeparator() + cost + lineSeparator()).getBytes());

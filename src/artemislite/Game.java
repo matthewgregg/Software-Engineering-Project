@@ -22,11 +22,10 @@ public class Game {
 	// global constants
 	private static final int GO_RESOURCES = 200;
 	private static final Random rand = new Random();
-	private static final Scanner scanner = new Scanner(System.in);
-	static final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
-	static final List<Square> squares = Collections.unmodifiableList(SetupGame.setupBoard());
-
 	// scanner cannot be closed and then reused
+	private static final Scanner scanner = new Scanner(System.in);
+	private static final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
+	private static final List<Square> squares = Collections.unmodifiableList(SetupGame.setupBoard());
 
 	public static void main(String[] args) {
 		clearScreen();
@@ -100,7 +99,7 @@ public class Game {
 			clearScreen();
 
 			Square landedSquare = squares.get(player.getPosition());
-			Triplet<SystemSquare, boolean, boolean> triplet = generateSquareStatus(player, landedSquare, rolled, paid, auctioned);
+			Triplet<SystemSquare, Boolean, Boolean> triplet = generateSquareStatus(player, landedSquare, rolled, paid, auctioned);
 			SystemSquare ss = triplet.getFirst();
 			paid = triplet.getSecond();
 			auctioned = triplet.getThird();
@@ -306,7 +305,7 @@ public class Game {
 	 * @param rolled		whether the current user has rolled or not
 	 * @return systemsquare if the square is a system square
 	 */
-	public static Triplet<SystemSquare, boolean, boolean> generateSquareStatus(Player player, Square landedSquare, boolean rolled, boolean paid, boolean auctioned) throws BankruptcyException {
+	public static Triplet<SystemSquare, Boolean, Boolean> generateSquareStatus(Player player, Square landedSquare, boolean rolled, boolean paid, boolean auctioned) throws BankruptcyException {
 		System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
 
 		Square square = squares.get(player.getPosition());
@@ -349,10 +348,10 @@ public class Game {
 			} else {
 				System.out.printf("You are on %s.\n", ss.getSquareName());
 			}
-			return new Triplet<SystemSquare, boolean, boolean>(ss, paid, auctioned);
+			return new Triplet<SystemSquare, Boolean, Boolean>(ss, paid, auctioned);
 		} else {
 			System.out.printf("You are on %s. It can't be owned.\n", landedSquare.getSquareName());
-			return new Triplet<SystemSquare, boolean, boolean>(null, paid, auctioned);
+			return new Triplet<SystemSquare, Boolean, Boolean>(null, paid, auctioned);
 		}
 	}
 
