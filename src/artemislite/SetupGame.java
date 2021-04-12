@@ -11,36 +11,15 @@ public class SetupGame {
 
 	private static final int MIN_PLAYERS = 2;
 	private static final int MAX_PLAYERS = 4;
-	private static final int NUMBER_OF_SQUARES = 12;
 	private ArrayList<Square> squares;
 
 	public static List<Player> playerCreation(Scanner scanner) {
 		ArrayList<Player> players = new ArrayList<>();
-		String userOption = "";
-		int numPlayers = 0;
-		boolean validPlayerNum = false;
 
 		System.out.println("How many players? Enter a number between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
+		int numPlayers = Game.scanIntInput(scanner, 2, 4, false);
 
-		do {
-			try {
-				/*
-				 * don't mix nextLine and nextInt as nextInt doesn't read the following new line
-				 * character which results ina empty string
-				 */
-				userOption = scanner.nextLine();
-				if (Integer.parseInt(userOption) >= MIN_PLAYERS && Integer.parseInt(userOption) <= MAX_PLAYERS) {
-					validPlayerNum = true;
-					numPlayers = Integer.parseInt(userOption);
-				} else {
-					System.out.println("Please enter a number between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
-				}
-			} catch (NumberFormatException e) {
-				System.out.println("Error! Try again.");
-			}
-		} while (!validPlayerNum);
-
-		System.out.println("Enter the names of the " + userOption + " players. Press return after entering a name.");
+		System.out.println("Enter the names of the " + numPlayers + " players. Press return after entering a name.");
 
 		int playerID = 0;
 		boolean validPlayerName = false;
