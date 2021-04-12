@@ -93,6 +93,7 @@ public class Game {
 		allMenu[6] = "Mortgage Element";
 		allMenu[7] = "Sell Developments";
 		//sell to another player
+		//buy back mortgaged element
 		allMenu[8] = "Finish Turn";
 		allMenu[9] = "Quit Game";
 
@@ -401,8 +402,8 @@ public class Game {
 	 * Scans menu input and allows user to enter '#' to cancel selection
 	 * 
 	 * @param scanner     the scanner
-	 * @param lowerLimit  the lower limit
-	 * @param upperLimit  the upper limit
+	 * @param lowerLimit  the inclusive lower limit
+	 * @param upperLimit  the inclusive upper limit
 	 * @param cancellable alternative input for the user, can be used to return to
 	 *                    previous screen or as non-input
 	 * @return the user's input
@@ -452,8 +453,8 @@ public class Game {
 				clearScreen();
 				System.out.printf("Bidding on %s, starting at %d. (Eligible bidders: %s)\n", square.getSquareName(),
 						square.getBaseCost(), names);
-				// check if current bidder is the highest bidder - break if so
 				if (bidder.getPlayerResources() >= highestBid) {
+					// check if current bidder is the highest bidder - break if so
 					if (bidder.equals(highestBidder) || rejectedCount == bidders.size()) {
 						biddingEnded = true;
 						break;
@@ -470,8 +471,8 @@ public class Game {
 					if (bid > prevBid) {
 						highestBid = bid;
 						highestBidder = bidder;
-						// increment rejected count to prevent infinite loop if no one bids
 					} else if (bid == -1) {
+						// increment rejected count to prevent infinite loop if no one bids
 						rejectedCount++;
 					}
 					// set current bid to previous user's bid for next iteration
@@ -576,8 +577,8 @@ public class Game {
 
 	/**
 	 * allows a player to mortgage an undeveloped element
-	 * @param scanner
-	 * @param player
+	 * @param scanner scanner
+	 * @param player player arraylist
 	 */
 	public static void mortgageMenu(Scanner scanner, Player player) throws BankruptcyException {
 		ArrayList<SystemSquare> undevelopedSquares = new ArrayList<>();
@@ -602,7 +603,7 @@ public class Game {
 	/**
 	 * generates a menu to allow a player to sell developments at half price
 	 * @param scanner scanner
-	 * @param player the curremt player
+	 * @param player the current player
 	 * @throws BankruptcyException
 	 */
 	public static void sellDevelopmentsMenu(Scanner scanner, Player player) throws BankruptcyException {
@@ -633,6 +634,7 @@ public class Game {
 	 */
 	public static void sellElement(Scanner scanner, Player player, final List<Player> players) throws BankruptcyException {
 		//TODO check if buyer has enough resources or has elements
+		//TODO this could be better written
 		ArrayList<Player> buyers = new ArrayList<>(players);
 		ArrayList<SystemSquare> undevelopedSquares = new ArrayList<>(player.getOwnedElements());
 		undevelopedSquares.removeIf(s -> s.getDevelopment() != 0);
@@ -775,15 +777,13 @@ public class Game {
 	 */
 	public static void clearScreen() {
 		try {
-			final String os = System.getProperty("os.name");
-
-			if (os.contains("Windows")) {
+			if (System.getProperty("os.name").contains("Windows")) {
 				new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
 			} else {
 				System.out.print("\033[H\033[2J");
 				System.out.flush();
 			}
-		} catch (final Exception e) {
+		} catch (Exception e) {
 			System.out.println("Error clearing console.");
 		}
 	}

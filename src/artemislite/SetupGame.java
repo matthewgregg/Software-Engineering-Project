@@ -20,7 +20,7 @@ public class SetupGame {
 		ArrayList<Player> players = new ArrayList<>();
 		boolean validPlayerName = false;
 
-		while (players.size() < numPlayers) {
+		do {
 			do {
 				String name = null;
 				try {
@@ -37,7 +37,7 @@ public class SetupGame {
 					System.out.printf("%s is not a valid name. Try again.\n", name);
 				}
 			} while (!validPlayerName);
-		}
+		} while (players.size() < numPlayers);
 		return players;
 	}
 
@@ -136,8 +136,6 @@ public class SetupGame {
 				220,
 				200,
 				new int[] { 10, 20, 30, 90, 150 });
-		
-	
 
 		Collections.addAll(squares, sq1, ss1, ss2, ss3, ss4, ss5, sq2, ss6, ss7, ss8, ss9, ss10);
 		squares.sort(new ComparePosition());

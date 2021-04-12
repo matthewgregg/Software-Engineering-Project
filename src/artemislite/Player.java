@@ -72,8 +72,8 @@ public class Player extends Actor {
      * @throws IllegalArgumentException if playerID outside bounds
      */
     public String getPlayerRole() throws IllegalArgumentException {
-        if (this.playerID >= MIN_PLAYER_ID && this.playerID <= MAX_PLAYER_ID) {
-            switch(this.playerID) {
+        if (playerID >= MIN_PLAYER_ID && playerID <= MAX_PLAYER_ID) {
+            switch(playerID) {
                 case 1:
                     return "Commander";
                 case 2:
@@ -124,11 +124,10 @@ public class Player extends Actor {
     public void purchaseSquare(SystemSquare square) throws BankruptcyException {
         this.ownedElements.add(square);
         square.setOwned(true);
-        //this.setPlayerResources(this.playerResources - square.getBaseCost());
         if (!square.isMortgaged()) {
             this.addResources(-1 * square.getBaseCost());
         } else {
-            this.addResources((int) -1.1 * square.getBaseCost());
+            this.addResources((int) (-1.1 * square.getBaseCost()));
             square.setMortgaged(false);
         }
     }
@@ -157,14 +156,6 @@ public class Player extends Actor {
      * @return the cost of the cheapest development
      */
     public int getMinimumOwnedDevCost() {
-        /*
-        int lowest = this.ownedElements.get(0).getCostPerDevelopment();
-        for (SystemSquare ss : this.ownedElements) {
-            if (ss.getCostPerDevelopment() < lowest) {
-                lowest = ss.getCostPerDevelopment();
-            }
-        }
-         */
         //the first square will always have the lowest development cost
         return this.ownedElements.first().getCostPerDevelopment();
     }
@@ -223,12 +214,7 @@ public class Player extends Actor {
      * @return whether the player has at least one element that can be mortgaged
      */
     public boolean hasMortgagableElements() {
-        for (SystemSquare s : this.getOwnedElements()) {
-            if (s.getDevelopment() == 0 && !s.isMortgaged()) {
-                return true;
-            }
-        }
-        return false;
+        return this.getOwnedElements().stream().filter(s -> s.getDevelopment() == 0).anyMatch(s -> !s.isMortgaged());
     }
 
     /**
@@ -236,11 +222,6 @@ public class Player extends Actor {
      * @return whether the player has at least one development
      */
     public boolean hasDevelopments() {
-        for (SystemSquare s : this.getOwnedElements()) {
-            if (s.getDevelopment() > 0) {
-                return true;
-            }
-        }
-        return false;
+        return this.getOwnedElements().stream().anyMatch(s -> s.getDevelopment() > 0);
     }
 }
