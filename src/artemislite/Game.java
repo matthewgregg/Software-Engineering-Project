@@ -306,7 +306,7 @@ public class Game {
 	 * @return systemsquare if the square is a system square
 	 */
 	public static Triplet<SystemSquare, Boolean, Boolean> generateSquareStatus(Player player, Square landedSquare, final List<Player> players, boolean rolled, boolean paid, boolean auctioned) throws BankruptcyException {
-		System.out.printf("%s's turn [%d units]\n", player.getName(), player.getPlayerResources());
+		System.out.printf("%s's turn [%d credits]\n", player.getName(), player.getPlayerResources());
 
 		Square square = squares.get(player.getPosition());
 		if (square instanceof SystemSquare) {
@@ -323,7 +323,7 @@ public class Game {
 						player.addResources(-1 * cost);
 						paid = true;
 						clearScreen();
-						System.out.printf("%s's turn [%d units] (Paid %s %d units)\n", player.getName(),
+						System.out.printf("%s's turn [%d credits] (Paid %s %d credits)\n", player.getName(),
 								player.getPlayerResources(), owner.getName(), cost);
 					}
 					System.out.printf("You are on %s. It is owned by %s.\n", squareName, owner.getName());
@@ -331,7 +331,7 @@ public class Game {
 			} else if (player.getPlayerResources() >= ss.getBaseCost()) {
 				String string = "You are on " + square.getSquareName() + ". It is not owned.";
 				if (rolled) {
-					string += " You can buy it for " + ss.getBaseCost() + " units.";
+					string += " You can buy it for " + ss.getBaseCost() + " credits.";
 				}
 				System.out.print(string + "\n");
 			} else if (isAuctionable(ss, player, players) && !auctioned && rolled) {
@@ -368,12 +368,12 @@ public class Game {
 		// remove incomplete systems using predicate
 		squares.removeIf(s -> !systems.contains(s.getSystemNameEnum()));
 
-		System.out.printf("You have %d units\n", player.getPlayerResources());
+		System.out.printf("You have %d credits\n", player.getPlayerResources());
 		System.out.println("Enter a square to develop. Enter # to cancel.");
 		int count = 1;
 		boolean valid = false;
 		for (SystemSquare square : squares) {
-			System.out.printf("%d. %s [%d] - %d units per dev.\n", count++, square.getSquareName(),
+			System.out.printf("%d. %s [%d] - %d credits per dev.\n", count++, square.getSquareName(),
 					square.getDevelopment(), square.getCostPerDevelopment());
 		}
 		int squareNum = scanIntInput(scanner, 1, squares.size(), true);
@@ -460,7 +460,7 @@ public class Game {
 						break;
 					}
 					if (highestBidder != null) {
-						System.out.printf("%s is the highest bidder at %d units\n", highestBidder.getName(),
+						System.out.printf("%s is the highest bidder at %d credits\n", highestBidder.getName(),
 								highestBid);
 					}
 					System.out.printf("%s, please enter your bid or # to skip.\n", bidder.getName());
@@ -531,8 +531,8 @@ public class Game {
 
 		// buying and selling
 		buyingSellingRules.add("Rules for Buying and Selling:");
-		buyingSellingRules.add("You'll each be allotted some Space Points (the currency of the solar system) to start out.");
-		buyingSellingRules.add("Use your points to purchase a square that you land on or pay other players when you land on their square.");
+		buyingSellingRules.add("You'll each be allotted some credits (the currency of the solar system) to start out.");
+		buyingSellingRules.add("Use your credits to purchase a square that you land on or pay other players when you land on their square.");
 		buyingSellingRules.add("If you don't want to buy the square you land on, it will be auctioned to the other players.");
 
 		// developing systems
@@ -545,7 +545,7 @@ public class Game {
 		// ending the game
 		endingRules.add("Rules for Ending the Game:");
 		endingRules.add("All systems must be developed to complete the mission and win the game.");
-		endingRules.add("Should any player go 'Bankrupt' by running out of Space Points, the game ends and the mission has failed.");
+		endingRules.add("Should any player go 'Bankrupt' by running out of credits, the game ends and the mission has failed.");
 
 		// join separate arrayLists into one
 		List<String> combinedRuleSets = Stream.of(basicGameRules,
@@ -595,7 +595,7 @@ public class Game {
 			SystemSquare s = undevelopedSquares.get(option-1);
 			s.setMortgaged(true);
 			player.addResources(s.getBaseCost());
-			System.out.printf("You have mortgaged %s for %d units. You can buy it back for %d units", s.getSquareName(), s.getBaseCost(), (int) (1.1 * s.getBaseCost()));
+			System.out.printf("You have mortgaged %s for %d credits. You can buy it back for %d credits", s.getSquareName(), s.getBaseCost(), (int) (1.1 * s.getBaseCost()));
 			loading(3, true);
 		}
 	}
@@ -612,7 +612,7 @@ public class Game {
 		int count = 1;
 		System.out.print("Enter an element to sell development from. Enter # to cancel.");
 		for (SystemSquare s : developedSquares) {
-			System.out.printf("%d. %s (%d units per development)\n", count++, s.getSquareName(), (int) (s.getCostPerDevelopment() * 0.5));
+			System.out.printf("%d. %s (%d credits per development)\n", count++, s.getSquareName(), (int) (s.getCostPerDevelopment() * 0.5));
 		}
 		int option = scanIntInput(scanner, 1, developedSquares.size(), true);
 		if (option > 0) {
@@ -657,7 +657,7 @@ public class Game {
 			if (buyOption > 0) {
 				Player buyer = buyers.get(buyOption - 1);
 				clearScreen();
-				System.out.print("What would you like to sell the element for?\n1. Space Points\n2. An element(s)\n");
+				System.out.print("What would you like to sell the element for?\n1. Credits\n2. An element(s)\n");
 				int paymentMethod = scanIntInput(scanner, 1, 2, true);
 				if (count > 0) {
 					if (paymentMethod == 1) {
