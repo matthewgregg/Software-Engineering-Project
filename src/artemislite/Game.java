@@ -23,12 +23,12 @@ public class Game {
 	private static final int GO_RESOURCES = 200;
 	private static final Random rand = new Random();
 	// scanner cannot be closed and then reused
-	public static final Scanner scanner = new Scanner(System.in);
 	private static final List<Square> squares = Collections.unmodifiableList(SetupGame.setupBoard());
 
 	public static void main(String[] args) {
 		clearScreen();
 
+		final Scanner scanner = new Scanner(System.in);
 		final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
 
 		System.out.print(welcomeMessage(players));
@@ -73,7 +73,7 @@ public class Game {
 	 * @return a boolean for whether the user finished their turn or not. If false,
 	 *         the player quit the game. If true, the player finished their turn
 	 */
-	public static boolean generateOptionsMenu(Scanner scanner, Player player, final List<Player> players) throws BankruptcyException {
+	public static boolean generateOptionsMenu(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
 		// local vars
 		int userOption;
 		boolean turnFinished = false;
@@ -103,7 +103,7 @@ public class Game {
 			clearScreen();
 
 			Square landedSquare = squares.get(player.getPosition());
-			Triplet<SystemSquare, Boolean, Boolean> triplet = generateSquareStatus(player, landedSquare, players, rolled, paid, auctioned);
+			Triplet<SystemSquare, Boolean, Boolean> triplet = generateSquareStatus(scanner, player, landedSquare, players, rolled, paid, auctioned);
 			SystemSquare ss = triplet.getFirst();
 			paid = triplet.getSecond();
 			auctioned = triplet.getThird();
@@ -301,13 +301,19 @@ public class Game {
 
 	/**
 	 * prints user message
-	 * 
+	 *
 	 * @param player       	the player
 	 * @param landedSquare 	the square they've landed on
 	 * @param rolled		whether the current user has rolled or not
 	 * @return systemsquare if the square is a system square
 	 */
-	public static Triplet<SystemSquare, Boolean, Boolean> generateSquareStatus(Player player, Square landedSquare, final List<Player> players, boolean rolled, boolean paid, boolean auctioned) throws BankruptcyException {
+	public static Triplet<SystemSquare, Boolean, Boolean> generateSquareStatus(Scanner scanner,
+																			   final Player player,
+																			   final Square landedSquare,
+																			   final List<Player> players,
+																			   boolean rolled,
+																			   boolean paid,
+																			   boolean auctioned) throws BankruptcyException {
 		System.out.printf("%s's turn [%d credits]\n", player.getName(), player.getPlayerResources());
 
 		Square square = squares.get(player.getPosition());
@@ -344,7 +350,7 @@ public class Game {
 				paid = true;
 				loading(3, true);
 				clearScreen();
-				generateSquareStatus(player, landedSquare, players, true, true, true);
+				generateSquareStatus(scanner, player, landedSquare, players, true, true, true);
 			} else if (rolled) {
 				System.out.printf("You are on %s but don't have enough resources to buy it.\n", ss.getSquareName());
 			} else {
@@ -363,7 +369,7 @@ public class Game {
 	 * @param scanner the scanner
 	 * @param player  the current player
 	 */
-	public static void developMenu(Scanner scanner, Player player) {
+	public static void developMenu(Scanner scanner, final Player player) {
 		ArrayList<SystemSquare> squares = player.getOwnedElements();
 		ArrayList<SystemName> systems = player.getDevelopableSystems();
 
@@ -438,7 +444,7 @@ public class Game {
 	 *
 	 * @param square  the square to auction
 	 */
-	public static void auctionSquare(Scanner scanner, SystemSquare square, Player player, final List<Player> players) throws BankruptcyException {
+	public static void auctionSquare(Scanner scanner, final SystemSquare square, final Player player, final List<Player> players) throws BankruptcyException {
 		// copy players into new arraylist and remove player from bidders list
 		ArrayList<Player> bidders = new ArrayList<>(players);
 		bidders.remove(player);
@@ -582,7 +588,7 @@ public class Game {
 	 * @param scanner scanner
 	 * @param player player arraylist
 	 */
-	public static void mortgageMenu(Scanner scanner, Player player) throws BankruptcyException {
+	public static void mortgageMenu(Scanner scanner, final Player player) throws BankruptcyException {
 		ArrayList<SystemSquare> undevelopedSquares = new ArrayList<>();
 		int count = 1;
 		System.out.println("Enter an element to mortgage. Enter # to cancel.");
@@ -608,7 +614,7 @@ public class Game {
 	 * @param player the current player
 	 * @throws BankruptcyException
 	 */
-	public static void sellDevelopmentsMenu(Scanner scanner, Player player) throws BankruptcyException {
+	public static void sellDevelopmentsMenu(Scanner scanner, final Player player) throws BankruptcyException {
 		ArrayList<SystemSquare> developedSquares = new ArrayList<>(player.getOwnedElements());
 		developedSquares.removeIf(s -> s.getDevelopment() == 0);
 		int count = 1;
@@ -634,7 +640,7 @@ public class Game {
 	 * @param scanner the scanner
 	 * @param player the current player
 	 */
-	public static void sellElement(Scanner scanner, Player player, final List<Player> players) throws BankruptcyException {
+	public static void sellElement(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
 		//TODO check if buyer has enough resources or has elements
 		//TODO this could be better written
 		ArrayList<Player> buyers = new ArrayList<>(players);
@@ -822,7 +828,7 @@ public class Game {
 	 * @param player the current player
 	 * @return whether the square can be auctioned or not
 	 */
-	public static boolean isAuctionable(SystemSquare ss, Player player, final List<Player> players) {
+	public static boolean isAuctionable(final SystemSquare ss, final Player player, final List<Player> players) {
 		return players.stream().filter(p -> !p.equals(player)).anyMatch(b -> b.getPlayerResources() > ss.getBaseCost());
 	}
 
