@@ -11,6 +11,7 @@ public class Player extends Actor {
     private static final int MIN_PLAYER_ID = 1;
     private static final int MAX_PLAYER_ID = 4;
     private static final String INVALID_PLAYER_ID = "Invalid player ID";
+    private static final String[] INVALID_NAMES = new String[]{"", "quit"};
     private static int playerID = 0;
     private final String name;
     private final SortedSet<SystemSquare> ownedElements = new TreeSet<>(new ComparePosition());
@@ -22,7 +23,6 @@ public class Player extends Actor {
      */
     public Player(String name) throws InvalidNameException {
         super(0);
-        final String[] INVALID_NAMES = new String[]{"", "quit"};
         if (Arrays.asList(INVALID_NAMES).contains(name)) {
             throw new InvalidNameException();
         } else {
@@ -162,7 +162,7 @@ public class Player extends Actor {
     }
 
     /**
-     * checks if a player has at least one entire system
+     * checks if a player has at least one entire system that isn't completely developed
      * @return the systems or null
      */
     public ArrayList<SystemName> getDevelopableSystems() {
