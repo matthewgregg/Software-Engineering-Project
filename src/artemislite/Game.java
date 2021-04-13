@@ -23,7 +23,7 @@ public class Game {
 	private static final int GO_RESOURCES = 200;
 	private static final Random rand = new Random();
 	// scanner cannot be closed and then reused
-	public static Scanner scanner = new Scanner(System.in);
+	public static final Scanner scanner = new Scanner(System.in);
 	private static final List<Square> squares = Collections.unmodifiableList(SetupGame.setupBoard());
 
 	public static void main(String[] args) {
