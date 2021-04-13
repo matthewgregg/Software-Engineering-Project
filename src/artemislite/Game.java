@@ -217,8 +217,9 @@ public class Game {
 				//sell developments
 				sellDevelopmentsMenu(scanner, player);
 			case 9:
-				// end turn
+				// end turn and check if any donations are needed
 				turnFinished = true;
+				determinePlayersAtRisk(scanner, player, players);
 				break;
 			case 10:
 				// quit game
@@ -706,6 +707,58 @@ public class Game {
 			}
 		}
 	}
+	
+	
+	public static void determinePlayersAtRisk(Scanner scanner, Player player, final List<Player> players) {
+
+		// the balance considered 'at risk'
+		int lowResources = 100;
+
+		// copy players into new arraylist and remove player from donors list
+		ArrayList<Player> donors = new ArrayList<>(players);
+		donors.remove(player);
+
+		// check to see if any player's resources are low and add to atRisk list if so
+		ArrayList<Player> playersAtRisk = new ArrayList<>(players);
+		for (Player p : players) {
+			if (p.getPlayerResources() < lowResources) {
+				playersAtRisk.add(p);
+			}
+		}
+
+		// output a warning message if any players at risk
+		if (playersAtRisk.size() > 0) {
+			System.out.printf("Warning, the following players are dangerously close to bankruptcy, which will end the game for all\n%s",
+					playersAtRisk.toString()); //TODO toString needs fixed
+			System.out.println("\nYou can donate to them help you all finish the mission\n");
+
+			// solicit donations for each player at risk
+			for (Player p : playersAtRisk) {
+				System.out.printf("Allow donations? Enter yes(y) or no(n)\n");
+				String choice = scanner.next();
+				if (choice.equalsIgnoreCase("Yes") || choice.equalsIgnoreCase("Y")) {
+					makeCharitableDonation(scanner, p, playersAtRisk, donors);
+				}
+				//TODO add else, error checking etc
+			}
+
+		}
+	}
+		
+		public static void makeCharitableDonation(Scanner scanner, Player player, List<Player> playersAtRisk, List<Player> donors) {
+			//output donors
+			for (Player donor : donors) {
+				String names = donors.stream().map(Player::getName).collect(Collectors.joining(", "));
+				clearScreen();
+				System.out.printf("Donations open for %s. (Eligible bidders: %s)\n", player.getName(), names);
+				
+				System.out.printf("%s, enter your donation or # to skip.\n", donor.getName());
+				
+				int donation = scanIntInput(scanner, 0, donor.getPlayerResources(), true);
+				
+				//TODO update player resources
+		}
+		}
 
 	interface IExecCloseable extends AutoCloseable {
 		void close();
