@@ -2,6 +2,7 @@ package artemislite;
 
 import javax.naming.InvalidNameException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * represents a player in the system
@@ -164,49 +165,15 @@ public class Player extends Actor {
      * checks if a player has at least one entire system
      * @return the systems or null
      */
-    public ArrayList<SystemName> getCompletedSystems() {
-        //only allow unique values
-        Set<SystemName> ownedSystems = new HashSet<>();
-        int size = getOwnedElements().size();
-
-        for (int i = 0; i < size; i++) {
-            int squaresInSys = getOwnedElements().get(i).getSystemType();
-            SystemSquare s = getOwnedElements().get(i);
-            SystemName initSys = s.getSystemNameEnum();
-            ownedSystems.add(initSys);
-
-            //this is 1 position greater than the number of squares to check as the operator in the inner loop is <
-            int squaresToCheckLimit = Math.min(i+squaresInSys, getOwnedElements().size());
-
-            //skip check if single square or if there are fewer squares left to check than are in the system
-            if (size == 1 || squaresInSys > size - i || s.isMortgaged()) {
-                ownedSystems.remove(initSys);
-                int tempsq = squaresToCheckLimit;
-                //end inner loop
-                squaresToCheckLimit = i + 1;
-                //skip outer loop to next system if mortgaged or to end if not
-                i = s.isMortgaged() ? tempsq : size;
-            }
-
-            for (int j = i + 1; j < squaresToCheckLimit; j++) {
-                SystemSquare s2 = getOwnedElements().get(j);
-                SystemName sys = s2.getSystemNameEnum();
-                if (sys.equals(initSys) && !s2.isMortgaged()) {
-                    i++;
-                } else {
-                    ownedSystems.remove(initSys);
-                    //updates i to skip uncompleted system
-                    i = j - 1;
-                    //ends inner loop
-                    j = i + squaresInSys;
-                }
-            }
-        }
-        if (ownedSystems.size() == 0) {
-            return null;
-        } else {
-            return new ArrayList<>(ownedSystems);
-        }
+    public ArrayList<SystemName> getDevelopableSystems() {
+        Map<SystemName, List<SystemSquare>> systems = this.ownedElements.stream()
+                .filter(s -> !s.isMortgaged())
+                .collect(Collectors.groupingBy(SystemSquare::getSystemNameEnum, Collectors.toList()));
+        //remove if incomplete system
+        systems.entrySet().removeIf(s -> s.getValue().size() != s.getValue().get(0).getSystemType());
+        //remove if fully developed system
+        systems.entrySet().removeIf(s -> s.getValue().stream().allMatch(t -> t.getDevelopment() == 4));
+        return systems.size() == 0 ? null : new ArrayList<>(systems.keySet());
     }
 
     /**

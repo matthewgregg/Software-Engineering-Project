@@ -134,7 +134,7 @@ public class Game {
 				// skip develop
 				if (i == 5 && (player.getOwnedElements().size() == 0
 						|| player.getMinimumOwnedDevCost() > player.getPlayerResources()
-						|| player.getCompletedSystems() == null)) {
+						|| player.getDevelopableSystems() == null)) {
 					continue;
 				}
 				//skip mortgage
@@ -363,7 +363,7 @@ public class Game {
 	 */
 	public static void developMenu(Scanner scanner, Player player) {
 		ArrayList<SystemSquare> squares = player.getOwnedElements();
-		ArrayList<SystemName> systems = player.getCompletedSystems();
+		ArrayList<SystemName> systems = player.getDevelopableSystems();
 
 		// remove incomplete systems using predicate
 		squares.removeIf(s -> !systems.contains(s.getSystemNameEnum()));

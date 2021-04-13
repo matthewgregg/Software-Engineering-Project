@@ -112,31 +112,32 @@ class PlayerTest {
     Player player;
 
     @Test
-    void testGetCompletedSystemValid() throws InvalidNameException, BankruptcyException {
+    void testGetDevelopableSystemValid() throws InvalidNameException, BankruptcyException {
         player = new Player("Test Player");
+
         Collections.addAll(squares, ss1, ss2, ss3, ss4, ss5, ss6, ss7, ss8, ss9, ss10);
 
         for (SystemSquare ss : squares) {
             player.purchaseSquare(ss);
         }
 
-        assertTrue(player.getCompletedSystems().contains(systemName1));
-        assertTrue(player.getCompletedSystems().contains(systemName2));
-        assertTrue(player.getCompletedSystems().contains(systemName3));
-        assertTrue(player.getCompletedSystems().contains(systemName4));
+        assertTrue(player.getDevelopableSystems().contains(systemName1));
+        assertTrue(player.getDevelopableSystems().contains(systemName2));
+        assertTrue(player.getDevelopableSystems().contains(systemName3));
+        assertTrue(player.getDevelopableSystems().contains(systemName4));
         squares.clear();
     }
 
     @Test
-    void testGetCompletedSystemInvalid() throws InvalidNameException, BankruptcyException {
+    void testGetDevelopableSystemInvalid() throws InvalidNameException, BankruptcyException {
         player = new Player("Test Player");
         Collections.addAll(squares, ss1, ss3, ss4, ss6, ss7, ss9);
 
-        assertNull(player.getCompletedSystems());
+        assertNull(player.getDevelopableSystems());
 
         for (SystemSquare ss : squares) {
             player.purchaseSquare(ss);
-            assertNull(player.getCompletedSystems());
+            assertNull(player.getDevelopableSystems());
         }
 
         ArrayList<SystemSquare> finalSystemSquare = new ArrayList<>();
@@ -147,14 +148,21 @@ class PlayerTest {
         for (SystemSquare ss : finalSystemSquare) {
             player2 = new Player("Player2");
             player2.purchaseSquare(ss);
-            assertNull(player2.getCompletedSystems());
+            assertNull(player2.getDevelopableSystems());
             for (SystemSquare s : squares) {
                 player2.purchaseSquare(s);
                 s.setMortgaged(true);
                 //set the finalSystemSquare to mortgaged if it matches the square name in squares (ie system completed)
                 ss.setMortgaged(finalSystemSquare.stream().noneMatch(e -> e.getSquareName().equals(s.getSquareName())));
-                assertNull(player2.getCompletedSystems());
+                assertNull(player2.getDevelopableSystems());
             }
         }
+
+        player2 = new Player("Player 2");
+        for (SystemSquare s : squares) {
+            player2.purchaseSquare(s);
+            s.setDevelopment(4);
+        }
+        assertNull(player2.getDevelopableSystems());
     }
 }
