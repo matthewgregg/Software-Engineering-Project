@@ -62,6 +62,7 @@ public class Game {
 		} else {
 			System.out.println("Epilogue...");
 		}
+		scanner.close();
 	}
 
 	/**
