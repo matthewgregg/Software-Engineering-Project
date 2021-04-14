@@ -143,7 +143,7 @@ public class Game {
 					continue;
 				}
 				//skip donate to player
-				if (i == 7 && players.stream().noneMatch(Player::goingBankrupt) && player.getPlayerResources() > BANKRUPTCY_RISK) {
+				if (i == 7 && (players.stream().noneMatch(Player::goingBankrupt) && player.getPlayerResources() > BANKRUPTCY_RISK || player.goingBankrupt())) {
 					continue;
 				}
 				menuNum++;
@@ -293,11 +293,15 @@ public class Game {
 																			   boolean auctioned) throws BankruptcyException {
 
 		if (players.stream().anyMatch(p -> p.getPlayerResources() < BANKRUPTCY_RISK)) {
-			String names = getPlayersNearBankruptcy(scanner, player, players).stream().map(Player::getName).collect(Collectors.joining(", "));
-			System.out.printf("%s is at risk of bankruptcy, which will end the game! Consider donating credits to them.\n", names);
+			if (player.goingBankrupt()) {
+				System.out.print("You are at risk of going bankrupt, which will end the game! Try and get the other players to donate credits to you.");
+			} else {
+				String names = getPlayersNearBankruptcy(scanner, player, players).stream().map(Player::getName).collect(Collectors.joining(", "));
+				System.out.printf("%s is at risk of bankruptcy, which will end the game! Consider donating credits to them.\n", names);
+			}
 		}
 
-		System.out.printf("%s's turn [%d credits]\n", player.getName(), player.getPlayerResources());
+		System.out.printf("%s's turn [%d credits]", player.getName(), player.getPlayerResources());
 
 		Square square = squares.get(player.getPosition());
 		if (square instanceof SystemSquare) {
@@ -306,42 +310,40 @@ public class Game {
 				Player owner = players.stream().filter(p -> p.getOwnedElements().contains(ss)).findAny().get();
 				String squareName = ss.getSquareName();
 				if (owner.equals(player)) {
-					System.out.printf("You are on %s. You own it.\n", squareName);
+					System.out.printf("\nYou are on %s. You own it.", squareName);
 				} else {
 					// owned by another player - subtract resources from player
 					int cost = ss.getLandingCost();
 					if (!paid && rolled && !ss.isMortgaged()) {
 						player.addResources(-1 * cost);
 						paid = true;
-						clearScreen();
-						System.out.printf("%s's turn [%d credits] (Paid %s %d credits)\n", player.getName(),
-								player.getPlayerResources(), owner.getName(), cost);
+						System.out.printf(" (Paid %s %d credits)", owner.getName(), cost);
 					}
-					System.out.printf("You are on %s. It is owned by %s.\n", squareName, owner.getName());
+					System.out.printf("\nYou are on %s. It is owned by %s.", squareName, owner.getName());
 				}
+				System.out.println();
 			} else if (player.getPlayerResources() >= ss.getBaseCost()) {
-				String string = "You are on " + square.getSquareName() + ". It is not owned.";
+				String string = "\nYou are on " + square.getSquareName() + ". It is not owned.";
 				if (rolled) {
 					string += " You can buy it for " + ss.getBaseCost() + " credits.";
 				}
-				System.out.print(string + "\n");
+				System.out.print(string);
 			} else if (isAuctionable(ss, player, players) && !auctioned && rolled) {
-				System.out.printf("You are on %s but don't have enough resources to buy it.\nAuctioning element", ss.getSquareName());
+				System.out.printf("\nYou are on %s but don't have enough resources to buy it.\nAuctioning element", ss.getSquareName());
 				loading(5, true);
 				auctionSquare(scanner, ss, player, players);
-				auctioned = true;
-				paid = true;
 				loading(3, true);
 				clearScreen();
-				generateSquareStatus(scanner, player, landedSquare, players, true, true, true);
+				return generateSquareStatus(scanner, player, landedSquare, players, true, true, true);
 			} else if (rolled) {
-				System.out.printf("You are on %s but don't have enough resources to buy it.\n", ss.getSquareName());
+				System.out.printf("\nYou are on %s but don't have enough resources to buy it.", ss.getSquareName());
 			} else {
-				System.out.printf("You are on %s.\n", ss.getSquareName());
+				System.out.printf("\nYou are on %s.", ss.getSquareName());
 			}
+			System.out.print("\n");
 			return new Triplet<>(ss, paid, auctioned);
 		} else {
-			System.out.printf("You are on %s. It can't be owned.\n", landedSquare.getSquareName());
+			System.out.printf("\nYou are on %s. It can't be owned.\n", landedSquare.getSquareName());
 			return new Triplet<>(null, paid, auctioned);
 		}
 	}
@@ -509,7 +511,6 @@ public class Game {
 		boolean biddingEnded = false;
 		int prevBid = 0;
 		Player highestBidder = null;
-		int rejectedCount = 0;
 		do {
 			Iterator<Player> i = bidders.iterator();
 			if (bidders.size() == 0 ) {
@@ -517,18 +518,18 @@ public class Game {
 			}
 			while (i.hasNext()) {
 				Player bidder = i.next();
-				int finalHighestBid = highestBid;
-				//bidders.removeIf(b -> b.getPlayerResources() < finalHighestBid);
-				String names = bidders.stream().map(Player::getName).collect(Collectors.joining(", "));
-				clearScreen();
-				// check if current bidder is the highest bidder - break if so
-				if (bidder.equals(highestBidder)) {
-					biddingEnded = true;
-					break;
-				}
-				System.out.printf("Bidding on %s, starting at %d. (Eligible bidders: %s)\n", square.getSquareName(),
-						square.getBaseCost(), names);
-				if (bidder.getPlayerResources() >= highestBid) {
+				if (bidder.getPlayerResources() < highestBid) {
+					i.remove();
+				} else {
+					String names = bidders.stream().map(Player::getName).collect(Collectors.joining(", "));
+					clearScreen();
+					// check if current bidder is the highest bidder - break if so
+					if (bidder.equals(highestBidder)) {
+						biddingEnded = true;
+						break;
+					}
+					System.out.printf("Bidding on %s, starting at %d. (Eligible bidders: %s)\n", square.getSquareName(),
+							square.getBaseCost(), names);
 					if (highestBidder != null) {
 						System.out.printf("%s is the highest bidder at %d credits\n", highestBidder.getName(),
 								highestBid);
@@ -542,14 +543,10 @@ public class Game {
 						highestBid = bid;
 						highestBidder = bidder;
 					} else if (bid == -1) {
-						// increment rejected count to prevent infinite loop if no one bids
-						rejectedCount++;
 						i.remove();
 					}
 					// set current bid to previous user's bid for next iteration
 					prevBid = bid;
-				} else {
-					i.remove();
 				}
 			}
 		} while (!biddingEnded);
@@ -874,6 +871,7 @@ public class Game {
 		if (recipients.size() == 1) {
 			recipient = recipients.get(0);
 		} else {
+			System.out.println("Which player would you like to donate to?");
 			int count = 1;
 			for (Player r : recipients) {
 				System.out.printf("%d. %s\n", count++, r.getName());
@@ -885,10 +883,13 @@ public class Game {
 				return;
 			}
 		}
+		System.out.printf("How much would you like to donate to %s\n", recipient.getName());
 		int resources = scanIntInput(scanner, MIN_BANKRUPTCY_DONATION, player.getPlayerResources() - MIN_BANKRUPTCY_DONATION, true);
 		if (resources > 0) {
 			recipient.addResources(resources);
 			player.addResources(-1 * resources);
+			System.out.printf("You have donated %d to %s", resources, recipient.getName());
+			loading(3, true);
 		}
 	}
 
