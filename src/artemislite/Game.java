@@ -58,6 +58,8 @@ public class Game {
 					.filter(e -> e.getDevelopment() == 4).count() == 10;
 		} while (!endGame && !quitGame && !bankruptcy);
 
+		clearScreen();
+
 		if (quitGame) {
 			System.out.printf("Game is over! %s quit the game.\n", players.get(playerCount - 1).getName());
 		} else if (bankruptcy) {
@@ -80,6 +82,7 @@ public class Game {
 		// local vars
 		int userOption;
 		boolean turnFinished = false;
+		boolean endGame = false;
 		boolean rolled = false;
 		boolean purchased = false;
 		boolean paid = false;
@@ -101,7 +104,6 @@ public class Game {
 
 		do {
 			menuNum = 0;
-			clearScreen();
 
 			Square landedSquare = squares.get(player.getPosition());
 			Triplet<SystemSquare, Boolean, Boolean> triplet = generateSquareStatus(scanner, player, landedSquare, players, rolled, paid, auctioned);
@@ -223,9 +225,15 @@ public class Game {
 			case 10:
 				// quit game
 				clearScreen();
+				System.out.print("Are you sure you want to quit? The game will end for all players in 10 seconds. Press enter to cancel.");
+				if (inputTimer(10)) {
+					endGame = true;
+				}
+				//consume new line char
+				scanner.nextLine();
 				break;
 			}
-		} while (!turnFinished && userOption != menuNum);
+		} while (!turnFinished && !endGame);
 		return turnFinished;
 	}
 
@@ -292,6 +300,8 @@ public class Game {
 																			   boolean rolled,
 																			   boolean paid,
 																			   boolean auctioned) throws BankruptcyException {
+
+		clearScreen();
 
 		if (players.stream().anyMatch(p -> p.getPlayerResources() < BANKRUPTCY_RISK)) {
 			if (player.goingBankrupt()) {
@@ -752,14 +762,13 @@ public class Game {
 			System.out.printf("%d. Continue\n", count);
 
 			option = scanIntInput(scanner, 1, sellerUndevelopedSquares.size(), true);
-			if (option != max) {
+			if (option < 0) {
+				return;
+			} else if (option > 0 && option < max) {
 				SystemSquare squareToTrade = sellerUndevelopedSquares.get(option - 1);
 				sellerSquares.add(squareToTrade);
 				sellerUndevelopedSquares.remove(squareToTrade);
 				max--;
-			}
-			if (option < 0) {
-				return;
 			}
 		} while (option < max);
 
@@ -805,6 +814,9 @@ public class Game {
 					player.removeSquare(ss);
 					buyer.purchaseSquare(ss, cost);
 				}
+			} else {
+				//consume new line char
+				scanner.nextLine();
 			}
 		} else if (paymentMethod == 2) {
 			int squareOption;
@@ -821,14 +833,13 @@ public class Game {
 				}
 				System.out.printf("%d. Continue\n", count);
 				squareOption = scanIntInput(scanner, 1, max, true);
-				if (squareOption != max) {
+				if (squareOption < 0) {
+					return;
+				} else if (squareOption != max) {
 					SystemSquare squareToTrade = buyerUndevelopedSquares.get(squareOption - 1);
 					buyerSquares.add(squareToTrade);
 					buyerUndevelopedSquares.remove(squareToTrade);
 					max--;
-				}
-				if (squareOption < 0) {
-					return;
 				}
 			} while (squareOption < max);
 			System.out.println("The trade will occur in 10 seconds. Press enter to cancel.");
@@ -841,6 +852,9 @@ public class Game {
 					buyer.purchaseSquare(ss, 0);
 					player.removeSquare(ss);
 				}
+			} else {
+				//consume new line char
+				scanner.nextLine();
 			}
 		}
 	}
