@@ -1,4 +1,7 @@
 package artemislite;
+
+import java.util.Scanner;
+
 /**
  * @author mark
  *
@@ -11,41 +14,40 @@ public class MiniGames {
 	
 	public static void main(String[] args) {
 		// TODO The main method is just here to test your game!
-		/*
-		String q1 = "Which mission of Nasa brought the first human to the Moon?\n" 
+		String q1 = "Which mission of Nasa brought the first human to the Moon?\n"
 				+ "a) Apollo Mission\n b) Gemini Mission\n c) Mercury Mission";
-		
-		String q2 = "When did Nasa launch their first mission to the sun?\n" 
+
+		String q2 = "When did Nasa launch their first mission to the sun?\n"
 				+ "a) 2016\n b) 2017\n c) 2018\n";
-		
+
 		String q3 = "What is 4/5s as a decimal?\n"
 				+ "a) 0.8\n b) 0.45\n c) 4.5\n";
-		
+
 		String q4 = "What is 25 - 4 x 3?\n"
 				+ "a) 63\n b) 13\n c) 37\n";
-		
-		Questions [] questions = {
+
+		Questions[] questions = {
 				new Questions(q1, "a"),
 				new Questions(q2, "c"),
 				new Questions(q3, "a"),
-				new Questions(q4, "b");
-		}
-		
-		public static void playMinigame(Questions [] questions) {
-			int score = 0;
-			Scanner userInput = new Scanner(System.in);
-			
-			for (int i = 0; i <questions.length; i++) {
-				System.out.println(questions[i].getQuestion());
-				String answer = userInput.nextLine();
-				if (answer.equals(questions[i].getAnswer())) {
-					score++;
-				}
+				new Questions(q4, "b")
+		};
+	}
+
+	public static void playMinigame(Questions[] questions) {
+		int score = 0;
+		Scanner userInput = new Scanner(System.in);
+
+		for (Questions question : questions) {
+			System.out.println(question.getQuestion());
+			String answer = userInput.nextLine();
+			if (answer.equals(question.getAnswer())) {
+				score++;
 			}
-		
-	
+		}
+
+
 		System.out.println("You got " + score + "/" + questions.length);
-	*/
 	}
 	
 

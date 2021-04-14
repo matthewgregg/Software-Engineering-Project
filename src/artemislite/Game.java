@@ -139,6 +139,7 @@ public class Game {
 				if (i == 5 && !player.hasDevelopments() && !player.hasMortgagableElements() && !player.hasMortgagedElements()) {
 					continue;
 				}
+				//skip trade with player
 				if (i == 6 && players.stream().noneMatch(p -> p.getOwnedElements().size() > 0)) {
 					continue;
 				}
