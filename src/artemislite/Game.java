@@ -306,7 +306,7 @@ public class Game {
 
 		if (players.stream().anyMatch(p -> p.getPlayerResources() < BANKRUPTCY_RISK)) {
 			if (player.goingBankrupt()) {
-				System.out.print("You are at risk of going bankrupt, which will end the game! Try and get the other players to donate credits to you.");
+				System.out.print("You are at risk of going bankrupt, which will end the game! Try and get the other players to donate credits to you.\n");
 			} else {
 				String names = getPlayersNearBankruptcy(scanner, player, players).stream().map(Player::getName).collect(Collectors.joining(", "));
 				System.out.printf("%s is at risk of bankruptcy, which will end the game! Consider donating credits to them.\n", names);
@@ -333,7 +333,6 @@ public class Game {
 					}
 					System.out.printf("\nYou are on %s. It is owned by %s.", squareName, owner.getName());
 				}
-				System.out.println();
 			} else if (player.getPlayerResources() >= ss.getBaseCost()) {
 				String string = "\nYou are on " + square.getSquareName() + ". It is not owned.";
 				if (rolled) {
@@ -654,6 +653,10 @@ public class Game {
 
 		int userOption = scanIntInput(scanner, 1, menuNum, true);
 
+		if (userOption < 0) {
+			return;
+		}
+
 		switch (bankOptions.get(userOption)) {
 			case 1:
 				sellDevelopmentsMenu(scanner, player);
@@ -663,7 +666,6 @@ public class Game {
 				break;
 			case 3:
 				payOffMortgage(scanner, player);
-			default:
 		}
 	}
 
