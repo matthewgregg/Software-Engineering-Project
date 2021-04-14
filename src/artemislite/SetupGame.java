@@ -12,24 +12,29 @@ public class SetupGame {
 	private static final int MAX_PLAYERS = 4;
 
 	public static List<Player> playerCreation(Scanner scanner) {
-		System.out.println("How many players? Enter a number between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
-		int numPlayers = Game.scanIntInput(scanner, 2, 4, false);
+		System.out.println("How many crew members would like to play?\nEnter a number between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
+		int numPlayers = Game.scanIntInput(scanner, MIN_PLAYERS, MAX_PLAYERS, false);
 
-		System.out.println("Enter the names of the " + numPlayers + " players. Press return after entering a name.");
+		Game.clearScreen();
+
+		System.out.println("Enter the names of the " + numPlayers + " crew members.\nPress return after entering a name.");
 
 		ArrayList<Player> players = new ArrayList<>();
 		boolean validPlayerName = false;
+		int count = 1;
 
 		do {
 			do {
 				String name = null;
 				try {
+					System.out.printf("%d. ", count);
 					name = scanner.nextLine();
 					// add new player to players if the name is unique
 					String finalName = name;
 					if (players.stream().noneMatch(p -> p.getName().equals(finalName))) {
 						players.add(new Player(name));
 						validPlayerName = true;
+						count++;
 					} else {
 						throw new InvalidNameException();
 					}

@@ -30,12 +30,22 @@ public class Game {
 	public static void main(String[] args) {
 		clearScreen();
 
+		System.out.print(introduction());
+		loading(5, true);
+		clearScreen();
+
 		final Scanner scanner = new Scanner(System.in);
 		final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
 
 		clearScreen();
-		System.out.print(welcomeMessage(players));
-		loading(5, true);
+		try {
+			launchStatusCheck();
+		} catch (InterruptedException e) {
+			System.out.println("Thread error");
+		}
+		clearScreen();
+		printWelcomeMessage(players);
+		loading(10, true);
 
 		boolean quitGame = false;
 		boolean bankruptcy = false;
@@ -173,7 +183,7 @@ public class Game {
 				case 2:
 					// display which elements are owned by who
 					displayBoardState(players);
-					loading(5, true);
+					scanner.nextLine();
 					break;
 				case 3:
 					// roll dice and move player
@@ -231,7 +241,7 @@ public class Game {
 				case 10:
 					// quit game
 					clearScreen();
-					System.out.print("Are you sure you want to quit? The game will end for all players in 10 seconds. Press enter to cancel.");
+					System.out.print("WARNING\nAre you sure you want to quit? The game will end for all players in 10 seconds. Press enter to cancel.");
 					if (inputTimer(10)) {
 						endGame = true;
 					} else {
@@ -271,24 +281,106 @@ public class Game {
 					throw new NumberFormatException();
 				}
 			} catch (NumberFormatException e) {
-				System.out.printf("Please enter a number between %d and %d.\n", lowerLimit, upperLimit);
+				System.out.printf("Houston we have a problem! Please enter a number between %d and %d.\n", lowerLimit, upperLimit);
 			}
 		} while (!valid);
 		return userOption;
 	}
+
+	public static StringBuilder introduction() {
+		StringBuilder message = new StringBuilder("\t\t##################################\n"
+				+ "\t\t###      ARTEMISLITE 2024      ###\n"
+				+ "\t\t##################################");
+
+		message.append("\n\nWelcome to the ArtemisLite Game!\n\n"
+				+ "This virtual board game is inspired by Nasa's real life Artemis Mission...\n"
+				+ "You can help send the first woman and next man to the moon.\n\n"
+				+ "After that, next stop Mars");
+		return message;
+	}
+
+	public static void launchStatusCheck() throws InterruptedException {
+		System.out.print("Verify go/no-go for start all launch sequence.");
+		Thread.sleep(1500);
+		System.out.print("\n\tVerify go.");
+		Thread.sleep(1000);
+		System.out.print("\n\nMission director, CBTS 111.");
+		Thread.sleep(1500);
+		System.out.print("\n\tGo.");
+		Thread.sleep(1000);
+		System.out.print("\nVerify go for launch.");
+		Thread.sleep(1500);
+		System.out.print("\n\tGo for launch.");
+		Thread.sleep(1500);
+		System.out.print("\n\nFlight, go for launch.");
+		Thread.sleep(1500);
+		System.out.print("\n\nAll flight controllers, coming up on auto sequence.");
+		Thread.sleep(5000);
+
+		clearScreen();
+		System.out.print("BOOSTER.");
+		Thread.sleep(1000);
+		System.out.print("\n\tWe're GO, Flight.");
+		Thread.sleep(1000);
+		System.out.print("\nEECOM.");
+		Thread.sleep(1000);
+		System.out.print("\n\tGO, Flight.");
+		Thread.sleep(1000);
+		System.out.print("\nGNC.");
+		Thread.sleep(1000);
+		System.out.print("\n\tGO, Flight.");
+		Thread.sleep(1000);
+		System.out.print("\nTELCOM.");
+		Thread.sleep(1000);
+		System.out.print("\n\tGO, Flight.");
+		Thread.sleep(1000);
+		System.out.print("\nCONTROL.");
+		Thread.sleep(1000);
+		System.out.print("\n\tGO.");
+		Thread.sleep(1000);
+		System.out.print("\nNETWORK.");
+		Thread.sleep(1000);
+		System.out.print("\n\tAffirmative, Flight.");
+		Thread.sleep(3000);
+		System.out.print("\n\nLift off.");
+		Thread.sleep(3000);
+
+		clearScreen();
+		System.out.print("Staging...");
+		Thread.sleep(2000);
+		System.out.print("\n\nBOOSTER.");
+		Thread.sleep(1000);
+		System.out.print("\n\tGo.");
+		Thread.sleep(1000);
+		System.out.print("\nFIDO.");
+		Thread.sleep(1000);
+		System.out.print("\n\tGo.");
+		Thread.sleep(1000);
+		System.out.print("\nGUIDANCE.");
+		Thread.sleep(1000);
+		System.out.print("\n\tGo.");
+		Thread.sleep(1000);
+		System.out.print("\nGood for staging, CAPCOM.");
+		Thread.sleep(3000);
+
+		System.out.print("\n\nStaging...");
+		Thread.sleep(1000);
+		System.out.print(" and ignition.");
+		Thread.sleep(5000);
+		System.out.print("\n\nThrust is go, all engines.");
+		Thread.sleep(5000);}
 
 	/**
 	 * Displays personalised welcome message
 	 *
 	 * @return the message
 	 */
-	public static StringBuilder welcomeMessage(final List<Player> players) {
-		StringBuilder welcome = new StringBuilder("Welcome to ArtemisLite, ");
-		welcome.append(players.stream().limit(players.size() - 1).map(Player::getName).collect(Collectors.joining(", ")));
-		welcome.append(" and ").append(players.get(players.size() - 1).getName());
-		welcome.append(".\nThis virtual board game is inspired by Nasa's real life Artemis Mission..."
-				+ "\nYou can help send the first woman and next man to the moon." + "\n\nAfter that, next stop Mars");
-		return welcome;
+	public static void printWelcomeMessage(final List<Player> players) {
+		String welcome = "Welcome " + players.stream().limit(players.size() - 1).map(Player::getName).collect(Collectors.joining(", ")) +
+				" and " + players.get(players.size() - 1).getName() +
+				". Your mission as crew members of ArtemisLite is to procure all the systems required to launch "
+				+ "and land on the moon! Remember you're not just playing against each other - if a crew member goes bankrupt, you all lose!\n";
+		System.out.print(welcome);
 	}
 
 	/**
@@ -475,22 +567,42 @@ public class Game {
 	 * players)
 	 */
 	public static void displayBoardState(final List<Player> players) {
-		for (Player player : players) {
-			System.out.printf("%s (pos. %d) ", player.getName(), player.getPosition() + 1);
-			if (player.getOwnedElements().size() == 0) {
-				System.out.print("[No owned elements]");
+		System.out.printf("%-4s  %-28s  %-16s  %-20s\n", "[No]", "[Square Name]", "[Owner]", "[Player Position]");
+		SystemName prevSystem = null;
+		for (Square s : squares) {
+			String owner;
+			SystemSquare ss = null;
+			if (s instanceof SystemSquare) {
+				Player o = players.stream().filter(p -> p.getOwnedElements().contains(s)).findAny().orElse(null);
+				// TODO multiple players (truncate to 18 chars)
+				ss = (SystemSquare) s;
+				owner = o != null ? o.getName() + " (Dev " + ss.getDevelopment() + ")" : "";
 			} else {
-				System.out.print("[");
-				String separator = "";
-				for (SystemSquare s : player.getOwnedElements()) {
-					System.out.println(s.getSquareName());
-					System.out.printf(" (pos. %d, dev. %d)%s", s.getPosition() + 1, s.getDevelopment(), separator);
-					separator = ", ";
-				}
-				System.out.print("]");
+				owner = "Can't be owned";
 			}
-			System.out.println();
+			String landedPlayers = players.stream()
+					.filter(p -> p.getPosition() == s.getPosition())
+					.map(Player::getName)
+					.collect(Collectors.joining(", "));
+
+			if (landedPlayers.length() - 3 > 20) {
+				landedPlayers = landedPlayers.substring(0, 17) + "...";
+			}
+
+			if (!(s instanceof SystemSquare) ||  !(ss.getSystemNameEnum().equals(prevSystem))) {
+				System.out.println("----------------------------------------------------------------------------");
+				if (ss != null && !(ss.getSystemNameEnum().equals(prevSystem))) {
+					System.out.printf("%s\n", ss.getSystemNameString().toUpperCase());
+				}
+			}
+			int pos = s.getPosition() + 1;
+			System.out.printf("%-4s  %-28s  %-16s  %-20s\n", "["+pos+"]", "["+s.getSquareName()+"]", "["+owner+"]", "["+landedPlayers+"]");
+
+			if (ss != null) {
+				prevSystem = ss.getSystemNameEnum();
+			}
 		}
+		System.out.print("\nPress enter to return to the main menu.");
 	}
 
 	/**
