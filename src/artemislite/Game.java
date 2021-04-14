@@ -228,9 +228,10 @@ public class Game {
 				System.out.print("Are you sure you want to quit? The game will end for all players in 10 seconds. Press enter to cancel.");
 				if (inputTimer(10)) {
 					endGame = true;
+				} else {
+					//consume new line char
+					scanner.nextLine();
 				}
-				//consume new line char
-				scanner.nextLine();
 				break;
 			}
 		} while (!turnFinished && !endGame);
