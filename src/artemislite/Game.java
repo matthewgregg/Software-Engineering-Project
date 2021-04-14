@@ -487,14 +487,21 @@ public class Game {
 	}
 
 	/**
-	 * Roll two virtual dice and return two numbers
+	 * Roll two virtual, weighted d-n dice and return two numbers
+	 * When rolling two fair d6 dice, the most likely result is n+1, 7.
+	 * With these dice, any roll has equal probability
+	 * i.e. if the argument is n, the probability of any roll is 1/n
+	 * The probability is the same as if a single 2*d sided dice was rolled
 	 *
 	 * @return two-element integer array
 	 */
 	public static int[] rollDice(int d) {
+		int lowest = 2;
+		int rollSum = rand.nextInt(2 * d - lowest + 1) + lowest;
+		int split = rand.nextInt(rollSum + 1 - lowest) + lowest;
 		int[] roll = new int[2];
-		roll[0] = rand.nextInt(d) + 1;
-		roll[1] = rand.nextInt(d) + 1;
+		roll[0] = split - (lowest - 1);
+		roll[1] = (rollSum + 1) - split;
 		return roll;
 	}
 
