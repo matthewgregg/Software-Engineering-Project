@@ -54,13 +54,6 @@ public class Player extends Actor {
     }
 
     /**
-     * @param playerResources the playerResources to set
-     */
-    public void setPlayerResources(int playerResources) {
-        this.playerResources = playerResources;
-    }
-
-    /**
      * @return the ownedElements
      */
     public ArrayList<SystemSquare> getOwnedElements() {
@@ -97,7 +90,7 @@ public class Player extends Actor {
     public void addResources(int delta) throws BankruptcyException {
         int res = this.playerResources + delta;
         if (res >= 0) {
-            setPlayerResources(this.playerResources + delta);
+            this.playerResources += delta;
         } else {
             throw new BankruptcyException("You've gone bankrupt");
         }
@@ -125,12 +118,7 @@ public class Player extends Actor {
     public void purchaseSquare(SystemSquare square) throws BankruptcyException {
         this.ownedElements.add(square);
         square.setOwned(true);
-        if (!square.isMortgaged()) {
-            this.addResources(-1 * square.getBaseCost());
-        } else {
-            this.addResources((int) (-1.1 * square.getBaseCost()));
-            square.setMortgaged(false);
-        }
+        this.addResources(-1 * square.getBaseCost());
     }
 
     /**
@@ -184,11 +172,23 @@ public class Player extends Actor {
         return this.getOwnedElements().stream().filter(s -> s.getDevelopment() == 0).anyMatch(s -> !s.isMortgaged());
     }
 
+    public boolean hasMortgagedElements() {
+        return this.getOwnedElements().stream().anyMatch(SystemSquare::isMortgaged);
+    }
+
     /**
      * find out whether the user has any developments
      * @return whether the player has at least one development
      */
     public boolean hasDevelopments() {
         return this.getOwnedElements().stream().anyMatch(s -> s.getDevelopment() > 0);
+    }
+
+    /**
+     * whether the player is close to going bankrupt or not (less than or equal to 200 credits)
+     * @return player resources <= 200
+     */
+    public boolean goingBankrupt() {
+        return this.getPlayerResources() <= 200;
     }
 }

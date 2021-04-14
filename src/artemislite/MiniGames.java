@@ -1,8 +1,4 @@
-/**
- * 
- */
 package artemislite;
-import java.util.Scanner;
 /**
  * @author mark
  *
@@ -49,10 +45,10 @@ public class MiniGames {
 		
 	
 		System.out.println("You got " + score + "/" + questions.length);
-		
+	*/
 	}
 	
-	*/
+
 	public void navigationGame() {
 		
 		// TODO - Thought this could be a simple math game!

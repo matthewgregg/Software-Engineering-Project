@@ -74,7 +74,7 @@ class GameTest {
 
         player1.purchaseSquare(ss1);
         player1.purchaseSquare(ss2);
-        Game.sellElement(scanner, player1, players);
+        Game.tradeWithPlayer(scanner, player1, players);
         assertEquals(res + cost, player1.getPlayerResources());
         assertTrue(player2.getOwnedElements().contains(ss1));
 
@@ -82,7 +82,7 @@ class GameTest {
         System.setIn(inElement);
         scanner = new Scanner(inElement);
 
-        Game.sellElement(scanner, player2, players);
+        Game.tradeWithPlayer(scanner, player2, players);
         assertTrue(player1.getOwnedElements().contains(ss1));
         assertFalse(player1.getOwnedElements().contains(ss2));
         assertTrue(player2.getOwnedElements().contains(ss2));
