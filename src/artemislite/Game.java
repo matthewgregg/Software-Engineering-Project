@@ -53,9 +53,8 @@ public class Game {
 				// player went bankrupt
 				bankruptcy = true;
 			}
-			endGame = players.stream()
-					.flatMap(p -> p.getOwnedElements().stream())
-					.filter(e -> e.getDevelopment() == 4).count() == 10;
+			endGame = players.stream().flatMap(p -> p.getOwnedElements().stream()).filter(e -> e.getDevelopment() == 4)
+					.count() == 10;
 		} while (!endGame && !quitGame && !bankruptcy);
 
 		clearScreen();
@@ -66,6 +65,7 @@ public class Game {
 			System.out.printf("Game is over! %s went bankrupt.\n", players.get(playerCount - 1).getName());
 		} else {
 			System.out.println("Epilogue...");
+		//	epilogue(players);
 		}
 		scanner.close();
 	}
@@ -78,7 +78,8 @@ public class Game {
 	 * @return a boolean for whether the user finished their turn or not. If false,
 	 *         the player quit the game. If true, the player finished their turn
 	 */
-	public static boolean generateOptionsMenu(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
+	public static boolean generateOptionsMenu(Scanner scanner, final Player player, final List<Player> players)
+			throws BankruptcyException {
 		// local vars
 		int userOption;
 		boolean turnFinished = false;
@@ -106,7 +107,8 @@ public class Game {
 			menuNum = 0;
 
 			Square landedSquare = squares.get(player.getPosition());
-			Triplet<SystemSquare, Boolean, Boolean> triplet = generateSquareStatus(scanner, player, landedSquare, players, rolled, paid, auctioned);
+			Triplet<SystemSquare, Boolean, Boolean> triplet = generateSquareStatus(scanner, player, landedSquare,
+					players, rolled, paid, auctioned);
 			SystemSquare ss = triplet.getFirst();
 			paid = triplet.getSecond();
 			auctioned = triplet.getThird();
@@ -137,16 +139,18 @@ public class Game {
 						|| player.getDevelopableSystems() == null)) {
 					continue;
 				}
-				//skip deal with bank
-				if (i == 5 && !player.hasDevelopments() && !player.hasMortgagableElements() && !player.hasMortgagedElements()) {
+				// skip deal with bank
+				if (i == 5 && !player.hasDevelopments() && !player.hasMortgagableElements()
+						&& !player.hasMortgagedElements()) {
 					continue;
 				}
-				//skip trade with player
+				// skip trade with player
 				if (i == 6 && players.stream().noneMatch(p -> p.getOwnedElements().size() > 0)) {
 					continue;
 				}
-				//skip donate to player
-				if (i == 7 && (players.stream().noneMatch(Player::goingBankrupt) && player.getPlayerResources() > BANKRUPTCY_RISK || player.goingBankrupt())) {
+				// skip donate to player
+				if (i == 7 && (players.stream().noneMatch(Player::goingBankrupt)
+						&& player.getPlayerResources() > BANKRUPTCY_RISK || player.goingBankrupt())) {
 					continue;
 				}
 				menuNum++;
@@ -161,7 +165,8 @@ public class Game {
 			// output options menu
 			switch (menuOptions.get(userOption)) {
 			case 1:
-				//display rules
+				// display rules
+				epilogue(players);// TODO temporarily here - purely for testing purposes
 				displayGameRules(scanner);
 				break;
 			case 2:
@@ -192,7 +197,7 @@ public class Game {
 				loading(3, true);
 				break;
 			case 5:
-				//buy development
+				// buy development
 				buyDevelopmentsMenu(scanner, player);
 				break;
 			case 6:
@@ -200,11 +205,11 @@ public class Game {
 				bankMenu(scanner, player, players);
 				break;
 			case 7:
-				//trade or sell element
+				// trade or sell element
 				tradeWithPlayer(scanner, player, players);
 				break;
 			case 8:
-				//donate to other player
+				// donate to other player
 				makeDonation(scanner, player, players);
 				break;
 			case 9:
@@ -214,7 +219,8 @@ public class Game {
 				// and the auction hasn't occurred yet
 				turnFinished = true;
 				if (ss != null && !ss.isOwned() && !purchased && isAuctionable(ss, player, players) && !auctioned) {
-					System.out.printf("%s didn't want to buy %s.\nAuctioning element", player.getName(), ss.getSquareName());
+					System.out.printf("%s didn't want to buy %s.\nAuctioning element", player.getName(),
+							ss.getSquareName());
 					loading(5, true);
 					auctionSquare(scanner, ss, player, players);
 					auctioned = true;
@@ -225,11 +231,12 @@ public class Game {
 			case 10:
 				// quit game
 				clearScreen();
-				System.out.print("Are you sure you want to quit? The game will end for all players in 10 seconds. Press enter to cancel.");
+				System.out.print(
+						"Are you sure you want to quit? The game will end for all players in 10 seconds. Press enter to cancel.");
 				if (inputTimer(10)) {
 					endGame = true;
 				} else {
-					//consume new line char
+					// consume new line char
 					scanner.nextLine();
 				}
 				break;
@@ -278,38 +285,38 @@ public class Game {
 	 */
 	public static StringBuilder welcomeMessage(final List<Player> players) {
 		StringBuilder welcome = new StringBuilder("Welcome to ArtemisLite, ");
-		welcome.append(players.stream().limit(players.size() - 1).map(Player::getName).collect(Collectors.joining(", ")));
+		welcome.append(
+				players.stream().limit(players.size() - 1).map(Player::getName).collect(Collectors.joining(", ")));
 		welcome.append(" and ").append(players.get(players.size() - 1).getName());
-		welcome.append(".\nThis virtual board game is inspired by Nasa's real life Artemis Mission..." +
-				"\nYou can help send the first woman and next man to the moon." +
-				"\n\nAfter that, next stop Mars");
+		welcome.append(".\nThis virtual board game is inspired by Nasa's real life Artemis Mission..."
+				+ "\nYou can help send the first woman and next man to the moon." + "\n\nAfter that, next stop Mars");
 		return welcome;
 	}
 
 	/**
 	 * prints user message
 	 *
-	 * @param player       	the player
-	 * @param landedSquare 	the square they've landed on
-	 * @param rolled		whether the current user has rolled or not
+	 * @param player       the player
+	 * @param landedSquare the square they've landed on
+	 * @param rolled       whether the current user has rolled or not
 	 * @return systemsquare if the square is a system square
 	 */
-	public static Triplet<SystemSquare, Boolean, Boolean> generateSquareStatus(Scanner scanner,
-																			   final Player player,
-																			   final Square landedSquare,
-																			   final List<Player> players,
-																			   boolean rolled,
-																			   boolean paid,
-																			   boolean auctioned) throws BankruptcyException {
+	public static Triplet<SystemSquare, Boolean, Boolean> generateSquareStatus(Scanner scanner, final Player player,
+			final Square landedSquare, final List<Player> players, boolean rolled, boolean paid, boolean auctioned)
+			throws BankruptcyException {
 
 		clearScreen();
 
 		if (players.stream().anyMatch(p -> p.getPlayerResources() < BANKRUPTCY_RISK)) {
 			if (player.goingBankrupt()) {
-				System.out.print("You are at risk of going bankrupt, which will end the game! Try and get the other players to donate credits to you.\n");
+				System.out.print(
+						"You are at risk of going bankrupt, which will end the game! Try and get the other players to donate credits to you.\n");
 			} else {
-				String names = getPlayersNearBankruptcy(scanner, player, players).stream().map(Player::getName).collect(Collectors.joining(", "));
-				System.out.printf("%s is at risk of bankruptcy, which will end the game! Consider donating credits to them.\n", names);
+				String names = getPlayersNearBankruptcy(scanner, player, players).stream().map(Player::getName)
+						.collect(Collectors.joining(", "));
+				System.out.printf(
+						"%s is at risk of bankruptcy, which will end the game! Consider donating credits to them.\n",
+						names);
 			}
 		}
 
@@ -340,7 +347,8 @@ public class Game {
 				}
 				System.out.print(string);
 			} else if (isAuctionable(ss, player, players) && !auctioned && rolled) {
-				System.out.printf("\nYou are on %s but don't have enough resources to buy it.\nAuctioning element", ss.getSquareName());
+				System.out.printf("\nYou are on %s but don't have enough resources to buy it.\nAuctioning element",
+						ss.getSquareName());
 				loading(5, true);
 				auctionSquare(scanner, ss, player, players);
 				loading(3, true);
@@ -410,36 +418,40 @@ public class Game {
 		ArrayList<String> endingRules = new ArrayList<>();
 
 		// basic game structure rules
-		//TODO implement this somewhere
-		//basicGameRules.add("Roll dice to decide who goes first");
+		// TODO implement this somewhere
+		// basicGameRules.add("Roll dice to decide who goes first");
 		basicGameRules.add("Basic Game Rules:");
-		basicGameRules.add("The aim is to help NASA complete its mission by fully developing all mission-critical Systems");
+		basicGameRules
+				.add("The aim is to help NASA complete its mission by fully developing all mission-critical Systems");
 		basicGameRules.add("When it's your go, pick what you'd like to do from the menu.");
 		basicGameRules.add("e.g. Roll the dice to move along the board.");
 
 		// buying and selling
 		buyingSellingRules.add("Rules for Buying and Selling:");
 		buyingSellingRules.add("You'll each be allotted some credits (the currency of the solar system) to start out.");
-		buyingSellingRules.add("Use your credits to purchase a square that you land on or pay other players when you land on their square.");
-		buyingSellingRules.add("If you don't want to buy the square you land on, it will be auctioned to the other players.");
+		buyingSellingRules.add(
+				"Use your credits to purchase a square that you land on or pay other players when you land on their square.");
+		buyingSellingRules
+				.add("If you don't want to buy the square you land on, it will be auctioned to the other players.");
 
 		// developing systems
 		developmentRules.add("Rules for Developing Systems:");
-		developmentRules.add("The board has 12 squares in total grouped into " + systemNames.size() + " systems: " + Arrays.toString(systemNames.toArray()));
+		developmentRules.add("The board has 12 squares in total grouped into " + systemNames.size() + " systems: "
+				+ Arrays.toString(systemNames.toArray()));
 		developmentRules.add("Systems and their squares get more expensive the further you are along the board...");
 		developmentRules.add("There's also bigger rewards should another player land on your square.");
-		developmentRules.add("Once you own a whole system, you can pay to add a development, but only if you can pass a mini-challenge first!");
+		developmentRules.add(
+				"Once you own a whole system, you can pay to add a development, but only if you can pass a mini-challenge first!");
 
 		// ending the game
 		endingRules.add("Rules for Ending the Game:");
 		endingRules.add("All systems must be developed to complete the mission and win the game.");
-		endingRules.add("Should any player go 'Bankrupt' by running out of credits, the game ends and the mission has failed.");
+		endingRules.add(
+				"Should any player go 'Bankrupt' by running out of credits, the game ends and the mission has failed.");
 
 		// join separate arrayLists into one
-		List<String> combinedRuleSets = Stream.of(basicGameRules,
-				buyingSellingRules,
-				developmentRules,
-				endingRules).flatMap(Collection::stream).collect(Collectors.toList());
+		List<String> combinedRuleSets = Stream.of(basicGameRules, buyingSellingRules, developmentRules, endingRules)
+				.flatMap(Collection::stream).collect(Collectors.toList());
 
 		// create hashmap of user input and corresponding list
 		HashMap<Integer, List<String>> getList = new HashMap<>();
@@ -487,11 +499,10 @@ public class Game {
 	}
 
 	/**
-	 * Roll two virtual, weighted d-n dice and return two numbers
-	 * When rolling two fair d6 dice, the most likely result is n+1, 7.
-	 * With these dice, any roll has equal probability
-	 * i.e. if the argument is n, the probability of any roll is 1/n
-	 * The probability is the same as if a single 2*d sided dice was rolled
+	 * Roll two virtual, weighted d-n dice and return two numbers When rolling two
+	 * fair d6 dice, the most likely result is n+1, 7. With these dice, any roll has
+	 * equal probability i.e. if the argument is n, the probability of any roll is
+	 * 1/n The probability is the same as if a single 2*d sided dice was rolled
 	 *
 	 * @return two-element integer array
 	 */
@@ -519,9 +530,10 @@ public class Game {
 	/**
 	 * Auctions a square to other players
 	 *
-	 * @param square  the square to auction
+	 * @param square the square to auction
 	 */
-	public static void auctionSquare(Scanner scanner, final SystemSquare square, final Player player, final List<Player> players) throws BankruptcyException {
+	public static void auctionSquare(Scanner scanner, final SystemSquare square, final Player player,
+			final List<Player> players) throws BankruptcyException {
 		// copy players into new arraylist and remove player from bidders list
 		ArrayList<Player> bidders = new ArrayList<>(players);
 		bidders.remove(player);
@@ -531,7 +543,7 @@ public class Game {
 		Player highestBidder = null;
 		do {
 			Iterator<Player> i = bidders.iterator();
-			if (bidders.size() == 0 ) {
+			if (bidders.size() == 0) {
 				biddingEnded = true;
 			}
 			while (i.hasNext()) {
@@ -554,8 +566,7 @@ public class Game {
 					}
 					System.out.printf("%s, please enter your bid or # to skip.\n", bidder.getName());
 
-					int bid = scanIntInput(scanner,
-							square.getBaseCost() + (highestBid == square.getBaseCost() ? 0 : 1),
+					int bid = scanIntInput(scanner, square.getBaseCost() + (highestBid == square.getBaseCost() ? 0 : 1),
 							bidder.getPlayerResources(), true);
 					if (bid > prevBid) {
 						highestBid = bid;
@@ -622,13 +633,17 @@ public class Game {
 	}
 
 	/**
-	 * Allows the user to choose to sell developments, mortgage a property or pay off the mortgage on a property
+	 * Allows the user to choose to sell developments, mortgage a property or pay
+	 * off the mortgage on a property
+	 * 
 	 * @param scanner the scanner
-	 * @param player the current player
+	 * @param player  the current player
 	 * @param players an arraylist of all players
 	 */
-	public static void bankMenu(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
-		System.out.println("Welcome to the space bank. Here you can sell developments, mortgage an element or pay off a mortgage. Please select an option or enter # to cancel.");
+	public static void bankMenu(Scanner scanner, final Player player, final List<Player> players)
+			throws BankruptcyException {
+		System.out.println(
+				"Welcome to the space bank. Here you can sell developments, mortgage an element or pay off a mortgage. Please select an option or enter # to cancel.");
 		HashMap<Integer, Integer> bankOptions = new HashMap<>();
 		String[] bankMenu = new String[3];
 		bankMenu[0] = "Sell Developments";
@@ -643,7 +658,9 @@ public class Game {
 			if (i == 1 && !player.hasMortgagableElements()) {
 				continue;
 			}
-			if (i == 2 && !player.hasMortgagedElements() && player.getOwnedElements().stream().filter(SystemSquare::isMortgaged).noneMatch(s -> player.getPlayerResources() > (int) (s.getBaseCost() * 1.1))) {
+			if (i == 2 && !player.hasMortgagedElements()
+					&& player.getOwnedElements().stream().filter(SystemSquare::isMortgaged)
+							.noneMatch(s -> player.getPlayerResources() > (int) (s.getBaseCost() * 1.1))) {
 				continue;
 			}
 			menuNum++;
@@ -658,21 +675,22 @@ public class Game {
 		}
 
 		switch (bankOptions.get(userOption)) {
-			case 1:
-				sellDevelopmentsMenu(scanner, player);
-				break;
-			case 2:
-				mortgageElement(scanner, player);
-				break;
-			case 3:
-				payOffMortgage(scanner, player);
+		case 1:
+			sellDevelopmentsMenu(scanner, player);
+			break;
+		case 2:
+			mortgageElement(scanner, player);
+			break;
+		case 3:
+			payOffMortgage(scanner, player);
 		}
 	}
 
 	/**
 	 * generates a menu to allow a player to sell developments at half price
+	 * 
 	 * @param scanner scanner
-	 * @param player the current player
+	 * @param player  the current player
 	 * @throws BankruptcyException
 	 */
 	public static void sellDevelopmentsMenu(Scanner scanner, final Player player) throws BankruptcyException {
@@ -682,7 +700,8 @@ public class Game {
 		int count = 1;
 		System.out.print("Enter an element to sell development from. Enter # to cancel.");
 		for (SystemSquare s : developedSquares) {
-			System.out.printf("%d. %s (%d credits per development)\n", count++, s.getSquareName(), (int) (s.getCostPerDevelopment() * 0.5));
+			System.out.printf("%d. %s (%d credits per development)\n", count++, s.getSquareName(),
+					(int) (s.getCostPerDevelopment() * 0.5));
 		}
 		int option = scanIntInput(scanner, 1, developedSquares.size(), true);
 		if (option > 0) {
@@ -691,7 +710,8 @@ public class Game {
 			int dev = scanIntInput(scanner, 1, s.getDevelopment(), true);
 			if (dev > 0) {
 				player.developElement(s, -1 * dev);
-				System.out.printf("You have sold %s developments for a total of %s", dev, dev * s.getCostPerDevelopment());
+				System.out.printf("You have sold %s developments for a total of %s", dev,
+						dev * s.getCostPerDevelopment());
 				loading(3, true);
 			}
 		}
@@ -699,8 +719,9 @@ public class Game {
 
 	/**
 	 * allows a player to mortgage an undeveloped element
+	 * 
 	 * @param scanner scanner
-	 * @param player player arraylist
+	 * @param player  player arraylist
 	 */
 	public static void mortgageElement(Scanner scanner, final Player player) throws BankruptcyException {
 		ArrayList<SystemSquare> undevelopedSquares = new ArrayList<>();
@@ -714,26 +735,26 @@ public class Game {
 		}
 		int option = scanIntInput(scanner, 1, undevelopedSquares.size(), true);
 		if (option > 0) {
-			SystemSquare s = undevelopedSquares.get(option-1);
+			SystemSquare s = undevelopedSquares.get(option - 1);
 			s.setMortgaged(true);
 			player.addResources(s.getBaseCost());
-			System.out.printf("You have mortgaged %s for %d credits. You can buy it back for %d credits.", s.getSquareName(), s.getBaseCost(), (int) (1.1 * s.getBaseCost()));
+			System.out.printf("You have mortgaged %s for %d credits. You can buy it back for %d credits.",
+					s.getSquareName(), s.getBaseCost(), (int) (1.1 * s.getBaseCost()));
 			loading(3, true);
 		}
 	}
 
 	/**
 	 * allows a player to pay off a mortgaged element
+	 * 
 	 * @param scanner scanner
-	 * @param player the current player
+	 * @param player  the current player
 	 * @throws BankruptcyException
 	 */
 	public static void payOffMortgage(Scanner scanner, final Player player) throws BankruptcyException {
 		System.out.println("Which element would you like to pay off the mortgage on?");
-		List<SystemSquare> mortgaged = player.getOwnedElements().stream()
-				.filter(SystemSquare::isMortgaged)
-				.filter(s -> player.getPlayerResources() > (int) (1.1 * s.getBaseCost()))
-				.collect(Collectors.toList());
+		List<SystemSquare> mortgaged = player.getOwnedElements().stream().filter(SystemSquare::isMortgaged)
+				.filter(s -> player.getPlayerResources() > (int) (1.1 * s.getBaseCost())).collect(Collectors.toList());
 		int count = 1;
 		for (SystemSquare s : mortgaged) {
 			System.out.printf("%d. %s\n", count, s.getSquareName());
@@ -748,11 +769,14 @@ public class Game {
 	}
 
 	/**
-	 * allows a player to sell an undeveloped element to another player for resources or elements
+	 * allows a player to sell an undeveloped element to another player for
+	 * resources or elements
+	 * 
 	 * @param scanner the scanner
-	 * @param player the current player
+	 * @param player  the current player
 	 */
-	public static void tradeWithPlayer(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
+	public static void tradeWithPlayer(Scanner scanner, final Player player, final List<Player> players)
+			throws BankruptcyException {
 		ArrayList<Player> buyers = new ArrayList<>(players);
 		buyers.remove(player);
 		ArrayList<SystemSquare> sellerUndevelopedSquares = new ArrayList<>(player.getOwnedElements());
@@ -760,11 +784,12 @@ public class Game {
 
 		int count;
 		int option;
-		int max = sellerUndevelopedSquares.size()+1;
+		int max = sellerUndevelopedSquares.size() + 1;
 		ArrayList<SystemSquare> sellerSquares = new ArrayList<>();
 		do {
 			count = 1;
-			System.out.println("Enter an undeveloped element(s) to sell. Select continue to finalise selection. Enter # to cancel at any time.");
+			System.out.println(
+					"Enter an undeveloped element(s) to sell. Select continue to finalise selection. Enter # to cancel at any time.");
 			for (SystemSquare s : sellerUndevelopedSquares) {
 				System.out.printf("%d. %s ($%d)", count++, s.getSquareName(), s.getBaseCost());
 				System.out.print(s.isMortgaged() ? " - mortgaged" : "" + "\n");
@@ -825,18 +850,19 @@ public class Game {
 					buyer.purchaseSquare(ss, cost);
 				}
 			} else {
-				//consume new line char
+				// consume new line char
 				scanner.nextLine();
 			}
 		} else if (paymentMethod == 2) {
 			int squareOption;
-			max = buyer.getOwnedElements().size()+1;
+			max = buyer.getOwnedElements().size() + 1;
 			ArrayList<SystemSquare> buyerSquares = new ArrayList<>();
 			ArrayList<SystemSquare> buyerUndevelopedSquares = buyer.getOwnedElements();
 			do {
 				clearScreen();
 				count = 1;
-				System.out.printf("Enter which element(s) %s will give to %s. Select continue to finalise selection.\n", buyer.getName(), player.getName());
+				System.out.printf("Enter which element(s) %s will give to %s. Select continue to finalise selection.\n",
+						buyer.getName(), player.getName());
 				for (SystemSquare ss : buyerUndevelopedSquares) {
 					System.out.printf("%d. %s ($%d)", count++, ss.getSquareName(), ss.getBaseCost());
 					System.out.print(ss.isMortgaged() ? " - mortgaged" : "" + "\n");
@@ -863,7 +889,7 @@ public class Game {
 					player.removeSquare(ss);
 				}
 			} else {
-				//consume new line char
+				// consume new line char
 				scanner.nextLine();
 			}
 		}
@@ -871,12 +897,15 @@ public class Game {
 
 	/**
 	 * get the players that have resources < {@value BANKRUPTCY_RISK}
+	 * 
 	 * @param scanner scanner
-	 * @param player the current player
+	 * @param player  the current player
 	 * @param players all players
-	 * @return an arraylist of players that have resources < {@value BANKRUPTCY_RISK}
+	 * @return an arraylist of players that have resources <
+	 *         {@value BANKRUPTCY_RISK}
 	 */
-	public static List<Player> getPlayersNearBankruptcy(Scanner scanner, final Player player, final List<Player> players) {
+	public static List<Player> getPlayersNearBankruptcy(Scanner scanner, final Player player,
+			final List<Player> players) {
 		List<Player> playersNearBankruptcy = new ArrayList<>(players);
 		playersNearBankruptcy.remove(player);
 		playersNearBankruptcy.removeIf(s -> s.getPlayerResources() >= BANKRUPTCY_RISK);
@@ -885,12 +914,15 @@ public class Game {
 
 	/**
 	 * allows a player to make a donation to another player
+	 * 
 	 * @param scanner scanner
-	 * @param player the current player
+	 * @param player  the current player
 	 * @param players all players
-	 * @throws BankruptcyException this exception will never be thrown as user input is limited
+	 * @throws BankruptcyException this exception will never be thrown as user input
+	 *                             is limited
 	 */
-	public static void makeDonation(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
+	public static void makeDonation(Scanner scanner, final Player player, final List<Player> players)
+			throws BankruptcyException {
 		List<Player> recipients = getPlayersNearBankruptcy(scanner, player, players);
 		Player recipient;
 		if (recipients.size() == 1) {
@@ -909,7 +941,8 @@ public class Game {
 			}
 		}
 		System.out.printf("How much would you like to donate to %s\n", recipient.getName());
-		int resources = scanIntInput(scanner, MIN_BANKRUPTCY_DONATION, player.getPlayerResources() - MIN_BANKRUPTCY_DONATION, true);
+		int resources = scanIntInput(scanner, MIN_BANKRUPTCY_DONATION,
+				player.getPlayerResources() - MIN_BANKRUPTCY_DONATION, true);
 		if (resources > 0) {
 			recipient.addResources(resources);
 			player.addResources(-1 * resources);
@@ -918,12 +951,103 @@ public class Game {
 		}
 	}
 
+	/**
+	 * Handles ending of the game
+	 * 
+	 * @param players
+	 * @param player
+	 */
+	public static void epilogue(final List<Player> players) {
+
+		HashMap<ArrayList<SystemSquare>, Player> playerPortfolio = new HashMap<>();
+
+		System.out.print("Congratulations on completing the ArtemisLite mission!");
+		loading(2, true);
+		System.out.print("Space exploration is reaching new frontiers thanks to your crew's valient efforts");
+		loading(2, true);
+		System.out.println("You're all winners but here's the final state of play: ");
+		loading(3, true);
+
+		for (Player p : players) {
+			System.out.printf("\n%s ended the game with:\n", p.getName());
+
+			System.out.printf("\t***Units***\n\t%d\n", p.getPlayerResources());
+
+			playerPortfolio.put(p.getOwnedElements(), p);
+			System.out.println("\t***Elements Owned***\t");
+			// iterate owned system squares
+			for (ArrayList<SystemSquare> arrList : playerPortfolio.keySet()) {
+				// check if arrayLists in map value are empty and output accordingly
+				if (arrList.isEmpty()) {
+					System.out.printf("\t%s owned no elements\n", p.getName());
+				} else {
+					System.out.println("\t" + playerPortfolio.keySet()); // TODO Fix - needs to be a stream?
+				}
+			}
+			System.out.printf("\t***Net Value*** \n");
+			int totalNetWorth = calculateNetWorth(playerPortfolio, p);
+			System.out.println("\t" + totalNetWorth);
+			System.out.println("\nFinal order of players:\n" + determinefinalOrder(players));
+		}
+
+		// Ending message
+		System.out.println("\nThank you for playing.");
+	}
+
+	/**
+	 * Calculates net worth of all players base cost of element + (cost_per_dev*4) +
+	 * playerResources
+	 * 
+	 * @param playerPortfolio
+	 * @return
+	 */
+	public static int calculateNetWorth(Map<ArrayList<SystemSquare>, Player> playerPortfolio, Player p) {
+
+		int netWorth = 0;
+
+		// loop through map of system squares
+		for (ArrayList<SystemSquare> value : playerPortfolio.keySet()) {
+			// loop through each list of owned elements
+			for (SystemSquare ownedSquare : value) {
+				// base cost + (cost_per_dev*4) + playerResources
+				// TODO Fix - currently returns 0 if player has no owned squares
+				netWorth = ownedSquare.getBaseCost() + (ownedSquare.getCostPerDevelopment() * 4)
+						+ p.getPlayerResources();
+			}
+		}
+		return netWorth;
+
+	}
+
+	/**
+	 * 
+	 * @param players
+	 */
+	private static String determinefinalOrder(final List<Player> players) {
+
+		// TODO Should be based on netWorth rather than players' resources
+
+		int count = 0;
+		// Unsorted array
+		Integer[] finalScores = new Integer[players.size()];
+		for (Player pl : players) {
+			finalScores[count] = pl.getPlayerResources();
+			count++;
+		}
+
+		// Return sorted array
+		Arrays.sort(finalScores, Collections.reverseOrder());
+		return Arrays.toString(finalScores);
+
+	}
+
 	interface IExecCloseable extends AutoCloseable {
 		void close();
 	}
 
 	/**
 	 * starts a timer that can be interrupted by the user
+	 * 
 	 * @return whether the timer stopped gracefully or was interrupted
 	 */
 	public static boolean inputTimer(int time) {
@@ -944,9 +1068,10 @@ public class Game {
 			} catch (InterruptedException | ExecutionException e) {
 				return false;
 			}
-			/*either use autocloseable interface or finally block
-		} finally {
-			ex.shutdownNow();*/
+			/*
+			 * either use autocloseable interface or finally block } finally {
+			 * ex.shutdownNow();
+			 */
 		}
 	}
 
@@ -969,8 +1094,7 @@ public class Game {
 	 */
 	public static <E extends Enum<E>> String stringifyEnum(E en) {
 		return Arrays.stream(en.name().toLowerCase().split("_"))
-				.map(s -> s.substring(0, 1).toUpperCase() + s.substring(1))
-				.collect(Collectors.joining(" "));
+				.map(s -> s.substring(0, 1).toUpperCase() + s.substring(1)).collect(Collectors.joining(" "));
 	}
 
 	/**
