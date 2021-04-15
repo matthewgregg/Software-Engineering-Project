@@ -53,16 +53,16 @@ public class SetupGame {
 		SystemSquare ss1 = new SystemSquare("Moon Gateway Station",
 				1,
 				SystemName.EXPLORATION_GROUND_SYSTEM,
-				2,
+				1,
 				80,
 				50,
 				//		  0dev, 1dev,  2dev,  3dev, MjDev
-				new int[] { 20,   60,  180,   320,  450 });
+				new int[] { 20, 60, 180, 320, 450 });
 
 		SystemSquare ss2 = new SystemSquare("Lunar Payload Services",
 				2,
 				SystemName.EXPLORATION_GROUND_SYSTEM,
-				2,
+				1,
 				100,
 				200,
 				new int[] { 30, 90, 270, 400, 550 });
@@ -96,7 +96,7 @@ public class SetupGame {
 		SystemSquare ss6 = new SystemSquare("Core Stage Depleted",
 				7,
 				SystemName.GATEWAY_OUTPOST,
-				2,
+				3,
 				160,
 				200,
 				new int[] { 60, 180, 500, 700, 900 });
@@ -104,7 +104,7 @@ public class SetupGame {
 		SystemSquare ss7 = new SystemSquare("Spun Stage",
 				8,
 				SystemName.GATEWAY_OUTPOST,
-				2,
+				3,
 				160,
 				200,
 				new int[] { 60, 180, 500, 700, 900 });
@@ -112,7 +112,7 @@ public class SetupGame {
 		SystemSquare ss8 = new SystemSquare("SLS Booster Testing",
 				9,
 				SystemName.GATEWAY_OUTPOST,
-				2,
+				3,
 				180,
 				200,
 				new int[] { 70, 200, 550, 750, 950 });
@@ -120,7 +120,7 @@ public class SetupGame {
 		SystemSquare ss9 = new SystemSquare("Astronaut Training",
 				10,
 				SystemName.LUNAR_LANDER,
-				2,
+				4,
 				200,
 				200,
 				new int[] { 80, 220, 600, 800, 1000 });
@@ -128,7 +128,7 @@ public class SetupGame {
 		SystemSquare ss10 = new SystemSquare("Launch Facilities Upgrades",
 				11,
 				SystemName.LUNAR_LANDER,
-				2,
+				4,
 				220,
 				200,
 				new int[] { 90, 250, 700, 875, 1050 });
