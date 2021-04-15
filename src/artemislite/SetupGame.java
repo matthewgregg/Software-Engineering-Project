@@ -30,9 +30,9 @@ public class SetupGame {
 					System.out.printf("%d. ", count);
 					name = scanner.nextLine();
 					// add new player to players if the name is unique
-					String finalName = name;
+					String finalName = name.substring(0, 1).toUpperCase() + name.substring(1);
 					if (players.stream().noneMatch(p -> p.getName().equals(finalName))) {
-						players.add(new Player(name));
+						players.add(new Player(finalName));
 						validPlayerName = true;
 						count++;
 					} else {

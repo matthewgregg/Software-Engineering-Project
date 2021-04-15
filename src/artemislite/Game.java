@@ -441,7 +441,7 @@ public class Game {
 				}
 				System.out.print(string);
 			} else if (isAuctionable(ss, player, players) && !auctioned && rolled) {
-				System.out.printf("\nYou are on %s but don't have enough resources to purcahse it.\nAuctioning element", ss.getSquareName());
+				System.out.printf("\nYou are on %s but don't have enough resources to purchase it.\nAuctioning element", ss.getSquareName());
 				loading(5, true);
 				auctionSquare(scanner, ss, player, players);
 				loading(3, true);
@@ -522,7 +522,7 @@ public class Game {
 		buyingSellingRules.add("Rules for Purchasing and Selling:");
 		buyingSellingRules.add("You'll each be allotted some credits (the currency of the solar system) to start out.");
 		buyingSellingRules.add("Use your credits to purchase a square that you land on or pay other players when you land on their square.");
-		buyingSellingRules.add("If you don't want to  the square you land on, it will be auctioned to the other players.");
+		buyingSellingRules.add("If you don't want to purchase the square you land on, it will be auctioned to the other players.");
 
 		// developing systems
 		developmentRules.add("Rules for Developing Systems:");
@@ -892,7 +892,7 @@ public class Game {
 			count = 1;
 			System.out.println("Enter an undeveloped element(s) to sell. Select continue to finalise selection. Enter # to cancel at any time.");
 			for (SystemSquare s : sellerUndevelopedSquares) {
-				System.out.printf("%d. %s ($%d)", count++, s.getSquareName(), s.getBaseCost());
+				System.out.printf("%d. %s (%d credits)", count++, s.getSquareName(), s.getBaseCost());
 				System.out.print(s.isMortgaged() ? " - mortgaged" : "" + "\n");
 			}
 			System.out.printf("%d. Continue\n", count);
@@ -964,7 +964,7 @@ public class Game {
 				count = 1;
 				System.out.printf("Enter which element(s) %s will give to %s. Select continue to finalise selection.\n", buyer.getName(), player.getName());
 				for (SystemSquare ss : buyerUndevelopedSquares) {
-					System.out.printf("%d. %s ($%d)", count++, ss.getSquareName(), ss.getBaseCost());
+					System.out.printf("%d. %s (%d credits)", count++, ss.getSquareName(), ss.getBaseCost());
 					System.out.print(ss.isMortgaged() ? " - mortgaged" : "" + "\n");
 				}
 				System.out.printf("%d. Continue\n", count);
@@ -1050,46 +1050,37 @@ public class Game {
 
 	/**
 	 * Handles ending of the game
-	 * 
-	 * @param players
+	 *
+	 * @param players all players
 	 */
 	public static void epilogue(final List<Player> players) {
 
-		HashMap<ArrayList<SystemSquare>, Player> playerPortfolio = new HashMap<>();
+		List<Player> winners = new ArrayList<>(players);
+		winners.sort(new CompareWinners());
 
 		System.out.print("Congratulations on completing the ArtemisLite mission!");
 		loading(1, true);
-		System.out.print("Space exploration is reaching new frontiers thanks to your crew's valient efforts");
+		System.out.print("Space exploration is reaching new frontiers thanks to your crew's valiant efforts");
 		loading(1, true);
-		System.out.println("You're all winners but here's the final state of play: ");
+		System.out.println("You're all winners but here's the final state of play:");
 		loading(3, true);
-		clearScreen();
 
-		for (Player p : players) {
-			System.out.printf("\n%s ended the game with:\n", p.getName());
+		for (Player p : winners) {
+			System.out.printf("\n%s ended the game with %d credits in total:\n", p.getName(), calculateNetWorth(p));
 
-			System.out.printf("\t***Units***\n\t%d\n", p.getPlayerResources());
+			System.out.printf("\t### Credits ###\n\t%d\n", p.getPlayerResources());
 
-			playerPortfolio.put(p.getOwnedElements(), p);
-			System.out.println("\t***Elements Owned***\t");
+			System.out.println("\t### Elements Owned ###\t");
 			// iterate owned system squares
-			for (ArrayList<SystemSquare> arrList : playerPortfolio.keySet()) {
-				// check if arrayLists in map value are empty and output accordingly
-				if (arrList.isEmpty()) {String names = arrList.stream().map(SystemSquare::getSquareName).collect(Collectors.joining(", "));
-					System.out.printf("\t%s owned no elements\n", p.getName());
-				} else {
-					String owned = arrList.stream().map(SystemSquare::getSquareName).collect(Collectors.joining(", "));
-					System.out.println("\t" + owned); // TODO Fix - needs to be a stream?
-				}
+			if (p.getOwnedElements().size() == 0) {
+				System.out.printf("\t%s owned no elements\n", p.getName());
+			} else {
+				String owned = p.getOwnedElements().stream()
+						.map(SystemSquare::getSquareName)
+						.collect(Collectors.joining(", "));
+				System.out.println("\t" + owned);
 			}
-			System.out.printf("\t***Net Value*** \n");
-			int totalNetWorth = calculateNetWorth(p);
-			System.out.println("\t" + totalNetWorth);
-//			System.out.println("\nFinal order of players:\n" + determineFinalOrder(players));
 		}
-		
-		System.out.println("\nFinal order of players:\n" + determineFinalOrder(players));
-
 		// Ending message
 		System.out.println("\nThank you for playing.");
 	}
@@ -1098,41 +1089,16 @@ public class Game {
 	 * Calculates net worth of all players base cost of element + (cost_per_dev*4) +
 	 * playerResources
 	 *
-	 * @return
+	 * @return the total net worth of the player
 	 */
-	public static int calculateNetWorth(Player p) {
-
-		int netWorth = p.getPlayerResources();
+	public static int calculateNetWorth(Player player) {
+		int netWorth = player.getPlayerResources();
 		// loop through each list of owned elements
-		for (SystemSquare s : p.getOwnedElements()) {
+		for (SystemSquare s : player.getOwnedElements()) {
 			// base cost + (cost_per_dev*4) + playerResources
-			// TODO Fix - currently returns 0 if player has no owned squares
-			netWorth += s.getBaseCost() + (s.getCostPerDevelopment() * s.getDevelopment());
+			netWorth += s.isMortgaged() ? 0 : (s.getBaseCost() + s.getCostPerDevelopment() * s.getDevelopment());
 		}
 		return netWorth;
-
-	}
-
-	/**
-	 * 
-	 * @param players
-	 */
-	private static String determineFinalOrder(final List<Player> players) {
-
-		// TODO Should be based on netWorth rather than players' resources
-
-		int count = 0;
-		// Unsorted array
-		Integer[] finalScores = new Integer[players.size()];
-		for (Player pl : players) {
-			finalScores[count] = pl.getPlayerResources();
-			count++;
-		}
-
-		// Return sorted array
-		Arrays.sort(finalScores, Collections.reverseOrder());
-		return Arrays.toString(finalScores);
-
 	}
 
 	interface IExecCloseable extends AutoCloseable {

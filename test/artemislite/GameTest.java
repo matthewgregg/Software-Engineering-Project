@@ -37,7 +37,6 @@ class GameTest {
 
         ss1 = new SystemSquare("Square 1",
                 1,
-                "System 1",
                 systemName1,
                 difficulty,
                 baseCost,
@@ -46,7 +45,6 @@ class GameTest {
 
         ss2 = new SystemSquare("Square 2",
                 2,
-                "System 1",
                 systemName1,
                 difficulty,
                 baseCost,
@@ -55,7 +53,6 @@ class GameTest {
 
         ss3 = new SystemSquare("Square 3",
                 3,
-                "System 1",
                 systemName2,
                 difficulty,
                 baseCost,
