@@ -2,6 +2,9 @@ package artemislite;
 
 import java.util.Arrays;
 
+/**
+ * Represents a question within the game
+ */
 public class Question {
 	private final String question;
 	private final String[] choices;

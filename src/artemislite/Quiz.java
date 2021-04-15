@@ -4,6 +4,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Contains methods relating to the quiz functionality of the game
+ */
 public class Quiz {
 	public static boolean generateQuestions(Scanner scanner, int difficulty) {
 

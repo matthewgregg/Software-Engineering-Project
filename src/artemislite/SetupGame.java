@@ -4,8 +4,7 @@ import javax.naming.InvalidNameException;
 import java.util.*;
 
 /**
- * @author mark
- *
+ * Methods for creating elements and players for setting up the game
  */
 public class SetupGame {
 	private static final int MIN_PLAYERS = 2;
