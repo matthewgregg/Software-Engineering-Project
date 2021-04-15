@@ -31,12 +31,12 @@ public class Game {
 		clearScreen();
 
 		System.out.print(introduction());
-		loading(5, true);
+		//loading(5, true);
 		clearScreen();
 
 		final Scanner scanner = new Scanner(System.in);
 		final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
-
+		/*
 		clearScreen();
 		try {
 			launchStatusCheck();
@@ -46,7 +46,7 @@ public class Game {
 		clearScreen();
 		printWelcomeMessage(players);
 		loading(10, true);
-
+*/
 		boolean quitGame = false;
 		boolean bankruptcy = false;
 		int playerCount = 0;
@@ -1077,13 +1077,13 @@ public class Game {
 				if (arrList.isEmpty()) {
 					System.out.printf("\t%s owned no elements\n", p.getName());
 				} else {
-					System.out.println("\t" + playerPortfolio.keySet()); // TODO Fix - needs to be a stream?
+					System.out.println("\t" + arrList.toString()); // TODO Fix - needs to be a stream?
 				}
 			}
 			System.out.printf("\t***Net Value*** \n");
-			int totalNetWorth = calculateNetWorth(playerPortfolio, p);
+			int totalNetWorth = calculateNetWorth(p);
 			System.out.println("\t" + totalNetWorth);
-			System.out.println("\nFinal order of players:\n" + determinefinalOrder(players));
+			System.out.println("\nFinal order of players:\n" + determineFinalOrder(players));
 		}
 
 		// Ending message
@@ -1093,23 +1093,17 @@ public class Game {
 	/**
 	 * Calculates net worth of all players base cost of element + (cost_per_dev*4) +
 	 * playerResources
-	 * 
-	 * @param playerPortfolio
+	 *
 	 * @return
 	 */
-	public static int calculateNetWorth(Map<ArrayList<SystemSquare>, Player> playerPortfolio, Player p) {
+	public static int calculateNetWorth(Player p) {
 
-		int netWorth = 0;
-
-		// loop through map of system squares
-		for (ArrayList<SystemSquare> value : playerPortfolio.keySet()) {
-			// loop through each list of owned elements
-			for (SystemSquare ownedSquare : value) {
-				// base cost + (cost_per_dev*4) + playerResources
-				// TODO Fix - currently returns 0 if player has no owned squares
-				netWorth = ownedSquare.getBaseCost() + (ownedSquare.getCostPerDevelopment() * 4)
-						+ p.getPlayerResources();
-			}
+		int netWorth = p.getPlayerResources();
+		// loop through each list of owned elements
+		for (SystemSquare s : p.getOwnedElements()) {
+			// base cost + (cost_per_dev*4) + playerResources
+			// TODO Fix - currently returns 0 if player has no owned squares
+			netWorth += s.getBaseCost() + (s.getCostPerDevelopment() * s.getDevelopment());
 		}
 		return netWorth;
 
@@ -1119,7 +1113,7 @@ public class Game {
 	 * 
 	 * @param players
 	 */
-	private static String determinefinalOrder(final List<Player> players) {
+	private static String determineFinalOrder(final List<Player> players) {
 
 		// TODO Should be based on netWorth rather than players' resources
 
