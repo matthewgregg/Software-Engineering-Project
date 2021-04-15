@@ -428,6 +428,7 @@ public class Game {
 					int cost = ss.getLandingCost();
 					if (!paid && rolled && !ss.isMortgaged()) {
 						player.addResources(-1 * cost);
+						owner.addResources(cost);
 						paid = true;
 						System.out.printf(" (Paid %s %d credits)", owner.getName(), cost);
 					}
