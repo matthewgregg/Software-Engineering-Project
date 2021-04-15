@@ -7,10 +7,10 @@ import java.util.stream.IntStream;
 public class Quiz {
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
-		test(scanner, 3);
+		generateQuestions(scanner, 3);
 	}
 
-	public static boolean test(Scanner scanner,int difficulty) {
+	public static boolean generateQuestions(Scanner scanner, int difficulty) {
 
 		Question q1 = new Question("How many months are there in 12 years?", new String[] { "124", "142", "144"}, "144", 1);
 		Question q2 = new Question("What is NASA's motto?", new String[] { "To infinity and beyond", "For the love of space exploration", "For the benefit of all" }, "For the benefit of all", 1);

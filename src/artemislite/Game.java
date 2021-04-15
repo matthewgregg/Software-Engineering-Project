@@ -29,11 +29,9 @@ public class Game {
 
 	public static void main(String[] args) {
 		clearScreen();
-		System.out.println(" "); // This empty print line is to avoid clearScreen() character formatting
 		System.out.print(introduction());
 		// loading(5, true);
 		clearScreen();
-		System.out.println(" ");
 		final Scanner scanner = new Scanner(System.in);
 		final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
 		/*
@@ -62,7 +60,6 @@ public class Game {
 		} while (!endGame && !quitGame && !bankruptcy);
 
 		clearScreen();
-		System.out.println(" ");
 		if (quitGame) {
 			System.out.printf("Game is over! %s quit the game.\n", players.get(playerCount - 1).getName());
 		} else if (bankruptcy) {
@@ -165,7 +162,7 @@ public class Game {
 			userOption = scanIntInput(scanner, 1, menuNum, false);
 
 			clearScreen();
-			System.out.println(" ");
+
 			// output options menu
 			switch (menuOptions.get(userOption)) {
 			case 1:
@@ -235,7 +232,6 @@ public class Game {
 			case 10:
 				// quit game
 				clearScreen();
-				System.out.println(" ");
 				System.out.print(
 						"WARNING\nAre you sure you want to quit? The game will end for all players in 10 seconds. Press enter to cancel.");
 				if (inputTimer(10)) {
@@ -390,21 +386,16 @@ public class Game {
 	 * @return systemsquare if the square is a system square
 	 */
 	public static Triplet<SystemSquare, Boolean, Boolean> generateSquareStatus(Scanner scanner, final Player player,
-			final Square landedSquare, final List<Player> players, boolean rolled, boolean paid, boolean auctioned)
-			throws BankruptcyException {
+			final Square landedSquare, final List<Player> players, boolean rolled, boolean paid, boolean auctioned) throws BankruptcyException {
 
 		clearScreen();
-		System.out.println(" ");
 		if (players.stream().anyMatch(p -> p.getPlayerResources() < BANKRUPTCY_RISK)) {
 			if (player.goingBankrupt()) {
-				System.out.print(
-						"You are at risk of going bankrupt, which will end the game! Try and get the other players to donate credits to you.\n");
+				System.out.print("You are at risk of going bankrupt, which will end the game! Try and get the other players to donate credits to you.\n");
 			} else {
 				String names = getPlayersNearBankruptcy(scanner, player, players).stream().map(Player::getName)
 						.collect(Collectors.joining(", "));
-				System.out.printf(
-						"%s is at risk of bankruptcy, which will end the game! Consider donating credits to them.\n",
-						names);
+				System.out.printf("%s is at risk of bankruptcy, which will end the game! Consider donating credits to them.\n", names);
 			}
 		}
 
@@ -442,7 +433,6 @@ public class Game {
 				auctionSquare(scanner, ss, player, players);
 				loading(3, true);
 				clearScreen();
-				System.out.println(" ");
 				return generateSquareStatus(scanner, player, landedSquare, players, true, true, true);
 			} else if (rolled) {
 				System.out.printf("\nYou are on %s but don't have enough resources to purchase it.",
@@ -554,7 +544,6 @@ public class Game {
 
 		int option = scanIntInput(scanner, 1, rulesMenu.length, true);
 		clearScreen();
-		System.out.println(" ");
 		if (option > 0) {
 			for (String s : getList.get(option)) {
 				System.out.print(s);
@@ -563,7 +552,6 @@ public class Game {
 			System.out.print("\nPress enter to return to main menu");
 			scanner.nextLine();
 			clearScreen();
-			System.out.println(" ");
 		}
 	}
 
@@ -664,7 +652,6 @@ public class Game {
 				} else {
 					String names = bidders.stream().map(Player::getName).collect(Collectors.joining(", "));
 					clearScreen();
-					System.out.println(" ");
 					// check if current bidder is the highest bidder - break if so
 					if (bidder.equals(highestBidder)) {
 						biddingEnded = true;
@@ -807,7 +794,6 @@ public class Game {
 	 */
 	public static void sellDevelopmentsMenu(Scanner scanner, final Player player) throws BankruptcyException {
 		clearScreen();
-		System.out.println(" ");
 		ArrayList<SystemSquare> developedSquares = new ArrayList<>(player.getOwnedElements());
 		developedSquares.removeIf(s -> s.getDevelopment() == 0);
 		int count = 1;
@@ -923,7 +909,6 @@ public class Game {
 		int paymentMethod;
 		if (buyers.stream().anyMatch(s -> s.getOwnedElements().size() > 0)) {
 			clearScreen();
-			System.out.println(" ");
 			System.out.print("What would you like to sell the element for?\n1. Credits\n2. An element(s)\n");
 
 			paymentMethod = scanIntInput(scanner, 1, 2, true);
@@ -939,7 +924,6 @@ public class Game {
 		}
 
 		clearScreen();
-		System.out.println(" ");
 		System.out.print("Who would you like to sell the element to?\n");
 		count = 1;
 		for (Player buyer : buyers) {
@@ -955,7 +939,6 @@ public class Game {
 
 		if (paymentMethod == 1) {
 			clearScreen();
-			System.out.println(" ");
 			System.out.println("Enter your agreed price for the element.");
 			int cost = scanIntInput(scanner, 0, buyer.getPlayerResources(), true);
 			System.out.println("The trade will occur in 10 seconds. Press enter to cancel.");
@@ -976,7 +959,6 @@ public class Game {
 			ArrayList<SystemSquare> buyerUndevelopedSquares = buyer.getOwnedElements();
 			do {
 				clearScreen();
-				System.out.println(" ");
 				count = 1;
 				System.out.printf("Enter which element(s) %s will give to %s. Select continue to finalise selection.\n",
 						buyer.getName(), player.getName());
@@ -1184,6 +1166,7 @@ public class Game {
 				System.out.print("\033[H\033[2J");
 				System.out.flush();
 			}
+			System.out.println(); // This empty print line is to avoid clearScreen() character formatting
 		} catch (Exception e) {
 			System.out.println("Error clearing console.");
 		}
