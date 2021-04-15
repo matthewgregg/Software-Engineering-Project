@@ -5,11 +5,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Quiz {
-	public static void main(String[] args) {
-		Scanner scanner = new Scanner(System.in);
-		generateQuestions(scanner, 3);
-	}
-
 	public static boolean generateQuestions(Scanner scanner, int difficulty) {
 
 		Question q1 = new Question("How many months are there in 12 years?", new String[] { "124", "142", "144"}, "144", 1);
@@ -37,17 +32,15 @@ public class Quiz {
 		ArrayList<Question> questions = new ArrayList<>();
 		Collections.addAll(questions, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18);
 
-		int correct = 0;
+		// filter questions matching required difficulty
 		List<Question> questionsFiltered = questions.stream().filter(q -> q.getDifficulty() == difficulty).collect(Collectors.toList());
-		List<Question> questionList = new ArrayList<>();
-		for (int i = 0; i < 4; i++) {
-			int index = new Random().nextInt(questionsFiltered.size());
-			Question question = questionsFiltered.get(index);
-			questionList.add(question);
-		}
-		Iterator<Question> i = questionList.iterator();
-		while (i.hasNext()) {
-			Question question = i.next();
+		// pick 4 random questions
+		Collections.shuffle(questionsFiltered);
+		List<Question> questionList = questionsFiltered.subList(0, 4);
+
+		int correct = 0;
+		for (Question question : questionList) {
+			Game.clearScreen();
 			System.out.println(question.getQuestion());
 			int count = 1;
 			int ansInt = -1;
@@ -66,7 +59,6 @@ public class Quiz {
 				if (Arrays.stream(question.getChoices()).anyMatch(a -> a.equalsIgnoreCase(ans))
 						|| Arrays.stream(IntStream.range(1, question.getChoices().length + 1).toArray()).anyMatch(n -> Integer.toString(n).equals(ans))) {
 					valid = true;
-					i.remove();
 					if (question.getAnswer().equalsIgnoreCase(ans) || Integer.toString(ansInt).equals(ans)) {
 						correct++;
 						System.out.print("Correct!");
@@ -80,8 +72,8 @@ public class Quiz {
 				}
 			} while (!valid);
 		}
-		scanner.close();
 
+		Game.clearScreen();
 		System.out.println("You got " + correct + " out of 4.");
 
 		return (double) correct / (double) 4 > 0.6;
