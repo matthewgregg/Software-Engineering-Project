@@ -20,7 +20,7 @@ public class Question {
 			this.answer = correctAnswer;
 			this.difficulty = difficulty;
 		} else {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("The answer you entered doesn't match any of the choices");
 		}
 	}
 

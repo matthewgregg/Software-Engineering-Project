@@ -26,7 +26,7 @@ public class Quiz {
 		Question q14 = new Question("When did NASA launch their first mission to the sun?", new String[] { "2016", "2017", "2018" }, "2018", 4);
 		Question q15 = new Question("NASA stands for the National ____ and Space Administration. Fill in the blank.", new String[] { "Astronomy", "Aeronautics", "Aerospace", "Air" }, "Aeronautics", 4);
 		Question q16 = new Question("When was NASA founded?", new String[] { "1945", "1958", "1969", "1980" }, "1958", 4);
-		Question q17 = new Question("You are travelling at an average of 5000km/h, how many hours does it take to get to the moon, 380,000km away?", new String[] { "76 hours", "175 hours", "17.5 hours", "34 hours" }, "76 hours", 4);
+		Question q17 = new Question("You are travelling at an average of 5000 km/h, how many hours does it take to get to the moon, 380,000 km away?", new String[] { "76 hours", "175 hours", "17.5 hours", "34 hours" }, "76 hours", 4);
 		Question q18 = new Question("What asteroid disc, made of rock and ice, is around 20 AU wide and starts at Neptune's orbit?", new String[] { "Oort cloud", "Hills cloud", "Asteroid belt", "Kuiper belt" }, "Kuiper belt", 4);
 
 		ArrayList<Question> questions = new ArrayList<>();
