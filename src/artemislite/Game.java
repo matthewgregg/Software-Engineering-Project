@@ -107,7 +107,7 @@ public class Game {
 		allMenu[1] = "Display Board State";
 		allMenu[2] = "Roll Dice";
 		allMenu[3] = "Purchase Element";
-		allMenu[4] = "Buy Developments";
+		allMenu[4] = "Purchase Developments";
 		allMenu[5] = "Sell Developments or Mortgage Element";
 		allMenu[6] = "Trade with Player";
 		allMenu[7] = "Donate to Player";
@@ -203,7 +203,7 @@ public class Game {
 					// purchase unowned square
 					assert ss != null;
 					player.purchaseSquare(ss);
-					System.out.print("Purchasing " + ss.getSquareName());
+					System.out.print("Purchasing " + ss.getSquareName() + " for " + player.getName());
 					purchased = true;
 					loading(3, true);
 					break;
@@ -230,7 +230,7 @@ public class Game {
 					// and the auction hasn't occurred yet
 					turnFinished = true;
 					if (ss != null && !ss.isOwned() && !purchased && isAuctionable(ss, player, players) && !auctioned) {
-						System.out.printf("%s didn't want to buy %s.\nAuctioning element", player.getName(), ss.getSquareName());
+						System.out.printf("%s didn't want to purchase %s.\nAuctioning element", player.getName(), ss.getSquareName());
 						loading(5, true);
 						auctionSquare(scanner, ss, player, players);
 						auctioned = true;
@@ -295,7 +295,7 @@ public class Game {
 		message.append("\n\nWelcome to the ArtemisLite Game!\n\n"
 				+ "This virtual board game is inspired by Nasa's real life Artemis Mission...\n"
 				+ "You can help send the first woman and next man to the moon.\n\n"
-				+ "After that, next stop Mars");
+				+ "After that, next stop Mars!\n\n");
 		return message;
 	}
 
@@ -437,18 +437,18 @@ public class Game {
 			} else if (player.getPlayerResources() >= ss.getBaseCost()) {
 				String string = "\nYou are on " + square.getSquareName() + ". It is not owned.";
 				if (rolled) {
-					string += " You can buy it for " + ss.getBaseCost() + " credits.";
+					string += " You can purchase it for " + ss.getBaseCost() + " credits.";
 				}
 				System.out.print(string);
 			} else if (isAuctionable(ss, player, players) && !auctioned && rolled) {
-				System.out.printf("\nYou are on %s but don't have enough resources to buy it.\nAuctioning element", ss.getSquareName());
+				System.out.printf("\nYou are on %s but don't have enough resources to purcahse it.\nAuctioning element", ss.getSquareName());
 				loading(5, true);
 				auctionSquare(scanner, ss, player, players);
 				loading(3, true);
 				clearScreen();
 				return generateSquareStatus(scanner, player, landedSquare, players, true, true, true);
 			} else if (rolled) {
-				System.out.printf("\nYou are on %s but don't have enough resources to buy it.", ss.getSquareName());
+				System.out.printf("\nYou are on %s but don't have enough resources to purchase it.", ss.getSquareName());
 			} else {
 				System.out.printf("\nYou are on %s.", ss.getSquareName());
 			}
@@ -519,10 +519,10 @@ public class Game {
 		basicGameRules.add("e.g. Roll the dice to move along the board.");
 
 		// buying and selling
-		buyingSellingRules.add("Rules for Buying and Selling:");
+		buyingSellingRules.add("Rules for Purchasing and Selling:");
 		buyingSellingRules.add("You'll each be allotted some credits (the currency of the solar system) to start out.");
 		buyingSellingRules.add("Use your credits to purchase a square that you land on or pay other players when you land on their square.");
-		buyingSellingRules.add("If you don't want to buy the square you land on, it will be auctioned to the other players.");
+		buyingSellingRules.add("If you don't want to  the square you land on, it will be auctioned to the other players.");
 
 		// developing systems
 		developmentRules.add("Rules for Developing Systems:");
@@ -1058,11 +1058,12 @@ public class Game {
 		HashMap<ArrayList<SystemSquare>, Player> playerPortfolio = new HashMap<>();
 
 		System.out.print("Congratulations on completing the ArtemisLite mission!");
-		loading(2, true);
+		loading(1, true);
 		System.out.print("Space exploration is reaching new frontiers thanks to your crew's valient efforts");
-		loading(2, true);
+		loading(1, true);
 		System.out.println("You're all winners but here's the final state of play: ");
 		loading(3, true);
+		clearScreen();
 
 		for (Player p : players) {
 			System.out.printf("\n%s ended the game with:\n", p.getName());
@@ -1084,8 +1085,10 @@ public class Game {
 			System.out.printf("\t***Net Value*** \n");
 			int totalNetWorth = calculateNetWorth(p);
 			System.out.println("\t" + totalNetWorth);
-			System.out.println("\nFinal order of players:\n" + determineFinalOrder(players));
+//			System.out.println("\nFinal order of players:\n" + determineFinalOrder(players));
 		}
+		
+		System.out.println("\nFinal order of players:\n" + determineFinalOrder(players));
 
 		// Ending message
 		System.out.println("\nThank you for playing.");
