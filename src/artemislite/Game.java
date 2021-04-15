@@ -1052,7 +1052,6 @@ public class Game {
 	 * Handles ending of the game
 	 * 
 	 * @param players
-	 * @param player
 	 */
 	public static void epilogue(final List<Player> players) {
 

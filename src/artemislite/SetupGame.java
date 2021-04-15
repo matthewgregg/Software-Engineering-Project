@@ -52,7 +52,6 @@ public class SetupGame {
 
 		SystemSquare ss1 = new SystemSquare("Moon Gateway Station",
 				1,
-				"System 1",
 				SystemName.EXPLORATION_GROUND_SYSTEM,
 				2,
 				80,
@@ -61,7 +60,6 @@ public class SetupGame {
 
 		SystemSquare ss2 = new SystemSquare("Lunar Payload Services",
 				2,
-				"System 1",
 				SystemName.EXPLORATION_GROUND_SYSTEM,
 				2,
 				100,
@@ -70,7 +68,6 @@ public class SetupGame {
 
 		SystemSquare ss3 = new SystemSquare("Onward to Lunar Surface",
 				3,
-				"System 1",
 				SystemName.ORION_SPACECRAFT,
 				2,
 				120,
@@ -79,7 +76,6 @@ public class SetupGame {
 
 		SystemSquare ss4 = new SystemSquare("Navigation Control",
 				4,
-				"System 1",
 				SystemName.ORION_SPACECRAFT,
 				2,
 				120,
@@ -88,7 +84,6 @@ public class SetupGame {
 
 		SystemSquare ss5 = new SystemSquare("Abort Launch",
 				5,
-				"System 1",
 				SystemName.ORION_SPACECRAFT,
 				2,
 				140,
@@ -99,7 +94,6 @@ public class SetupGame {
 
 		SystemSquare ss6 = new SystemSquare("Core Stage Depleted",
 				7,
-				"System 1",
 				SystemName.GATEWAY_OUTPOST,
 				2,
 				160,
@@ -108,7 +102,6 @@ public class SetupGame {
 
 		SystemSquare ss7 = new SystemSquare("Spun Stage",
 				8,
-				"System 1",
 				SystemName.GATEWAY_OUTPOST,
 				2,
 				160,
@@ -117,7 +110,6 @@ public class SetupGame {
 
 		SystemSquare ss8 = new SystemSquare("SLS Booster Testing",
 				9,
-				"System 1",
 				SystemName.GATEWAY_OUTPOST,
 				2,
 				180,
@@ -126,7 +118,6 @@ public class SetupGame {
 
 		SystemSquare ss9 = new SystemSquare("Astronaut Training",
 				10,
-				"System 1",
 				SystemName.LUNAR_LANDER,
 				2,
 				200,
@@ -135,7 +126,6 @@ public class SetupGame {
 
 		SystemSquare ss10 = new SystemSquare("Launch Facilities Upgrades",
 				11,
-				"System 1",
 				SystemName.LUNAR_LANDER,
 				2,
 				220,

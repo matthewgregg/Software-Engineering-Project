@@ -31,13 +31,12 @@ public class SystemSquare extends Square {
      */
     public SystemSquare(String squareName,
                         int position,
-                        String message,
                         SystemName systemName,
                         int minigameDifficulty,
                         int baseCost,
                         int costPerDevelopment,
                         int[] landingCost) throws IllegalArgumentException {
-        super(squareName, position, message);
+        super(squareName, position, null);
         setSystemName(systemName);
         this.minigameDifficulty = minigameDifficulty;
         this.baseCost = baseCost;
