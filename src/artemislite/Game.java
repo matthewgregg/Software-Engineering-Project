@@ -35,8 +35,13 @@ public class Game {
 		final Scanner scanner = new Scanner(System.in);
 		final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
 
-		clearScreen(); try { launchStatusCheck(); } catch (InterruptedException e) {
-		System.out.println("Thread error"); } clearScreen();
+		clearScreen();
+		try {
+			launchStatusCheck();
+		} catch (InterruptedException e) {
+			System.out.println("Thread error");
+		}
+		clearScreen();
 		printWelcomeMessage(players); loading(10, true);
 		boolean quitGame = false;
 		boolean bankruptcy = false;
@@ -78,8 +83,7 @@ public class Game {
 	 * @return a boolean for whether the user finished their turn or not. If false,
 	 *         the player quit the game. If true, the player finished their turn
 	 */
-	public static boolean generateOptionsMenu(Scanner scanner, final Player player, final List<Player> players)
-			throws BankruptcyException {
+	public static boolean generateOptionsMenu(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
 		// local vars
 		int userOption;
 		boolean turnFinished = false;
@@ -140,8 +144,7 @@ public class Game {
 					continue;
 				}
 				// skip deal with bank
-				if (i == 5 && !player.hasDevelopments() && !player.hasMortgagableElements()
-						&& !player.hasMortgagedElements()) {
+				if (i == 5 && !player.hasDevelopments() && !player.hasMortgagableElements() && !player.hasMortgagedElements()) {
 					continue;
 				}
 				// skip trade with player
@@ -590,10 +593,12 @@ public class Game {
 	}
 
 	/**
-	 * Roll two virtual, weighted d-n dice and return two numbers When rolling two
-	 * fair d6 dice, the most likely result is n+1, 7. With these dice, any roll has
-	 * equal probability i.e. if the argument is n, the probability of any roll is
-	 * 1/n The probability is the same as if a single 2*d sided dice was rolled
+	 * Roll two virtual, weighted d-n dice and return two numbers
+	 * The probabilities for rolling two fair dice approximate a normal distribution, making n+1 the most likely outcome
+	 * For 2d6, the most likely roll is 7, for 2d3, it is 4.
+	 * With these 'weighted' dice, any roll has equal probability
+	 * i.e. if the argument is n, the probability of any roll is 1/n
+	 * The probability is the same as if a single 2*d sided dice was rolled
 	 *
 	 * @return two-element integer array
 	 */
@@ -859,8 +864,7 @@ public class Game {
 	 * @param scanner the scanner
 	 * @param player  the current player
 	 */
-	public static void tradeWithPlayer(Scanner scanner, final Player player, final List<Player> players)
-			throws BankruptcyException {
+	public static void tradeWithPlayer(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
 		ArrayList<Player> buyers = new ArrayList<>(players);
 		buyers.remove(player);
 		ArrayList<SystemSquare> sellerUndevelopedSquares = new ArrayList<>(player.getOwnedElements());
@@ -872,8 +876,7 @@ public class Game {
 		ArrayList<SystemSquare> sellerSquares = new ArrayList<>();
 		do {
 			count = 1;
-			System.out.println(
-					"Enter an undeveloped element(s) to sell. Select continue to finalise selection. Enter # to cancel at any time.");
+			System.out.println("Enter an undeveloped element(s) to sell. Select continue to finalise selection. Enter # to cancel at any time.");
 			for (SystemSquare s : sellerUndevelopedSquares) {
 				System.out.printf("%d. %s (%d credits)", count++, s.getSquareName(), s.getBaseCost());
 				System.out.print(s.isMortgaged() ? " - mortgaged" : "" + "\n");
