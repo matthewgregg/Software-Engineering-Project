@@ -1074,10 +1074,11 @@ public class Game {
 			// iterate owned system squares
 			for (ArrayList<SystemSquare> arrList : playerPortfolio.keySet()) {
 				// check if arrayLists in map value are empty and output accordingly
-				if (arrList.isEmpty()) {
+				if (arrList.isEmpty()) {String names = arrList.stream().map(SystemSquare::getSquareName).collect(Collectors.joining(", "));
 					System.out.printf("\t%s owned no elements\n", p.getName());
 				} else {
-					System.out.println("\t" + arrList.toString()); // TODO Fix - needs to be a stream?
+					String owned = arrList.stream().map(SystemSquare::getSquareName).collect(Collectors.joining(", "));
+					System.out.println("\t" + owned); // TODO Fix - needs to be a stream?
 				}
 			}
 			System.out.printf("\t***Net Value*** \n");
