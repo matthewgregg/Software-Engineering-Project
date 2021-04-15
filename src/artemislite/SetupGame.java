@@ -50,7 +50,7 @@ public class SetupGame {
 		ArrayList<Square> squares = new ArrayList<>();
 		Square sq1 = new Square("Mission Control", 0, "Pass Go, Collect 200! or something ...");
 
-		SystemSquare ss1 = new SystemSquare("Moon Gateway Station",
+		SystemSquare ss1 = new SystemSquare("Astronaut Training",
 				1,
 				SystemName.EXPLORATION_GROUND_SYSTEM,
 				1,
@@ -59,7 +59,7 @@ public class SetupGame {
 				//		  0dev, 1dev,  2dev,  3dev, MjDev
 				new int[] { 20, 60, 180, 320, 450 });
 
-		SystemSquare ss2 = new SystemSquare("Lunar Payload Services",
+		SystemSquare ss2 = new SystemSquare("Launch Facilities",
 				2,
 				SystemName.EXPLORATION_GROUND_SYSTEM,
 				1,
@@ -67,7 +67,7 @@ public class SetupGame {
 				200,
 				new int[] { 30, 90, 270, 400, 550 });
 
-		SystemSquare ss3 = new SystemSquare("Onward to Lunar Surface",
+		SystemSquare ss3 = new SystemSquare("SLS Booster Testing",
 				3,
 				SystemName.ORION_SPACECRAFT,
 				2,
@@ -75,7 +75,7 @@ public class SetupGame {
 				200,
 				new int[] { 40, 100, 300, 450, 600 });
 
-		SystemSquare ss4 = new SystemSquare("Navigation Control",
+		SystemSquare ss4 = new SystemSquare("Lunar Payload Services",
 				4,
 				SystemName.ORION_SPACECRAFT,
 				2,
@@ -83,7 +83,7 @@ public class SetupGame {
 				150,
 				new int[]  { 40, 100, 300, 450, 600 });
 
-		SystemSquare ss5 = new SystemSquare("Abort Launch",
+		SystemSquare ss5 = new SystemSquare("Navigation Control",
 				5,
 				SystemName.ORION_SPACECRAFT,
 				2,
@@ -93,7 +93,7 @@ public class SetupGame {
 
 		Square sq2 = new Square("Nothing", 6, "Missed launch window");
 
-		SystemSquare ss6 = new SystemSquare("Core Stage Depleted",
+		SystemSquare ss6 = new SystemSquare("Core Stage",
 				7,
 				SystemName.GATEWAY_OUTPOST,
 				3,
@@ -101,7 +101,7 @@ public class SetupGame {
 				200,
 				new int[] { 60, 180, 500, 700, 900 });
 
-		SystemSquare ss7 = new SystemSquare("Spun Stage",
+		SystemSquare ss7 = new SystemSquare("Solid Rocket Boosters",
 				8,
 				SystemName.GATEWAY_OUTPOST,
 				3,
@@ -109,7 +109,7 @@ public class SetupGame {
 				200,
 				new int[] { 60, 180, 500, 700, 900 });
 
-		SystemSquare ss8 = new SystemSquare("SLS Booster Testing",
+		SystemSquare ss8 = new SystemSquare("Spun Stage",
 				9,
 				SystemName.GATEWAY_OUTPOST,
 				3,
@@ -117,7 +117,7 @@ public class SetupGame {
 				200,
 				new int[] { 70, 200, 550, 750, 950 });
 
-		SystemSquare ss9 = new SystemSquare("Astronaut Training",
+		SystemSquare ss9 = new SystemSquare("Moon Gateway Station",
 				10,
 				SystemName.LUNAR_LANDER,
 				4,
@@ -125,7 +125,7 @@ public class SetupGame {
 				200,
 				new int[] { 80, 220, 600, 800, 1000 });
 
-		SystemSquare ss10 = new SystemSquare("Launch Facilities Upgrades",
+		SystemSquare ss10 = new SystemSquare("Tranquility Base",
 				11,
 				SystemName.LUNAR_LANDER,
 				4,
