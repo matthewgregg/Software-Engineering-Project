@@ -30,9 +30,10 @@ public class MiniGames {
 		}
 		*/
 
+		/*
 		Map<String, String> map = new HashMap<>();
-		map.put("How many months are there in 12 years?\n a) 124\n b) 142\n c) 144\n", "c");
-		map.put("What is 4/5 as a decimal?\n a) 0.8\n b) 0.45\n c) 4.5\n", "a");
+		map.put("How many months are there in 12 years?\n a) 144\n b) 142\n c) 124\n", "a");
+		map.put("What is NASA's motto?\n a) To infity and beyond\n b) For the love of space exploration\n c) For the benefit of all\n", "c");
 		map.put("Which mission of NASA brought the first human to the Moon?\n a) apollo\n b) mercury\n c)gemini\n",
 				"a");
 		map.put("What is 25 - 4 x 3?\n a)63\n b)13\n c)37\n ", "b");
@@ -66,7 +67,126 @@ public class MiniGames {
 
 		System.out.println("Your Score is " + ans);
 
+	
+	*/
+		
 	}
+		
+	public static void quizLevelOne() {
+		
+		Map<String, String> map = new HashMap<>();
+		map.put("How many months are there in 12 years?\n a) 124\n b) 142\n c) 144\n", "c");
+		map.put("What is NASA's motto?\n a) To infity and beyond\n b) For the love of space exploration\n c) For the benefit of all\n", "c");
+		map.put("Which mission of NASA brought the first human to the Moon?\n a) apollo\n b) mercury\n c)gemini\n",
+				"a");
+		
+
+		Set<String> keySet = map.keySet();
+		// converting set to list
+		List<String> keyList = new ArrayList<>(keySet);
+
+		int size = keyList.size();
+
+		int ans = 0;
+		Scanner sc = new Scanner(System.in);
+		for (String s : map.keySet()) {
+			// System.out.print("Enter a string: ");
+			String str = "";
+
+			int randIdx = new Random().nextInt(size);
+			String randomKey = keyList.get(randIdx);
+			String randomValue = map.get(randomKey);
+			// System.out.println("key: " + randomKey + ", value: " + randomValue);
+			System.out.println(randomKey);
+			str = sc.nextLine();
+			// reads string
+			if (str.equals(randomValue)) {
+				ans++;
+
+			}
+		}
+		System.out.println("Your Score is " + ans);
+	}	
+		
+		public static void quizLevelTwo() {
+			
+			Map<String, String> map = new HashMap<>();
+			
+			map.put("Which planet has the most moons?\n a) Neptune\n b) Jupiter\n c) Saturn\n", "c");
+			map.put("What is 4/5 as a decimal?\n a) 0.8\n b) 0.45\n c) 4.5\n", "a");
+			map.put("Which mission of NASA brought the first human to the Moon?\n a) apollo\n b) mercury\n c)gemini\n",
+					"a");
+			
+
+			Set<String> keySet = map.keySet();
+			// converting set to list
+			List<String> keyList = new ArrayList<>(keySet);
+
+			int size = keyList.size();
+
+			int ans = 0;
+			Scanner sc = new Scanner(System.in);
+			for (String s : map.keySet()) {
+				// System.out.print("Enter a string: ");
+				String str = "";
+
+				int randIdx = new Random().nextInt(size);
+				String randomKey = keyList.get(randIdx);
+				String randomValue = map.get(randomKey);
+				// System.out.println("key: " + randomKey + ", value: " + randomValue);
+				System.out.println(randomKey);
+				str = sc.nextLine();
+				// reads string
+				if (str.equals(randomValue)) {
+					ans++;
+
+				}
+			}
+			
+		
+
+			System.out.println("Your Score is " + ans);
+		}
+		
+		
+		public static void quizLevelThree() {
+			
+Map<String, String> map = new HashMap<>();
+			
+			map.put("Uranus has only been visited by which spacecraft?\n a) The ArtemisLite\n b) The Voyager 2\n c) The Orion 2\n", "c");
+			map.put("Which is the second smallest planet?\n a) Mars\n b) Jupiter\n c) Earth\n", "a");
+			map.put("What is 25 - 4 x 3?\n a)63\n b)13\n c)37\n ", "b");
+
+			Set<String> keySet = map.keySet();
+			// converting set to list
+			List<String> keyList = new ArrayList<>(keySet);
+
+			int size = keyList.size();
+
+			int ans = 0;
+			Scanner sc = new Scanner(System.in);
+			for (String s : map.keySet()) {
+				// System.out.print("Enter a string: ");
+				String str = "";
+
+				int randIdx = new Random().nextInt(size);
+				String randomKey = keyList.get(randIdx);
+				String randomValue = map.get(randomKey);
+				// System.out.println("key: " + randomKey + ", value: " + randomValue);
+				System.out.println(randomKey);
+				str = sc.nextLine();
+				// reads string
+				if (str.equals(randomValue)) {
+					ans++;
+
+				}
+			}
+			
+			
+			
+		}
+		
+	
 	
 	public static boolean nasaQuiz() {
 		
