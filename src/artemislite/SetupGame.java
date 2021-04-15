@@ -39,7 +39,7 @@ public class SetupGame {
 						throw new InvalidNameException();
 					}
 				} catch (InvalidNameException e) {
-					System.out.printf("%s is not a valid name. Try again.\n", name);
+					System.out.printf("%s has already been entered. Please add a different name.\n", name);
 				}
 			} while (!validPlayerName);
 		} while (players.size() < numPlayers);
