@@ -16,7 +16,7 @@ public class SetupGame {
 		int numPlayers = Game.scanIntInput(scanner, MIN_PLAYERS, MAX_PLAYERS, false);
 
 		Game.clearScreen();
-
+		System.out.println(" ");
 		System.out.println("Enter the names of the " + numPlayers + " crew members.\nPress return after entering a name.");
 
 		ArrayList<Player> players = new ArrayList<>();
