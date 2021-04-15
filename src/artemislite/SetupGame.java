@@ -55,8 +55,9 @@ public class SetupGame {
 				SystemName.EXPLORATION_GROUND_SYSTEM,
 				2,
 				80,
-				200,
-				new int[] { 10, 20, 30, 90, 150 });
+				50,
+				//		  0dev, 1dev,  2dev,  3dev, MjDev
+				new int[] { 20,   60,  180,   320,  450 });
 
 		SystemSquare ss2 = new SystemSquare("Lunar Payload Services",
 				2,
@@ -64,31 +65,31 @@ public class SetupGame {
 				2,
 				100,
 				200,
-				new int[] { 10, 20, 30, 90, 150 });
+				new int[] { 30, 90, 270, 400, 550 });
 
 		SystemSquare ss3 = new SystemSquare("Onward to Lunar Surface",
 				3,
 				SystemName.ORION_SPACECRAFT,
 				2,
-				120,
+				150,
 				200,
-				new int[] { 10, 20, 30, 90, 150 });
+				new int[] { 40, 100, 300, 450, 600 });
 
 		SystemSquare ss4 = new SystemSquare("Navigation Control",
 				4,
 				SystemName.ORION_SPACECRAFT,
 				2,
 				120,
-				200,
-				new int[] { 10, 20, 30, 90, 150 });
+				150,
+				new int[]  { 40, 100, 300, 450, 600 });
 
 		SystemSquare ss5 = new SystemSquare("Abort Launch",
 				5,
 				SystemName.ORION_SPACECRAFT,
 				2,
 				140,
-				200,
-				new int[] { 10, 20, 30, 90, 150 });
+				150,
+				new int[] { 50, 150, 450, 625, 750 });
 
 		Square sq2 = new Square("Nothing", 6, "Missed launch window");
 
@@ -98,7 +99,7 @@ public class SetupGame {
 				2,
 				160,
 				200,
-				new int[] { 10, 20, 30, 90, 150 });
+				new int[] { 60, 180, 500, 700, 900 });
 
 		SystemSquare ss7 = new SystemSquare("Spun Stage",
 				8,
@@ -106,7 +107,7 @@ public class SetupGame {
 				2,
 				160,
 				200,
-				new int[] { 10, 20, 30, 90, 150 });
+				new int[] { 60, 180, 500, 700, 900 });
 
 		SystemSquare ss8 = new SystemSquare("SLS Booster Testing",
 				9,
@@ -114,7 +115,7 @@ public class SetupGame {
 				2,
 				180,
 				200,
-				new int[] { 10, 20, 30, 90, 150 });
+				new int[] { 70, 200, 550, 750, 950 });
 
 		SystemSquare ss9 = new SystemSquare("Astronaut Training",
 				10,
@@ -122,7 +123,7 @@ public class SetupGame {
 				2,
 				200,
 				200,
-				new int[] { 10, 20, 30, 90, 150 });
+				new int[] { 80, 220, 600, 800, 1000 });
 
 		SystemSquare ss10 = new SystemSquare("Launch Facilities Upgrades",
 				11,
@@ -130,7 +131,7 @@ public class SetupGame {
 				2,
 				220,
 				200,
-				new int[] { 10, 20, 30, 90, 150 });
+				new int[] { 90, 250, 700, 875, 1050 });
 
 		Collections.addAll(squares, sq1, ss1, ss2, ss3, ss4, ss5, sq2, ss6, ss7, ss8, ss9, ss10);
 		squares.sort(new ComparePosition());
