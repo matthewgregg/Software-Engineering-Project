@@ -34,10 +34,12 @@ public class SetupGame {
 						validPlayerName = true;
 						count++;
 					} else {
-						throw new InvalidNameException();
+						throw new DuplicateNameException();
 					}
 				} catch (InvalidNameException e) {
 					System.out.printf("%s is not a valid name. Try again.\n", name);
+				} catch (DuplicateNameException e) {
+					System.out.printf("%s has already been taken. Please enter a different name.", name);
 				}
 			} while (!validPlayerName);
 		} while (players.size() < numPlayers);

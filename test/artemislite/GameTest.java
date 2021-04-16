@@ -95,7 +95,6 @@ class GameTest {
 
     @Test
     void testInputTimerInvalid() {
-        InputStream inBackup = System.in;
         ByteArrayInputStream in = new ByteArrayInputStream(("1" + lineSeparator()).getBytes());
         System.setIn(in);
         new Scanner(in);
@@ -111,6 +110,6 @@ class GameTest {
             System.out.println(roll[0] + roll[1]);
         }
         Map<Integer, Long> map = rolls.stream().collect(Collectors.groupingBy(i -> i, Collectors.counting()));
-        map.forEach((k, v) -> System.out.println(k + " : " + v));
+        map.forEach((k, v) -> System.out.println(k + ": " + v));
     }
 }

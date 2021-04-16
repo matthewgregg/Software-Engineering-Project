@@ -23,6 +23,7 @@ public class Game {
 	private static final int GO_RESOURCES = 200;
 	private static final int BANKRUPTCY_RISK = 100;
 	private static final int MIN_BANKRUPTCY_DONATION = 100;
+
 	private static final Random rand = new Random();
 	// scanner cannot be closed and then reused
 	private static final List<Square> squares = Collections.unmodifiableList(SetupGame.setupBoard());
