@@ -188,19 +188,14 @@ public class Game {
 				try {
 					player.updatePosition(roll[0] + roll[1]);
 				} catch (IndexOutOfBoundsException e) {
-					System.out.print("You passed Go! Updating resources");
+					System.out.printf("Your budget increased! You get %d credits", GO_RESOURCES);
 					player.addResources(GO_RESOURCES);
 					loading(3, true);
 				}
 				break;
 			case 4:
 				// purchase unowned square
-				assert ss != null;
-				player.purchaseSquare(ss);
-				System.out.printf("Purchasing %s for %d credits for %s", ss.getSquareName(), ss.getBaseCost(), player.getName());
-				loading(3, true);
-				System.out.printf("\nYour new balance is %d credits", player.getPlayerResources());
-				loading(2, false);
+				purchaseSquare(ss, player);
 				purchased = true;
 				break;
 			case 5:
@@ -615,6 +610,32 @@ public class Game {
 		roll[0] = split - (lowest - 1);
 		roll[1] = (rollSum + 1) - split;
 		return roll;
+	}
+
+	/**
+	 * Handles purchasing of a square
+	 * @param ss the square to be purchased
+	 * @param player the current player
+	 * @throws BankruptcyException throws whena  player runs out of resources
+	 */
+	public static void purchaseSquare(Scanner scanner, SystemSquare ss, Player player) throws BankruptcyException {
+		assert ss != null;
+		if (player.getOwnedSquares().stream().filter(s -> s.getSystemNameEnum().equals(ss.getSystemNameEnum())).count() == ss.getSystemType() - 1) {
+			System.out.print("To purchase your last element, you have to pass a quiz. Loading");
+			loading(5, true);
+			if (Quiz.generateQuestions(scanner, ss.getMinigameDifficulty())) {
+				System.out.println("Well done! You passed the quiz.");
+			} else {
+				System.out.print("You didn't pass the quiz! Better luck next time");
+				loading(3, true);
+				return;
+			}
+		}
+		player.purchaseSquare(ss);
+		System.out.printf("Purchasing %s for %d credits for %s", ss.getSquareName(), ss.getBaseCost(), player.getName());
+		loading(3, true);
+		System.out.printf("\nYour new balance is %d credits", player.getPlayerResources());
+		loading(2, false);
 	}
 
 	/**
