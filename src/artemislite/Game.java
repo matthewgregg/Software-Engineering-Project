@@ -626,7 +626,7 @@ public class Game {
 			if (Quiz.generateQuestions(scanner, ss.getMinigameDifficulty())) {
 				System.out.println("Well done! You passed the quiz.");
 			} else {
-				System.out.print("You didn't pass the quiz! Better luck next time");
+				System.out.print("You didn't pass the quiz. Better luck next time");
 				loading(3, true);
 				return;
 			}
@@ -735,8 +735,24 @@ public class Game {
 			System.out.println("Enter how many developments to add. Enter # to cancel.");
 			do {
 				try {
-					int dev = scanIntInput(scanner, 1, chosenSquare.getMaxDevelopment(), true);
+					int maxDevToAdd = chosenSquare.getMaxDevelopment() - chosenSquare.getDevelopment();
+					int dev = scanIntInput(scanner, chosenSquare.getDevelopment() + 1, maxDevToAdd, true);
 					if (dev > 0) {
+						boolean otherSquaresFullyDev = player.getOwnedSquares().stream()
+								.filter(s -> s.getSystemNameEnum().equals(chosenSquare.getSystemNameEnum()))
+								.filter(s -> s.getDevelopment() == 4)
+								.count() == chosenSquare.getSystemType();
+						if (otherSquaresFullyDev && dev == maxDevToAdd) {
+							System.out.print("To purchase your last development, you have to pass a quiz. Loading");
+							loading(5, true);
+							if (Quiz.generateQuestions(scanner, ss.getMinigameDifficulty())) {
+								System.out.println("Well done! You passed the quiz.");
+							} else {
+								System.out.print("You didn't pass the quiz. Better luck next time");
+								loading(3, true);
+								return;
+							}
+						}
 						player.developSquare(chosenSquare, dev);
 						valid = true;
 						System.out.printf("Developing %s with %d development(s) at %d each", chosenSquare.getSquareName(), dev, chosenSquare.getCostPerDevelopment());
