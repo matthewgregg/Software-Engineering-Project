@@ -70,8 +70,7 @@ public class Game {
 		} else if (bankruptcy) {
 			System.out.printf("Game is over! %s went bankrupt.\n", players.get(playerCount - 1).getName());
 		} else {
-			System.out.println("Epilogue...");
-			// epilogue(players);
+			epilogue(players);
 		}
 		scanner.close();
 	}
@@ -171,7 +170,6 @@ public class Game {
 			switch (menuOptions.get(userOption)) {
 			case 1:
 				// display rules
-				epilogue(players);// TODO temporarily here - purely for testing purposes
 				displayGameRules(scanner);
 				break;
 			case 2:
