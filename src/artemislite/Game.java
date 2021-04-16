@@ -447,6 +447,7 @@ public class Game {
 			System.out.print("\n");
 			return new Triplet<>(ss, paid, auctioned);
 		} else {
+			System.out.print("\n" + landedSquare.getMessage());
 			System.out.printf("\nYou are on %s. It can't be owned.\n", landedSquare.getSquareName());
 			return new Triplet<>(null, paid, auctioned);
 		}

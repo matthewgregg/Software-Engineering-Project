@@ -48,7 +48,7 @@ public class SetupGame {
 
 	public static ArrayList<Square> setupBoard() {
 		ArrayList<Square> squares = new ArrayList<>();
-		Square sq1 = new Square("Mission Control", 0, "Pass Go, Collect 200! or something ...");
+		Square sq1 = new Square("Mission Control", 0, "Negotiating budget, please wait");
 
 		SystemSquare ss1 = new SystemSquare("Astronaut Training",
 				1,
@@ -91,7 +91,7 @@ public class SetupGame {
 				150,
 				new int[] { 50, 150, 450, 625, 750 });
 
-		Square sq2 = new Square("Nothing", 6, "Missed launch window");
+		Square sq2 = new Square("Nothing", 6, "Calculating trajectory, please hold position");
 
 		SystemSquare ss6 = new SystemSquare("Core Stage",
 				7,
