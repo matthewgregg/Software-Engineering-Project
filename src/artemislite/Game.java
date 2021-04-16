@@ -193,6 +193,7 @@ public class Game {
 				break;
 			case 4:
 				// purchase unowned square
+				assert ss != null;
 				purchaseSquare(scanner, ss, player);
 				purchased = true;
 				break;
@@ -617,7 +618,6 @@ public class Game {
 	 * @throws BankruptcyException throws whena  player runs out of resources
 	 */
 	public static void purchaseSquare(Scanner scanner, SystemSquare ss, Player player) throws BankruptcyException {
-		assert ss != null;
 		if (player.getOwnedSquares().stream().filter(s -> s.getSystemNameEnum().equals(ss.getSystemNameEnum())).count() == ss.getSystemType() - 1) {
 			System.out.print("To purchase your last element, you have to pass a quiz. Loading");
 			loading(5, true);
