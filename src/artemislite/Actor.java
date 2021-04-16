@@ -25,7 +25,7 @@ public abstract class Actor {
      * @param position the position to set
      * @throws IllegalArgumentException if outside bounds
      */
-    public void setPosition(int position) throws IllegalArgumentException {
+    private void setPosition(int position) throws IllegalArgumentException {
         if (position >= MIN_POSITION && position <= MAX_POSITION) {
             this.position = position;
         } else {

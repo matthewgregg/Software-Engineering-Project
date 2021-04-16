@@ -1,5 +1,6 @@
 package artemislite;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.naming.InvalidNameException;
@@ -7,127 +8,188 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * PlayerTest - test the Player class (and Actor as Player call's Actor's methods)
+ */
 class PlayerTest {
-    SystemName systemName1 = SystemName.EXPLORATION_GROUND_SYSTEM;
-    SystemName systemName2 = SystemName.ORION_SPACECRAFT;
-    SystemName systemName3 = SystemName.GATEWAY_OUTPOST;
-    SystemName systemName4 = SystemName.LUNAR_LANDER;
-    int[] devCost = new int[]{0,0,0,0,0};
-    int baseCost = 0;
-    int costPerDev = 0;
-    int difficulty = 0;
+    SystemName systemName1, systemName2, systemName3, systemName4;
+    int[] devCost;
+    int baseCost, costPerDev, difficulty, playerInitialRes, playerInitPos, resourcesValid, developmentValid, developmentInvalid;
+    int bankruptTrue1, bankruptTrue2, bankruptFalse;
+    SystemSquare ss1, ss2, ss3, ss4, ss5, ss6, ss7, ss8, ss9, ss10;
+    SortedSet<SystemSquare> squares;
+    String nameValid, nameInvalid, nameInvalidNull;
+    String INVALID_SQUARE_TO_DEVELOP, MAX_DEVELOPMENT_REACHED, BANKRUPTCY;
+    Player player1, player2, player3, player4;
+    String role1, role2, role3, role4;
 
-    SystemSquare ss1 = new SystemSquare("Square 1",
-            1,
-            systemName1,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
+    @BeforeEach
+    void setUp() throws InvalidNameException {
+        systemName1 = SystemName.EXPLORATION_GROUND_SYSTEM;
+        systemName2 = SystemName.ORION_SPACECRAFT;
+        systemName3 = SystemName.GATEWAY_OUTPOST;
+        systemName4 = SystemName.LUNAR_LANDER;
 
-    SystemSquare ss2 = new SystemSquare("Square 2",
-            2,
-            systemName1,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
+        devCost = new int[]{0, 0, 0, 0, 0};
 
-    SystemSquare ss3 = new SystemSquare("Square 3",
-            3,
-            systemName2,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
+        baseCost = 0;
+        costPerDev = 0;
+        difficulty = 0;
+        playerInitialRes = 1500;
+        playerInitPos = 0;
+        resourcesValid = 100;
+        developmentValid = 1;
+        developmentInvalid = 5;
 
-    SystemSquare ss4 = new SystemSquare("Square 4",
-            4,
-            systemName2,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
+        bankruptTrue1 = 1;
+        bankruptTrue2 = 200;
+        bankruptFalse = 201;
 
-    SystemSquare ss5 = new SystemSquare("Square 5",
-            5,
-            systemName2,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
+        nameValid = "Player";
+        nameInvalid = "";
+        nameInvalidNull = null;
 
-    SystemSquare ss6 = new SystemSquare("Square 6",
-            7,
-            systemName3,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
+        role1 = "Commander";
+        role2 = "Command Module Pilot";
+        role3 = "Lunar Module Pilot";
+        role4 = "Docking Module Pilot";
 
-    SystemSquare ss7 = new SystemSquare("Square 7",
-            8,
-            systemName3,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
+        INVALID_SQUARE_TO_DEVELOP = "The player does not own this square.";
+        MAX_DEVELOPMENT_REACHED = "Element fully developed";
+        BANKRUPTCY = "You've gone bankrupt";
 
-    SystemSquare ss8 = new SystemSquare("Square 8",
-            9,
-            systemName3,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
+        ss1 = new SystemSquare("Square 1", 1, systemName1, difficulty, baseCost, costPerDev, devCost);
+        ss2 = new SystemSquare("Square 2", 2, systemName1, difficulty, baseCost, costPerDev, devCost);
+        ss3 = new SystemSquare("Square 3", 3, systemName2, difficulty, baseCost, costPerDev, devCost);
+        ss4 = new SystemSquare("Square 4", 4, systemName2, difficulty, baseCost, costPerDev, devCost);
+        ss5 = new SystemSquare("Square 5", 5, systemName2, difficulty, baseCost, costPerDev, devCost);
+        ss6 = new SystemSquare("Square 6", 7, systemName3, difficulty, baseCost, costPerDev, devCost);
+        ss7 = new SystemSquare("Square 7", 8, systemName3, difficulty, baseCost, costPerDev, devCost);
+        ss8 = new SystemSquare("Square 8", 9, systemName3, difficulty, baseCost, costPerDev, devCost);
+        ss9 = new SystemSquare("Square 9", 10, systemName4, difficulty, baseCost, costPerDev, devCost);
+        ss10 = new SystemSquare("Square 10", 11, systemName4, difficulty, baseCost, costPerDev, devCost);
 
-    SystemSquare ss9 = new SystemSquare("Square 9",
-            10,
-            systemName4,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
+        squares = new TreeSet<>(new ComparePosition());
 
-    SystemSquare ss10 = new SystemSquare("Square 10",
-            11,
-            systemName4,
-            difficulty,
-            baseCost,
-            costPerDev,
-            devCost);
+        player1 = new Player(nameValid);
+        player2 = new Player(nameValid);
+        player3 = new Player(nameValid);
+        player4 = new Player(nameValid);
 
-    SortedSet<SystemSquare> squares = new TreeSet<>(new ComparePosition());
+    }
 
-    Player player;
+    @Test
+    void testConstructorValid() throws InvalidNameException {
+        Player playerTest = new Player(nameValid);
+        assertEquals(nameValid, playerTest.getName());
+        assertEquals(playerInitialRes, playerTest.getPlayerResources());
+        assertEquals(playerInitPos, playerTest.getPosition());
+    }
+
+    @Test
+    void testConstructorInvalid() {
+        assertThrows(InvalidNameException.class, () -> {
+            new Player(nameInvalid);
+        });
+
+        assertThrows(InvalidNameException.class, () -> {
+            new Player(nameInvalidNull);
+        });
+    }
+
+    @Test
+    void testGetOwnedSquares() throws BankruptcyException, InvalidNameException {
+        player1.purchaseSquare(ss1);
+        assertTrue(player1.getOwnedSquares().size() != 0);
+        assertTrue(player1.getOwnedSquares().contains(ss1));
+    }
+
+    @Test
+    void testAddResourcesValid() throws BankruptcyException {
+        int res = player1.getPlayerResources();
+        player1.addResources(resourcesValid);
+        assertEquals(res + resourcesValid, player1.getPlayerResources());
+    }
+
+    @Test
+    void testAddResourcesInvalid() {
+        int res = player1.getPlayerResources();
+        BankruptcyException e = assertThrows(BankruptcyException.class, () -> {
+            player1.addResources(-1 * res - 1);
+        });
+        assertEquals(BANKRUPTCY, e.getMessage());
+    }
+
+    @Test
+    void testDevelopSquareValid() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        player1.developSquare(ss1, developmentValid);
+        assertEquals(ss1.getDevelopment(), developmentValid);
+    }
+
+    @Test
+    void testDevelopSquareInvalid() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> {
+            player1.purchaseSquare(ss1);
+            player1.developSquare(ss1, developmentInvalid);
+        });
+        assertEquals(MAX_DEVELOPMENT_REACHED, e.getMessage());
+
+        e = assertThrows(IllegalArgumentException.class, () -> {
+            player1.developSquare(ss2, developmentInvalid);
+        });
+        assertEquals(INVALID_SQUARE_TO_DEVELOP, e.getMessage());
+    }
+
+    @Test
+    void testPurchaseSquare() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        assertTrue(player1.getOwnedSquares().contains(ss1));
+        player1.purchaseSquare(ss2, resourcesValid);
+        assertTrue(player1.getOwnedSquares().contains(ss2));
+    }
+
+    @Test
+    void testRemoveSquare() {
+        player1.removeSquare(ss1);
+        assertFalse(player1.getOwnedSquares().contains(ss1));
+    }
+
+    @Test
+    void testGetMinimumOwnedDevCost() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        player1.purchaseSquare(ss2);
+        player1.purchaseSquare(ss3);
+        assertEquals(ss1.getBaseCost(), player1.getMinimumOwnedDevCost());
+    }
 
     @Test
     void testGetDevelopableSystemValid() throws InvalidNameException, BankruptcyException {
-        player = new Player("Test Player");
+        player1 = new Player(nameValid);
 
         Collections.addAll(squares, ss1, ss2, ss3, ss4, ss5, ss6, ss7, ss8, ss9, ss10);
 
         for (SystemSquare ss : squares) {
-            player.purchaseSquare(ss);
+            player1.purchaseSquare(ss);
         }
 
-        assertTrue(player.getDevelopableSystems().contains(systemName1));
-        assertTrue(player.getDevelopableSystems().contains(systemName2));
-        assertTrue(player.getDevelopableSystems().contains(systemName3));
-        assertTrue(player.getDevelopableSystems().contains(systemName4));
+        assertTrue(player1.getDevelopableSystems().contains(systemName1));
+        assertTrue(player1.getDevelopableSystems().contains(systemName2));
+        assertTrue(player1.getDevelopableSystems().contains(systemName3));
+        assertTrue(player1.getDevelopableSystems().contains(systemName4));
         squares.clear();
     }
 
     @Test
     void testGetDevelopableSystemInvalid() throws InvalidNameException, BankruptcyException {
-        player = new Player("Test Player");
+        player1 = new Player("Test Player");
         Collections.addAll(squares, ss1, ss3, ss4, ss6, ss7, ss9);
 
-        assertNull(player.getDevelopableSystems());
+        assertNull(player1.getDevelopableSystems());
 
         for (SystemSquare ss : squares) {
-            player.purchaseSquare(ss);
-            assertNull(player.getDevelopableSystems());
+            player1.purchaseSquare(ss);
+            assertNull(player1.getDevelopableSystems());
         }
 
         ArrayList<SystemSquare> finalSystemSquare = new ArrayList<>();
@@ -154,5 +216,69 @@ class PlayerTest {
             s.setDevelopment(4);
         }
         assertNull(player2.getDevelopableSystems());
+    }
+
+    @Test
+    void testHasMortgageableSystemsTrue() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        assertTrue(player1.hasMortgageableSquares());
+    }
+
+    @Test
+    void testHasMortgageableSystemsFalse() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        player1.developSquare(ss1, developmentValid);
+        assertFalse(player1.hasMortgageableSquares());
+
+        player1.purchaseSquare(ss2);
+        ss2.setMortgaged(true);
+        assertFalse(player1.hasMortgageableSquares());
+    }
+
+    @Test
+    void testHasMortgagedSquaresTrue() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        ss1.setMortgaged(true);
+        assertTrue(player1.hasMortgagedSquares());
+    }
+
+    @Test
+    void testHasMortgagedSquaresFalse() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        assertFalse(player1.hasMortgagedSquares());
+    }
+
+    @Test
+    void testHasDevelopmentsTrue() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        player1.developSquare(ss1, 1);
+        assertTrue(player1.hasDevelopments());
+    }
+
+    @Test
+    void testHasDevelopmentsFalse() throws BankruptcyException {
+        assertFalse(player1.hasDevelopments());
+
+        player1.purchaseSquare(ss1);
+        assertFalse(player1.hasDevelopments());
+    }
+
+    @Test
+    void testGoingBankruptTrue() throws BankruptcyException {
+        int res = player1.getPlayerResources();
+        player1.addResources(-1 * res + bankruptTrue1);
+        assertTrue(player1.goingBankrupt());
+
+        res = player1.getPlayerResources();
+        player1.addResources(-1 * res + bankruptTrue2);
+        assertTrue(player1.goingBankrupt());
+    }
+
+    @Test
+    void testGoingBankruptFalse() throws BankruptcyException {
+        int res = player1.getPlayerResources();
+        player1.addResources(-1 * res + bankruptFalse);
+        assertFalse(player1.goingBankrupt());
+
     }
 }

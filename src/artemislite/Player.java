@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
  * represents a player in the system
  */
 public class Player extends Actor {
-    private static final int MIN_PLAYER_ID = 1;
-    private static final int MAX_PLAYER_ID = 4;
-    private static final String INVALID_PLAYER_ID = "Invalid player ID";
-    private static final String[] INVALID_NAMES = new String[]{"", "quit"};
-    private static int playerID = 0;
+    private static final String[] INVALID_NAMES = new String[]{"", "#"};
+    private static final String INVALID_SQUARE_TO_DEVELOP = "The player does not own this square.";
+    private static final String INVALID_DEVELOPMENT = "The development is more than the maximum development.";
+    private static final String BANKRUPTCY = "You've gone bankrupt";
+    private static final String MAX_DEVELOPMENT_REACHED = "Element fully developed";
     private final String name;
     private final SortedSet<SystemSquare> ownedSquares = new TreeSet<>(new ComparePosition());
     private int playerResources;
@@ -23,21 +23,13 @@ public class Player extends Actor {
      */
     public Player(String name) throws InvalidNameException {
         super(0);
-        if (Arrays.asList(INVALID_NAMES).contains(name)) {
+        if (Arrays.asList(INVALID_NAMES).contains(name) || name == null) {
             throw new InvalidNameException();
         } else {
-            Player.playerID += 1;
             this.name = name;
-            this.playerResources = 500;
+            this.playerResources = 1500;
         }
     }
-
-    /**
-	 * @return the playerID
-	 */
-	public int getPlayerID() {
-		return playerID;
-	}
 
 	/**
      * @return the name
@@ -61,29 +53,6 @@ public class Player extends Actor {
     }
 
     /**
-     * gets the player role based on playerID
-     * @return the player role
-     * @throws IllegalArgumentException if playerID outside bounds
-     */
-    public String getPlayerRole() throws IllegalArgumentException {
-        if (playerID >= MIN_PLAYER_ID && playerID <= MAX_PLAYER_ID) {
-            switch(playerID) {
-                case 1:
-                    return "Commander";
-                case 2:
-                    return "Command Module Pilot";
-                case 3:
-                    return "Lunar Module Pilot";
-                case 4:
-                    return "Docking Module Pilot";
-            }
-        } else {
-            throw new IllegalArgumentException(INVALID_PLAYER_ID);
-        }
-        return null;
-    }
-
-    /**
      * updates a player's resources
      * @param delta the change in resources
      */
@@ -92,22 +61,26 @@ public class Player extends Actor {
         if (res >= 0) {
             this.playerResources += delta;
         } else {
-            throw new BankruptcyException("You've gone bankrupt");
+            throw new BankruptcyException(BANKRUPTCY);
         }
     }
 
     /**
-     * develops a square
+     * adds a number of developments to a square
      * @param square the square to be developed
      */
     public void developSquare(SystemSquare square, int devDelta) throws IllegalArgumentException, BankruptcyException {
-        try {
-            this.addResources(devDelta * square.getCostPerDevelopment() * -1 * (int) (devDelta > 0 ? 1 : 0.5));
-            square.setDevelopment(devDelta+square.getDevelopment());
-        } catch (IllegalArgumentException e) {
-            //undo payment
-            this.addResources(devDelta * square.getCostPerDevelopment());
-            throw new IllegalArgumentException();
+        if (this.getOwnedSquares().contains(square)) {
+            try {
+                this.addResources(devDelta * square.getCostPerDevelopment() * -1 * (int) (devDelta > 0 ? 1 : 0.5));
+                square.setDevelopment(devDelta+square.getDevelopment());
+            } catch (IllegalArgumentException e) {
+                //undo payment
+                this.addResources(devDelta * square.getCostPerDevelopment());
+                throw new IllegalArgumentException(MAX_DEVELOPMENT_REACHED);
+            }
+        } else {
+            throw new IllegalArgumentException(INVALID_SQUARE_TO_DEVELOP);
         }
     }
 
@@ -168,7 +141,7 @@ public class Player extends Actor {
      * find out whether the user has any mortgagable squares
      * @return whether the player has at least one squares that can be mortgaged
      */
-    public boolean hasMortgagableSquares() {
+    public boolean hasMortgageableSquares() {
         return this.getOwnedSquares().stream().filter(s -> s.getDevelopment() == 0).anyMatch(s -> !s.isMortgaged());
     }
 

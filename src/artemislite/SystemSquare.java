@@ -150,7 +150,7 @@ public class SystemSquare extends Square {
      * @param development the development to set
      */
     public void setDevelopment(int development) throws IllegalArgumentException {
-        if (this.development >= MIN_DEVELOPMENT && this.development <= MAX_DEVELOPMENT) {
+        if (development >= MIN_DEVELOPMENT && development <= MAX_DEVELOPMENT) {
             this.development = development;
         } else {
             throw new IllegalArgumentException(MAX_DEVELOPMENT_REACHED);

@@ -144,7 +144,7 @@ public class Game {
 					continue;
 				}
 				// skip deal with bank
-				if (i == 5 && !player.hasDevelopments() && !player.hasMortgagableSquares() && !player.hasMortgagedSquares()) {
+				if (i == 5 && !player.hasDevelopments() && !player.hasMortgageableSquares() && !player.hasMortgagedSquares()) {
 					continue;
 				}
 				// skip trade with player
@@ -788,7 +788,7 @@ public class Game {
 			if (i == 0 && !player.hasDevelopments()) {
 				continue;
 			}
-			if (i == 1 && !player.hasMortgagableSquares()) {
+			if (i == 1 && !player.hasMortgageableSquares()) {
 				continue;
 			}
 			if (i == 2 && !player.hasMortgagedSquares()
@@ -913,28 +913,32 @@ public class Game {
 		sellerUndevelopedSquares.removeIf(s -> s.getDevelopment() != 0);
 
 		int count;
-		int option;
-		int max = sellerUndevelopedSquares.size() + 1;
+		int userOption;
+		int optionNum = sellerUndevelopedSquares.size() + 1;
+		int maxEntry = sellerUndevelopedSquares.size();
 		ArrayList<SystemSquare> sellerSquares = new ArrayList<>();
 		do {
 			count = 1;
-			System.out.println("Enter an undeveloped element(s) to sell. Select continue to finalise selection. Enter # to cancel at any time.");
+			System.out.println("Enter an undeveloped element(s) to sell. Select continue to finalise selection if there are multiple. Enter # to cancel at any time.");
 			for (SystemSquare s : sellerUndevelopedSquares) {
 				System.out.printf("%d. %s (%d credits)", count++, s.getSquareName(), s.getBaseCost());
 				System.out.print(s.isMortgaged() ? " - mortgaged" : "" + "\n");
 			}
-			System.out.printf("%d. Continue\n", count);
+			if (sellerSquares.size() > 0) {
+				System.out.printf("%d. Continue\n", count);
+				maxEntry++;
+			}
 
-			option = scanIntInput(scanner, 1, sellerUndevelopedSquares.size(), true);
-			if (option < 0) {
+			userOption = scanIntInput(scanner, 1, maxEntry, true);
+			if (userOption < 0) {
 				return;
-			} else if (option > 0 && option < max) {
-				SystemSquare squareToTrade = sellerUndevelopedSquares.get(option - 1);
+			} else if (userOption > 0 && userOption < optionNum) {
+				SystemSquare squareToTrade = sellerUndevelopedSquares.get(userOption - 1);
 				sellerSquares.add(squareToTrade);
 				sellerUndevelopedSquares.remove(squareToTrade);
-				max--;
+				optionNum--;
 			}
-		} while (option < max);
+		} while (userOption < optionNum);
 
 		int paymentMethod;
 		if (buyers.stream().anyMatch(s -> s.getOwnedSquares().size() > 0)) {
@@ -984,28 +988,28 @@ public class Game {
 			}
 		} else if (paymentMethod == 2) {
 			int squareOption;
-			max = buyer.getOwnedSquares().size() + 1;
+			optionNum = buyer.getOwnedSquares().size() + 1;
 			ArrayList<SystemSquare> buyerSquares = new ArrayList<>();
 			ArrayList<SystemSquare> buyerUndevelopedSquares = buyer.getOwnedSquares();
 			do {
 				clearScreen();
 				count = 1;
-				System.out.printf("Enter which element(s) %s will give to %s. Select continue to finalise selection.\n", buyer.getName(), player.getName());
+				System.out.printf("Enter which element(s) %s will give to %s. Select continue to finalise selection if there are multiple..\n", buyer.getName(), player.getName());
 				for (SystemSquare ss : buyerUndevelopedSquares) {
 					System.out.printf("%d. %s (%d credits)", count++, ss.getSquareName(), ss.getBaseCost());
 					System.out.print(ss.isMortgaged() ? " - mortgaged" : "" + "\n");
 				}
 				System.out.printf("%d. Continue\n", count);
-				squareOption = scanIntInput(scanner, 1, max, true);
+				squareOption = scanIntInput(scanner, 1, optionNum, true);
 				if (squareOption < 0) {
 					return;
-				} else if (squareOption != max) {
+				} else if (squareOption != optionNum) {
 					SystemSquare squareToTrade = buyerUndevelopedSquares.get(squareOption - 1);
 					buyerSquares.add(squareToTrade);
 					buyerUndevelopedSquares.remove(squareToTrade);
-					max--;
+					optionNum--;
 				}
-			} while (squareOption < max);
+			} while (squareOption < optionNum);
 			System.out.println("The trade will occur in 10 seconds. Press enter to cancel.");
 			if (inputTimer(10)) {
 				for (SystemSquare square : buyerSquares) {

@@ -65,7 +65,7 @@ class GameTest {
     void testSellElementValid() throws BankruptcyException {
         int cost = 100;
 
-        ByteArrayInputStream inResources = new ByteArrayInputStream(("1" + lineSeparator() + "1" + lineSeparator() + "1" + lineSeparator() + cost + lineSeparator()).getBytes());
+        ByteArrayInputStream inResources = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + cost + lineSeparator()).getBytes());
         System.setIn(inResources);
         Scanner scanner = new Scanner(inResources);
         int res = player1.getPlayerResources();
@@ -76,7 +76,7 @@ class GameTest {
         assertEquals(res + cost, player1.getPlayerResources());
         assertTrue(player2.getOwnedSquares().contains(ss1));
 
-        ByteArrayInputStream inElement = new ByteArrayInputStream(("1" + lineSeparator() + "1" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + "2").getBytes());
+        ByteArrayInputStream inElement = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + "1" + lineSeparator() + "2").getBytes());
         System.setIn(inElement);
         scanner = new Scanner(inElement);
 
@@ -101,14 +101,19 @@ class GameTest {
     }
 
     @Test
-    void rollDice() {
+    void testRollDice() {
         ArrayList<Integer> rolls = new ArrayList<>();
-        for (int i =0; i < 10000; i++) {
-            int[] roll = Game.rollDice(3);
+        // as the loop value increases, the delta required will decrease as the results tends towards a normal dist.
+        int loop = 1000000;
+        int n = 3;
+        int averageFrequency = loop / (2 * n - 2 + 1);
+        for (int i = 0; i < loop; i++) {
+            int[] roll = Game.rollDice(n);
             rolls.add(roll[0] + roll[1]);
-            System.out.println(roll[0] + roll[1]);
         }
         Map<Integer, Long> map = rolls.stream().collect(Collectors.groupingBy(i -> i, Collectors.counting()));
-        map.forEach((k, v) -> System.out.println(k + ": " + v));
+        for (Long l : map.values()) {
+            assertEquals(l.intValue(), averageFrequency, averageFrequency * 0.01);
+        }
     }
 }

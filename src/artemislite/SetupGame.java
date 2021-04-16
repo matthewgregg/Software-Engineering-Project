@@ -9,6 +9,9 @@ import java.util.*;
 public class SetupGame {
 	private static final int MIN_PLAYERS = 2;
 	private static final int MAX_PLAYERS = 4;
+	private static final int MIN_PLAYER_ID = 1;
+	private static final int MAX_PLAYER_ID = 4;
+	private static final String INVALID_PLAYER_ID = "Invalid player ID";
 
 	public static List<Player> playerCreation(Scanner scanner) {
 		System.out.println("How many crew members would like to play?\nEnter a number between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
@@ -136,5 +139,28 @@ public class SetupGame {
 		Collections.addAll(squares, sq1, ss1, ss2, ss3, ss4, ss5, sq2, ss6, ss7, ss8, ss9, ss10);
 		squares.sort(new ComparePosition());
 		return squares;
+	}
+
+	/**
+	 * gets the player role based on playerID
+	 * @return the player role
+	 * @throws IllegalArgumentException if playerID outside bounds
+	 */
+	public String getPlayerRole(int playerID) throws IllegalArgumentException {
+		if (playerID >= MIN_PLAYER_ID && playerID <= MAX_PLAYER_ID) {
+			switch(playerID) {
+				case 1:
+					return "Commander";
+				case 2:
+					return "Command Module Pilot";
+				case 3:
+					return "Lunar Module Pilot";
+				case 4:
+					return "Docking Module Pilot";
+			}
+		} else {
+			throw new IllegalArgumentException(INVALID_PLAYER_ID);
+		}
+		return null;
 	}
 }
