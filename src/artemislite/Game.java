@@ -158,6 +158,7 @@ public class Game {
 				}
 				menuNum++;
 				System.out.println(menuNum + ". " + allMenu[i]);
+				// store user-facing menu index paired with actual index
 				menuOptions.put(menuNum, i + 1);
 			}
 			System.out.println("Enter option");
@@ -196,9 +197,11 @@ public class Game {
 				// purchase unowned square
 				assert ss != null;
 				player.purchaseSquare(ss);
-				System.out.print("Purchasing " + ss.getSquareName() + " for " + player.getName());
-				purchased = true;
+				System.out.printf("Purchasing %s for %d credits for %s", ss.getSquareName(), ss.getBaseCost(), player.getName());
 				loading(3, true);
+				System.out.printf("\nYour new balance is %d credits", player.getPlayerResources());
+				loading(2, false);
+				purchased = true;
 				break;
 			case 5:
 				// buy development
@@ -714,8 +717,10 @@ public class Game {
 					if (dev > 0) {
 						player.developSquare(chosenSquare, dev);
 						valid = true;
-						System.out.printf("Developing %s with %d development(s)", chosenSquare.getSquareName(), dev);
+						System.out.printf("Developing %s with %d development(s) at %d each", chosenSquare.getSquareName(), dev, chosenSquare.getCostPerDevelopment());
 						loading(3, true);
+						System.out.printf("\nYour new balance is %d credits", player.getPlayerResources());
+						loading(2, false);
 					} else {
 						break;
 					}
