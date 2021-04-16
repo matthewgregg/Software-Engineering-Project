@@ -7,7 +7,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import static java.lang.System.lineSeparator;
 import static org.junit.jupiter.api.Assertions.*;
@@ -98,5 +100,17 @@ class GameTest {
         System.setIn(in);
         new Scanner(in);
         assertFalse(Game.inputTimer(1));
+    }
+
+    @Test
+    void rollDice() {
+        ArrayList<Integer> rolls = new ArrayList<>();
+        for (int i =0; i < 10000; i++) {
+            int[] roll = Game.rollDice(3);
+            rolls.add(roll[0] + roll[1]);
+            System.out.println(roll[0] + roll[1]);
+        }
+        Map<Integer, Long> map = rolls.stream().collect(Collectors.groupingBy(i -> i, Collectors.counting()));
+        map.forEach((k, v) -> System.out.println(k + " : " + v));
     }
 }

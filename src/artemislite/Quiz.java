@@ -39,7 +39,7 @@ public class Quiz {
 		List<Question> questionsFiltered = questions.stream().filter(q -> q.getDifficulty() == difficulty).collect(Collectors.toList());
 		// pick 4 random questions
 		Collections.shuffle(questionsFiltered);
-		List<Question> questionList = questionsFiltered.subList(0, 4);
+		List<Question> questionList = questionsFiltered.subList(0, 3);
 
 		int correct = 0;
 		for (Question question : questionList) {

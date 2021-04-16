@@ -394,7 +394,7 @@ public class Game {
 			if (player.goingBankrupt()) {
 				System.out.print("You are at risk of going bankrupt, which will end the game! Try and get the other players to donate credits to you.\n");
 			} else {
-				String names = getPlayersNearBankruptcy(scanner, player, players).stream().map(Player::getName)
+				String names = getPlayersNearBankruptcy(player, players).stream().map(Player::getName)
 						.collect(Collectors.joining(", "));
 				System.out.printf("%s is at risk of bankruptcy, which will end the game! Consider donating credits to them.\n", names);
 			}
@@ -983,14 +983,13 @@ public class Game {
 
 	/**
 	 * get the players that have resources < {@value BANKRUPTCY_RISK}
-	 * 
-	 * @param scanner scanner
+	 *
 	 * @param player  the current player
 	 * @param players all players
 	 * @return an arraylist of players that have resources <
 	 *         {@value BANKRUPTCY_RISK}
 	 */
-	public static List<Player> getPlayersNearBankruptcy(Scanner scanner, final Player player, final List<Player> players) {
+	public static List<Player> getPlayersNearBankruptcy(final Player player, final List<Player> players) {
 		List<Player> playersNearBankruptcy = new ArrayList<>(players);
 		playersNearBankruptcy.remove(player);
 		playersNearBankruptcy.removeIf(s -> s.getPlayerResources() >= BANKRUPTCY_RISK);
@@ -1007,7 +1006,7 @@ public class Game {
 	 *                             is limited
 	 */
 	public static void makeDonation(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
-		List<Player> recipients = getPlayersNearBankruptcy(scanner, player, players);
+		List<Player> recipients = getPlayersNearBankruptcy(player, players);
 		Player recipient;
 		if (recipients.size() == 1) {
 			recipient = recipients.get(0);
@@ -1109,10 +1108,7 @@ public class Game {
 				return true;
 			} catch (InterruptedException | ExecutionException e) {
 				return false;
-			} /*
-				 * finally { //either use autocloseable interface or finally block
-				 * ex.shutdownNow();
-				 */
+			}
 		}
 	}
 
