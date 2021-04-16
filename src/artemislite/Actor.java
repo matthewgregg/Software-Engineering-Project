@@ -26,11 +26,7 @@ public abstract class Actor {
      * @throws IllegalArgumentException if outside bounds
      */
     private void setPosition(int position) throws IllegalArgumentException {
-        if (position >= MIN_POSITION && position <= MAX_POSITION) {
-            this.position = position;
-        } else {
-            throw new IllegalArgumentException(INVALID_POSITION);
-        }
+        this.position = position;
     }
 
     /**
@@ -38,11 +34,15 @@ public abstract class Actor {
      * @param delta - the change in position of a player
      */
     public void updatePosition(int delta) {
-        if (this.position + delta <= 11) {
-            setPosition(this.position + delta);
+        if (delta > 0) {
+            if (this.position + delta <= 11) {
+                setPosition(this.position + delta);
+            } else {
+                setPosition(((this.position + delta + 1) % 12) - 1);
+                throw new IndexOutOfBoundsException();
+            }
         } else {
-            setPosition(((this.position + delta + 1) % 12) - 1);
-            throw new IndexOutOfBoundsException();
+            throw new IllegalArgumentException(INVALID_POSITION);
         }
     }
 }

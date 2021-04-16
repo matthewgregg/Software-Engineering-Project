@@ -136,10 +136,8 @@ class PlayerTest {
             assertTrue(player1.getPosition() <= maxPosition);
         });
 
-        assertThrows(IndexOutOfBoundsException.class, () -> {
-            player1.updatePosition(positionInvalid3 - player1.getPosition());
-            assertTrue(player1.getPosition() >= minPosition);
-            assertTrue(player1.getPosition() <= maxPosition);
+        assertThrows(IllegalArgumentException.class, () -> {
+            player1.updatePosition(positionInvalid3);
         });
     }
 
