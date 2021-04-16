@@ -60,7 +60,7 @@ public class Game {
 				// player went bankrupt
 				bankruptcy = true;
 			}
-			endGame = players.stream().flatMap(p -> p.getOwnedElements().stream())
+			endGame = players.stream().flatMap(p -> p.getOwnedSquares().stream())
 					.filter(e -> e.getDevelopment() == 4).count() == 10;
 		} while (!endGame && !quitGame && !bankruptcy);
 
@@ -139,17 +139,17 @@ public class Game {
 					continue;
 				}
 				// skip buy developments
-				if (i == 4 && (player.getOwnedElements().size() == 0
+				if (i == 4 && (player.getOwnedSquares().size() == 0
 						|| player.getMinimumOwnedDevCost() > player.getPlayerResources()
 						|| player.getDevelopableSystems() == null)) {
 					continue;
 				}
 				// skip deal with bank
-				if (i == 5 && !player.hasDevelopments() && !player.hasMortgagableElements() && !player.hasMortgagedElements()) {
+				if (i == 5 && !player.hasDevelopments() && !player.hasMortgagableSquares() && !player.hasMortgagedSquares()) {
 					continue;
 				}
 				// skip trade with player
-				if (i == 6 && players.stream().noneMatch(p -> p.getOwnedElements().size() > 0)) {
+				if (i == 6 && players.stream().noneMatch(p -> p.getOwnedSquares().size() > 0)) {
 					continue;
 				}
 				// skip donate to player
@@ -174,7 +174,7 @@ public class Game {
 				displayGameRules(scanner);
 				break;
 			case 2:
-				// display which elements are owned by who
+				// display which squares are owned by who
 				displayBoardState(players);
 				scanner.nextLine();
 				break;
@@ -209,7 +209,7 @@ public class Game {
 				bankMenu(scanner, player, players);
 				break;
 			case 7:
-				// trade or sell element
+				// trade or sell square
 				tradeWithPlayer(scanner, player, players);
 				break;
 			case 8:
@@ -407,7 +407,7 @@ public class Game {
 		if (square instanceof SystemSquare) {
 			SystemSquare ss = (SystemSquare) square;
 			if (ss.isOwned()) {
-				Player owner = players.stream().filter(p -> p.getOwnedElements().contains(ss)).findAny().get();
+				Player owner = players.stream().filter(p -> p.getOwnedSquares().contains(ss)).findAny().get();
 				String squareName = ss.getSquareName();
 				if (owner.equals(player)) {
 					System.out.printf("\nYou are on %s. You own it.", squareName);
@@ -552,7 +552,7 @@ public class Game {
 	}
 
 	/**
-	 * Displays current state of the board(i.e. which elements are owned by which
+	 * Displays current state of the board(i.e. which squares are owned by which
 	 * players)
 	 */
 	public static void displayBoardState(final List<Player> players) {
@@ -562,7 +562,7 @@ public class Game {
 			String owner;
 			SystemSquare ss = null;
 			if (s instanceof SystemSquare) {
-				Player o = players.stream().filter(p -> p.getOwnedElements().contains(s)).findAny().orElse(null);
+				Player o = players.stream().filter(p -> p.getOwnedSquares().contains(s)).findAny().orElse(null);
 				// TODO multiple players (truncate to 18 chars)
 				ss = (SystemSquare) s;
 				owner = o != null ? o.getName() + " (Dev " + ss.getDevelopment() + ")" : "";
@@ -685,13 +685,13 @@ public class Game {
 	}
 
 	/**
-	 * Allows Players to choose any of their owned elements to develop.
+	 * Allows Players to choose any of their owned squares to develop.
 	 *
 	 * @param scanner the scanner
 	 * @param player  the current player
 	 */
 	public static void buyDevelopmentsMenu(Scanner scanner, final Player player) {
-		ArrayList<SystemSquare> squares = player.getOwnedElements();
+		ArrayList<SystemSquare> squares = player.getOwnedSquares();
 		ArrayList<SystemName> systems = player.getDevelopableSystems();
 
 		// remove incomplete systems using predicate
@@ -712,7 +712,7 @@ public class Game {
 				try {
 					int dev = scanIntInput(scanner, 1, chosenSquare.getMaxDevelopment(), true);
 					if (dev > 0) {
-						player.developElement(chosenSquare, dev);
+						player.developSquare(chosenSquare, dev);
 						valid = true;
 						System.out.printf("Developing %s with %d development(s)", chosenSquare.getSquareName(), dev);
 						loading(3, true);
@@ -747,11 +747,11 @@ public class Game {
 			if (i == 0 && !player.hasDevelopments()) {
 				continue;
 			}
-			if (i == 1 && !player.hasMortgagableElements()) {
+			if (i == 1 && !player.hasMortgagableSquares()) {
 				continue;
 			}
-			if (i == 2 && !player.hasMortgagedElements()
-					&& player.getOwnedElements().stream().filter(SystemSquare::isMortgaged)
+			if (i == 2 && !player.hasMortgagedSquares()
+					&& player.getOwnedSquares().stream().filter(SystemSquare::isMortgaged)
 							.noneMatch(s -> player.getPlayerResources() > (int) (s.getBaseCost() * 1.1))) {
 				continue;
 			}
@@ -771,7 +771,7 @@ public class Game {
 			sellDevelopmentsMenu(scanner, player);
 			break;
 		case 2:
-			mortgageElement(scanner, player);
+			mortgageSquare(scanner, player);
 			break;
 		case 3:
 			payOffMortgage(scanner, player);
@@ -787,7 +787,7 @@ public class Game {
 	 */
 	public static void sellDevelopmentsMenu(Scanner scanner, final Player player) throws BankruptcyException {
 		clearScreen();
-		ArrayList<SystemSquare> developedSquares = new ArrayList<>(player.getOwnedElements());
+		ArrayList<SystemSquare> developedSquares = new ArrayList<>(player.getOwnedSquares());
 		developedSquares.removeIf(s -> s.getDevelopment() == 0);
 		int count = 1;
 		System.out.print("Enter an element to sell development from. Enter # to cancel.");
@@ -800,7 +800,7 @@ public class Game {
 			System.out.print("Enter how many developments to sell. Enter # to cancel.\n");
 			int dev = scanIntInput(scanner, 1, s.getDevelopment(), true);
 			if (dev > 0) {
-				player.developElement(s, -1 * dev);
+				player.developSquare(s, -1 * dev);
 				System.out.printf("You have sold %s developments for a total of %s", dev, dev * s.getCostPerDevelopment());
 				loading(3, true);
 			}
@@ -808,16 +808,16 @@ public class Game {
 	}
 
 	/**
-	 * allows a player to mortgage an undeveloped element
+	 * allows a player to mortgage an undeveloped squares
 	 * 
 	 * @param scanner scanner
 	 * @param player  player arraylist
 	 */
-	public static void mortgageElement(Scanner scanner, final Player player) throws BankruptcyException {
+	public static void mortgageSquare(Scanner scanner, final Player player) throws BankruptcyException {
 		ArrayList<SystemSquare> undevelopedSquares = new ArrayList<>();
 		int count = 1;
 		System.out.println("Enter an element to mortgage. Enter # to cancel.");
-		for (SystemSquare s : player.getOwnedElements()) {
+		for (SystemSquare s : player.getOwnedSquares()) {
 			if (s.getDevelopment() == 0) {
 				System.out.printf("%d. %s (%d)\n", count++, s.getSquareName(), s.getBaseCost());
 				undevelopedSquares.add(s);
@@ -835,7 +835,7 @@ public class Game {
 	}
 
 	/**
-	 * allows a player to pay off a mortgaged element
+	 * allows a player to pay off a mortgaged square
 	 * 
 	 * @param scanner scanner
 	 * @param player  the current player
@@ -843,7 +843,7 @@ public class Game {
 	 */
 	public static void payOffMortgage(Scanner scanner, final Player player) throws BankruptcyException {
 		System.out.println("Which element would you like to pay off the mortgage on?");
-		List<SystemSquare> mortgaged = player.getOwnedElements().stream().filter(SystemSquare::isMortgaged)
+		List<SystemSquare> mortgaged = player.getOwnedSquares().stream().filter(SystemSquare::isMortgaged)
 				.filter(s -> player.getPlayerResources() > (int) (1.1 * s.getBaseCost())).collect(Collectors.toList());
 		int count = 1;
 		for (SystemSquare s : mortgaged) {
@@ -859,8 +859,8 @@ public class Game {
 	}
 
 	/**
-	 * allows a player to sell an undeveloped element to another player for
-	 * resources or elements
+	 * allows a player to sell an undeveloped square to another player for
+	 * resources or squares
 	 * 
 	 * @param scanner the scanner
 	 * @param player  the current player
@@ -868,7 +868,7 @@ public class Game {
 	public static void tradeWithPlayer(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
 		ArrayList<Player> buyers = new ArrayList<>(players);
 		buyers.remove(player);
-		ArrayList<SystemSquare> sellerUndevelopedSquares = new ArrayList<>(player.getOwnedElements());
+		ArrayList<SystemSquare> sellerUndevelopedSquares = new ArrayList<>(player.getOwnedSquares());
 		sellerUndevelopedSquares.removeIf(s -> s.getDevelopment() != 0);
 
 		int count;
@@ -896,7 +896,7 @@ public class Game {
 		} while (option < max);
 
 		int paymentMethod;
-		if (buyers.stream().anyMatch(s -> s.getOwnedElements().size() > 0)) {
+		if (buyers.stream().anyMatch(s -> s.getOwnedSquares().size() > 0)) {
 			clearScreen();
 			System.out.print("What would you like to sell the element for?\n1. Credits\n2. An element(s)\n");
 
@@ -909,7 +909,7 @@ public class Game {
 		}
 
 		if (paymentMethod == 2) {
-			buyers.removeIf(b -> b.getOwnedElements().size() == 0);
+			buyers.removeIf(b -> b.getOwnedSquares().size() == 0);
 		}
 
 		clearScreen();
@@ -943,9 +943,9 @@ public class Game {
 			}
 		} else if (paymentMethod == 2) {
 			int squareOption;
-			max = buyer.getOwnedElements().size() + 1;
+			max = buyer.getOwnedSquares().size() + 1;
 			ArrayList<SystemSquare> buyerSquares = new ArrayList<>();
-			ArrayList<SystemSquare> buyerUndevelopedSquares = buyer.getOwnedElements();
+			ArrayList<SystemSquare> buyerUndevelopedSquares = buyer.getOwnedSquares();
 			do {
 				clearScreen();
 				count = 1;
@@ -1057,10 +1057,10 @@ public class Game {
 
 			System.out.println("\t---Elements Owned---\t");
 			// iterate owned system squares
-			if (p.getOwnedElements().size() == 0) {
+			if (p.getOwnedSquares().size() == 0) {
 				System.out.printf("\t%s owned no elements\n", p.getName());
 			} else {
-				String owned = p.getOwnedElements().stream().map(SystemSquare::getSquareName).collect(Collectors.joining(", "));
+				String owned = p.getOwnedSquares().stream().map(SystemSquare::getSquareName).collect(Collectors.joining(", "));
 				System.out.println("\t" + owned);
 			}
 		}
@@ -1069,14 +1069,14 @@ public class Game {
 	}
 
 	/**
-	 * Calculates net worth of all players (base cost of element + (cost_per_dev *playerResources))
+	 * Calculates net worth of all players (base cost of square + (cost_per_dev *playerResources))
 	 *
 	 * @return the total net worth of the player
 	 */
 	public static int calculateNetWorth(Player player) {
 		int netWorth = player.getPlayerResources();
-		// loop through each list of owned elements
-		for (SystemSquare s : player.getOwnedElements()) {
+		// loop through each list of owned squares
+		for (SystemSquare s : player.getOwnedSquares()) {
 			// base cost + (cost_per_dev*4) + playerResources
 			netWorth += s.isMortgaged() ? 0 : (s.getBaseCost() + s.getCostPerDevelopment() * s.getDevelopment());
 		}

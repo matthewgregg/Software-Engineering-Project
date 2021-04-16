@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,17 +74,17 @@ class GameTest {
         player1.purchaseSquare(ss2);
         Game.tradeWithPlayer(scanner, player1, players);
         assertEquals(res + cost, player1.getPlayerResources());
-        assertTrue(player2.getOwnedElements().contains(ss1));
+        assertTrue(player2.getOwnedSquares().contains(ss1));
 
         ByteArrayInputStream inElement = new ByteArrayInputStream(("1" + lineSeparator() + "1" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + "2").getBytes());
         System.setIn(inElement);
         scanner = new Scanner(inElement);
 
         Game.tradeWithPlayer(scanner, player2, players);
-        assertTrue(player1.getOwnedElements().contains(ss1));
-        assertFalse(player1.getOwnedElements().contains(ss2));
-        assertTrue(player2.getOwnedElements().contains(ss2));
-        assertFalse(player2.getOwnedElements().contains(ss1));
+        assertTrue(player1.getOwnedSquares().contains(ss1));
+        assertFalse(player1.getOwnedSquares().contains(ss2));
+        assertTrue(player2.getOwnedSquares().contains(ss2));
+        assertFalse(player2.getOwnedSquares().contains(ss1));
     }
 
     @Test

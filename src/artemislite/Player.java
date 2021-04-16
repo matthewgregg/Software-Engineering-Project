@@ -14,7 +14,7 @@ public class Player extends Actor {
     private static final String[] INVALID_NAMES = new String[]{"", "quit"};
     private static int playerID = 0;
     private final String name;
-    private final SortedSet<SystemSquare> ownedElements = new TreeSet<>(new ComparePosition());
+    private final SortedSet<SystemSquare> ownedSquares = new TreeSet<>(new ComparePosition());
     private int playerResources;
 
     /**
@@ -54,10 +54,10 @@ public class Player extends Actor {
     }
 
     /**
-     * @return the ownedElements
+     * @return the ownedSquares
      */
-    public ArrayList<SystemSquare> getOwnedElements() {
-        return new ArrayList<>(ownedElements);
+    public ArrayList<SystemSquare> getOwnedSquares() {
+        return new ArrayList<>(ownedSquares);
     }
 
     /**
@@ -100,7 +100,7 @@ public class Player extends Actor {
      * develops a square
      * @param square the square to be developed
      */
-    public void developElement(SystemSquare square, int devDelta) throws IllegalArgumentException, BankruptcyException {
+    public void developSquare(SystemSquare square, int devDelta) throws IllegalArgumentException, BankruptcyException {
         try {
             this.addResources(devDelta * square.getCostPerDevelopment() * -1 * (int) (devDelta > 0 ? 1 : 0.5));
             square.setDevelopment(devDelta+square.getDevelopment());
@@ -116,7 +116,7 @@ public class Player extends Actor {
      * @param square the square to be purchased
      */
     public void purchaseSquare(SystemSquare square) throws BankruptcyException {
-        this.ownedElements.add(square);
+        this.ownedSquares.add(square);
         square.setOwned(true);
         this.addResources(-1 * square.getBaseCost());
     }
@@ -126,7 +126,7 @@ public class Player extends Actor {
      * @param square the square to be purchased
      */
     public void purchaseSquare(SystemSquare square, int cost) throws BankruptcyException {
-        this.ownedElements.add(square);
+        this.ownedSquares.add(square);
         //this.setPlayerResources(this.playerResources - square.getBaseCost());
         this.addResources(-1 * cost);
     }
@@ -136,7 +136,7 @@ public class Player extends Actor {
      * @param square the square to remove
      */
     public void removeSquare(SystemSquare square) {
-        this.ownedElements.remove(square);
+        this.ownedSquares.remove(square);
         square.setOwned(false);
     }
 
@@ -146,7 +146,7 @@ public class Player extends Actor {
      */
     public int getMinimumOwnedDevCost() {
         //the first square will always have the lowest development cost
-        return this.ownedElements.first().getCostPerDevelopment();
+        return this.ownedSquares.first().getCostPerDevelopment();
     }
 
     /**
@@ -154,7 +154,7 @@ public class Player extends Actor {
      * @return the systems or null
      */
     public ArrayList<SystemName> getDevelopableSystems() {
-        Map<SystemName, List<SystemSquare>> systems = this.ownedElements.stream()
+        Map<SystemName, List<SystemSquare>> systems = this.ownedSquares.stream()
                 .filter(s -> !s.isMortgaged())
                 .collect(Collectors.groupingBy(SystemSquare::getSystemNameEnum, Collectors.toList()));
         //remove if incomplete system
@@ -165,15 +165,15 @@ public class Player extends Actor {
     }
 
     /**
-     * find out whether the user has any mortgagable elements
-     * @return whether the player has at least one element that can be mortgaged
+     * find out whether the user has any mortgagable squares
+     * @return whether the player has at least one squares that can be mortgaged
      */
-    public boolean hasMortgagableElements() {
-        return this.getOwnedElements().stream().filter(s -> s.getDevelopment() == 0).anyMatch(s -> !s.isMortgaged());
+    public boolean hasMortgagableSquares() {
+        return this.getOwnedSquares().stream().filter(s -> s.getDevelopment() == 0).anyMatch(s -> !s.isMortgaged());
     }
 
-    public boolean hasMortgagedElements() {
-        return this.getOwnedElements().stream().anyMatch(SystemSquare::isMortgaged);
+    public boolean hasMortgagedSquares() {
+        return this.getOwnedSquares().stream().anyMatch(SystemSquare::isMortgaged);
     }
 
     /**
@@ -181,7 +181,7 @@ public class Player extends Actor {
      * @return whether the player has at least one development
      */
     public boolean hasDevelopments() {
-        return this.getOwnedElements().stream().anyMatch(s -> s.getDevelopment() > 0);
+        return this.getOwnedSquares().stream().anyMatch(s -> s.getDevelopment() > 0);
     }
 
     /**
