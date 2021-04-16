@@ -195,7 +195,7 @@ public class Game {
 				break;
 			case 4:
 				// purchase unowned square
-				purchaseSquare(ss, player);
+				purchaseSquare(scanner, ss, player);
 				purchased = true;
 				break;
 			case 5:
@@ -736,16 +736,16 @@ public class Game {
 			do {
 				try {
 					int maxDevToAdd = chosenSquare.getMaxDevelopment() - chosenSquare.getDevelopment();
-					int dev = scanIntInput(scanner, chosenSquare.getDevelopment() + 1, maxDevToAdd, true);
-					if (dev > 0) {
+					int chosenDevToAdd = scanIntInput(scanner, chosenSquare.getDevelopment() + 1, maxDevToAdd, true);
+					if (chosenDevToAdd > 0) {
 						boolean otherSquaresFullyDev = player.getOwnedSquares().stream()
 								.filter(s -> s.getSystemNameEnum().equals(chosenSquare.getSystemNameEnum()))
 								.filter(s -> s.getDevelopment() == 4)
 								.count() == chosenSquare.getSystemType();
-						if (otherSquaresFullyDev && dev == maxDevToAdd) {
+						if (otherSquaresFullyDev && chosenDevToAdd == maxDevToAdd) {
 							System.out.print("To purchase your last development, you have to pass a quiz. Loading");
 							loading(5, true);
-							if (Quiz.generateQuestions(scanner, ss.getMinigameDifficulty())) {
+							if (Quiz.generateQuestions(scanner, chosenSquare.getMinigameDifficulty())) {
 								System.out.println("Well done! You passed the quiz.");
 							} else {
 								System.out.print("You didn't pass the quiz. Better luck next time");
@@ -753,9 +753,9 @@ public class Game {
 								return;
 							}
 						}
-						player.developSquare(chosenSquare, dev);
+						player.developSquare(chosenSquare, chosenDevToAdd);
 						valid = true;
-						System.out.printf("Developing %s with %d development(s) at %d each", chosenSquare.getSquareName(), dev, chosenSquare.getCostPerDevelopment());
+						System.out.printf("Developing %s with %d development(s) at %d each", chosenSquare.getSquareName(), chosenDevToAdd, chosenSquare.getCostPerDevelopment());
 						loading(3, true);
 						System.out.printf("\nYour new balance is %d credits", player.getPlayerResources());
 						loading(2, false);
