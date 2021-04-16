@@ -16,10 +16,12 @@ class PlayerTest {
     int[] devCost;
     int baseCost, costPerDev, difficulty, playerInitialRes, playerInitPos, resourcesValid, developmentValid, developmentInvalid;
     int bankruptTrue1, bankruptTrue2, bankruptFalse;
+    int positionValid1, positionValid2, positionInvalid1, positionInvalid2, positionInvalid3;
     SystemSquare ss1, ss2, ss3, ss4, ss5, ss6, ss7, ss8, ss9, ss10;
     SortedSet<SystemSquare> squares;
     String nameValid, nameInvalid, nameInvalidNull;
     String INVALID_SQUARE_TO_DEVELOP, MAX_DEVELOPMENT_REACHED, BANKRUPTCY;
+    int minPosition, maxPosition;
     Player player1, player2, player3, player4;
     String role1, role2, role3, role4;
 
@@ -44,6 +46,15 @@ class PlayerTest {
         bankruptTrue1 = 1;
         bankruptTrue2 = 200;
         bankruptFalse = 201;
+
+        positionValid1 = 1;
+        positionValid2 = 11;
+        positionInvalid1 = 12;
+        positionInvalid2 = 25;
+        positionInvalid3 = -1;
+
+        minPosition = 0;
+        maxPosition = 11;
 
         nameValid = "Player";
         nameInvalid = "";
@@ -94,6 +105,41 @@ class PlayerTest {
 
         assertThrows(InvalidNameException.class, () -> {
             new Player(nameInvalidNull);
+        });
+    }
+
+    @Test
+    void testGetPosition() {
+        assertEquals(playerInitPos, player1.getPosition());
+    }
+
+    @Test
+    void testUpdatePositionValid() {
+        player1.updatePosition(positionValid1 - player1.getPosition());
+        assertEquals(positionValid1, player1.getPosition());
+
+        player1.updatePosition(positionValid2 - player1.getPosition());
+        assertEquals(positionValid2, player1.getPosition());
+    }
+
+    @Test
+    void testUpdatePositionInvalid() {
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            player1.updatePosition(positionInvalid1 - player1.getPosition());
+            assertTrue(player1.getPosition() >= minPosition);
+            assertTrue(player1.getPosition() <= maxPosition);
+        });
+
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            player1.updatePosition(positionInvalid2 - player1.getPosition());
+            assertTrue(player1.getPosition() >= minPosition);
+            assertTrue(player1.getPosition() <= maxPosition);
+        });
+
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            player1.updatePosition(positionInvalid3 - player1.getPosition());
+            assertTrue(player1.getPosition() >= minPosition);
+            assertTrue(player1.getPosition() <= maxPosition);
         });
     }
 
