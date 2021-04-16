@@ -14,10 +14,10 @@ public class Quiz {
 		Question q2 = new Question("What is NASA's motto?", new String[] { "To infinity and beyond", "For the love of space exploration", "For the benefit of all" }, "For the benefit of all", 1);
 		Question q3 = new Question("Which NASA program landed the first humans on the Moon?", new String[] { "Apollo", "Mercury", "Gemini" },"Apollo", 1);
 		Question q4 = new Question("What name is given a region of spacetime where gravity is so strong even light can escape from it?", new String[] { "Black hole", "White hole", "Redshift", "Blueshift" }, "Black hole", 1);
-		Question q5 = new Question("Approximately how long does it take for light from the sun to reach Earth?", new String[] { "8 minutes", "11 minutes", "27 minutes", "42 minutes" }, "8 minutes", 1);
+		Question q5 = new Question("What is 4/5 as a decimal?", new String[] { "0.80", "0.45", "4.5" }, "0.80", 2);
 
 		Question q6 = new Question("Which planet in our solar system has the most moons?", new String[] { "Neptune", "Jupiter", "Saturn" }, "Saturn", 2);
-		Question q7 = new Question("What is 4/5 as a decimal?", new String[] { "0.80", "0.45", "4.5" }, "0.80", 2);
+		Question q7 = new Question("Approximately how long does it take for light from the sun to reach Earth?", new String[] { "8 minutes", "11 minutes", "27 minutes", "42 minutes" }, "8 minutes", 1);
 		Question q8 = new Question("True or false? The first person in space was an American.", new String[] { "True", "False" }, "False", 2);
 		Question q9 = new Question("NASA quarantined the astronauts who landed on the moon when they returned to Earth?. Why?", new String[] { "Moon germs", "Rest", "Adjusting to gravity", "Dizziness" }, "Moon germs", 2);
 		Question q10 = new Question("What is the name of the Artemis mission's capsule?", new String[] { "Lunar", "Orion", "SLS", "Explorer" }, "Orion", 3);
