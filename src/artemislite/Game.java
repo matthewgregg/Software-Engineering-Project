@@ -374,7 +374,7 @@ public class Game {
 				+ players.stream().limit(players.size() - 1).map(Player::getName).collect(Collectors.joining(", "))
 				+ " and " + players.get(players.size() - 1).getName()
 				+ ". Your mission as crew members of ArtemisLite is to procure all the systems required to launch "
-				+ "and land on the moon! Remember you're not just playing against each other - if a crew member goes bankrupt, you all lose!\n";
+				+ "and land on the moon! \nRemember you're not just playing against each other - if a crew member goes bankrupt, you all lose!\n";
 		System.out.print(welcome);
 	}
 
