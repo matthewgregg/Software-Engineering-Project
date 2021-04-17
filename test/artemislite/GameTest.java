@@ -45,9 +45,9 @@ class GameTest {
     void testSellElementValid() throws BankruptcyException {
         int cost = 100;
 
-        ByteArrayInputStream inResources = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + cost + lineSeparator()).getBytes());
-        System.setIn(inResources);
-        Scanner scanner = new Scanner(inResources);
+        ByteArrayInputStream in = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + cost + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
         int res = player1.getPlayerResources();
 
         player1.purchaseSquare(ss1);

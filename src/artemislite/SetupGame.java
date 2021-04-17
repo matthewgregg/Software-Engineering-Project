@@ -31,7 +31,12 @@ public class SetupGame {
 					System.out.printf("%d. ", count);
 					name = scanner.nextLine();
 					// add new player to players if the name is unique
-					String finalName = name.substring(0, 1).toUpperCase() + name.substring(1);
+					String finalName;
+					if (name.length() > 0) {
+						finalName = name.substring(0, 1).toUpperCase() + name.substring(1);
+					} else {
+						finalName = name;
+					}
 					if (players.stream().noneMatch(p -> p.getName().equals(finalName))) {
 						players.add(new Player(finalName));
 						validPlayerName = true;
@@ -42,7 +47,7 @@ public class SetupGame {
 				} catch (InvalidNameException e) {
 					System.out.printf("%s is not a valid name. Try again.\n", name);
 				} catch (DuplicateNameException e) {
-					System.out.printf("%s has already been taken. Please enter a different name.", name);
+					System.out.printf("%s has already been taken. Please enter a different name.\n", name);
 				}
 			} while (!validPlayerName);
 		} while (players.size() < numPlayers);
@@ -146,21 +151,18 @@ public class SetupGame {
 	 * @return the player role
 	 * @throws IllegalArgumentException if playerID outside bounds
 	 */
-	public String getPlayerRole(int playerID) throws IllegalArgumentException {
-		if (playerID >= MIN_PLAYER_ID && playerID <= MAX_PLAYER_ID) {
-			switch(playerID) {
-				case 1:
-					return "Commander";
-				case 2:
-					return "Command Module Pilot";
-				case 3:
-					return "Lunar Module Pilot";
-				case 4:
-					return "Docking Module Pilot";
-			}
-		} else {
-			throw new IllegalArgumentException(INVALID_PLAYER_ID);
+	public static String getPlayerRole(int playerID) throws IllegalArgumentException {
+		switch(playerID) {
+			case 1:
+				return "Commander";
+			case 2:
+				return "Command Module Pilot";
+			case 3:
+				return "Lunar Module Pilot";
+			case 4:
+				return "Docking Module Pilot";
+			default:
+				throw new IllegalArgumentException(INVALID_PLAYER_ID);
 		}
-		return null;
 	}
 }
