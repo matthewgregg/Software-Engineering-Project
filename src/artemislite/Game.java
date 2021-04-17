@@ -1074,14 +1074,14 @@ public class Game {
 		if (resources > 0) {
 			recipient.addResources(resources);
 			player.addResources(-1 * resources);
-			System.out.printf("You have donated %d to %s", resources, recipient.getName());
+			System.out.printf("You have donated %d credits to %s", resources, recipient.getName());
 			loading(3, true);
 		}
 	}
 
 	/**
 	 * Handles successful completion of the game
-	 * @param players
+	 * @param players all the players
 	 */
 	public static void epilogue(final List<Player> players) {
 
@@ -1100,7 +1100,7 @@ public class Game {
 
 			System.out.printf("\t--- Credits ---\n\t%d\n", p.getPlayerResources());
 
-			System.out.println("\t---Elements Owned---\t");
+			System.out.println("\t--- Elements Owned ---\t");
 			// iterate owned system squares
 			if (p.getOwnedSquares().size() == 0) {
 				System.out.printf("\t%s owned no elements\n", p.getName());

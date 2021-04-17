@@ -3,6 +3,7 @@ package artemislite;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.naming.InvalidNameException;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,11 @@ class GameTest {
     SystemName systemName1, systemName2;
     int[] devCost;
     int baseCost, costPerDev, difficulty;
+    int scanLowerLimit, scanUpperLimit, scanValidMid, scanInvalidLower, scanInvalidUpper, scanValidCancelResult;
+    String scanValidCancel, name;
+    SystemName systemName;
+    String systemNameString;
+    int systemNameEnumPos;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -28,6 +34,7 @@ class GameTest {
         player2 = new Player("Player 2");
         players.add(player1);
         players.add(player2);
+        name = "Player";
 
         systemName1 = SystemName.EXPLORATION_GROUND_SYSTEM;
         systemName2 = SystemName.ORION_SPACECRAFT;
@@ -35,6 +42,16 @@ class GameTest {
         baseCost = 0;
         costPerDev = 0;
         difficulty = 0;
+        scanLowerLimit = 1;
+        scanUpperLimit = 5;
+        scanValidMid = 3;
+        scanValidCancel = "#";
+        scanValidCancelResult = -1;
+        scanInvalidLower = 0;
+        scanInvalidUpper = 6;
+        systemName = SystemName.LUNAR_LANDER;
+        systemNameString = "Lunar Lander";
+        systemNameEnumPos = 3;
 
         ss1 = new SystemSquare("Square 1", 1, systemName1, difficulty, baseCost, costPerDev, devCost);
         ss2 = new SystemSquare("Square 2", 2, systemName1, difficulty, baseCost, costPerDev, devCost);
@@ -42,7 +59,110 @@ class GameTest {
     }
 
     @Test
-    void testSellElementValid() throws BankruptcyException {
+    void testScanIntInputValid() {
+        ByteArrayInputStream in = new ByteArrayInputStream((scanLowerLimit + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        int res = Game.scanIntInput(scanner, scanLowerLimit, scanUpperLimit, false);
+        assertEquals(scanLowerLimit, res);
+
+        in = new ByteArrayInputStream((scanUpperLimit + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        res = Game.scanIntInput(scanner, scanLowerLimit, scanUpperLimit, false);
+        assertEquals(scanUpperLimit, res);
+
+        in = new ByteArrayInputStream((scanValidCancel + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        res = Game.scanIntInput(scanner, scanLowerLimit, scanUpperLimit, true);
+        assertEquals(scanValidCancelResult, res);
+    }
+
+    @Test
+    void testScanIntInputInvalid() {
+        ByteArrayInputStream in = new ByteArrayInputStream((scanValidCancel + lineSeparator() + scanLowerLimit + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        int res = Game.scanIntInput(scanner, scanLowerLimit, scanUpperLimit, true);
+        assertEquals(scanValidCancelResult, res);
+
+        in = new ByteArrayInputStream((scanInvalidLower + lineSeparator() + scanLowerLimit + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        res = Game.scanIntInput(scanner, scanLowerLimit, scanUpperLimit, false);
+        assertEquals(scanLowerLimit, res);
+
+        in = new ByteArrayInputStream((scanInvalidUpper + lineSeparator() + scanLowerLimit + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        res = Game.scanIntInput(scanner, scanLowerLimit, scanUpperLimit, false);
+        assertEquals(scanLowerLimit, res);
+    }
+
+    @Test
+    void testRollDice() {
+        ArrayList<Integer> rolls = new ArrayList<>();
+        // as the loop value increases, the delta required will decrease as the results tends towards a normal dist.
+        int loop = 1000000;
+        int n = 3;
+        int averageFrequency = loop / (2 * n - 2 + 1);
+        for (int i = 0; i < loop; i++) {
+            int[] roll = Game.rollDice(n);
+            rolls.add(roll[0] + roll[1]);
+        }
+        Map<Integer, Long> map = rolls.stream().collect(Collectors.groupingBy(i -> i, Collectors.counting()));
+        for (Long l : map.values()) {
+            assertEquals(l.intValue(), averageFrequency, averageFrequency * 0.01);
+        }
+    }
+
+    @Test
+    void testSellDevelopmentsMenu() {
+
+    }
+
+    @Test
+    void testMortgageSquare() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        player1.purchaseSquare(ss2);
+        player1.developSquare(ss2, 1);
+        int res = player1.getPlayerResources();
+
+        ByteArrayInputStream in = new ByteArrayInputStream(("1" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.mortgageSquare(scanner, player1);
+        assertEquals(res, player1.getPlayerResources());
+
+        in = new ByteArrayInputStream(("1" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.mortgageSquare(scanner, player1);
+        assertEquals(res+ss1.getBaseCost(), player1.getPlayerResources());
+    }
+
+    @Test
+    void testPayOffMortgage() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        ss1.setMortgaged(true);
+        int res = player1.getPlayerResources();
+
+        ByteArrayInputStream in = new ByteArrayInputStream(("1" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.payOffMortgage(scanner, player1);
+        assertEquals(res - (int)(ss1.getBaseCost() * 1.1), player1.getPlayerResources());
+
+        in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.payOffMortgage(scanner, player1);
+        assertEquals(res, player1.getPlayerResources());
+    }
+
+    @Test
+    void testTradeWithPlayer() throws BankruptcyException {
         int cost = 100;
 
         ByteArrayInputStream in = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + cost + lineSeparator()).getBytes());
@@ -68,6 +188,57 @@ class GameTest {
     }
 
     @Test
+    void testGetPlayersNearBankruptcy() throws BankruptcyException {
+        int playerToDonateToAmount = 90;
+        player2.addResources(-1 * player2.getPlayerResources() + playerToDonateToAmount);
+        assertTrue(Game.getPlayersNearBankruptcy(player1, players).contains(player2));
+        assertFalse(Game.getPlayersNearBankruptcy(player1, players).contains(player1));
+    }
+
+    @Test
+    void testMakeDonation() throws BankruptcyException, InvalidNameException {
+        int donation = 100;
+        int playerToDonateToAmount = 90;
+        ByteArrayInputStream in = new ByteArrayInputStream((donation + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        int res1 = player1.getPlayerResources();
+        player2.addResources(-1 * player2.getPlayerResources() + playerToDonateToAmount);
+
+        Game.makeDonation(scanner, player1, players);
+        assertEquals(res1-donation, player1.getPlayerResources());
+        assertEquals(playerToDonateToAmount+donation, player2.getPlayerResources());
+
+        Player player3 = new Player("Player 3");
+        player2.addResources(-1 * player2.getPlayerResources() + playerToDonateToAmount);
+        player3.addResources(-1 * player3.getPlayerResources() + playerToDonateToAmount);
+        players.add(player3);
+
+        in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.makeDonation(scanner, player1, players);
+
+        in = new ByteArrayInputStream(("2" + lineSeparator() + donation + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.makeDonation(scanner, player1, players);
+        assertEquals(res1-2*donation, player1.getPlayerResources());
+        assertEquals(playerToDonateToAmount+donation, player3.getPlayerResources());
+
+
+    }
+
+    @Test
+    void testCalculateNetWorth() throws InvalidNameException, BankruptcyException {
+        Player playerNetWorthTest = new Player(name);
+        int res = playerNetWorthTest.getPlayerResources();
+        playerNetWorthTest.purchaseSquare(ss1);
+        playerNetWorthTest.developSquare(ss1, 4);
+        assertEquals(res, Game.calculateNetWorth(playerNetWorthTest));
+    }
+
+    @Test
     void testInputTimerValid() {
         assertTrue(Game.inputTimer(0));
     }
@@ -81,19 +252,9 @@ class GameTest {
     }
 
     @Test
-    void testRollDice() {
-        ArrayList<Integer> rolls = new ArrayList<>();
-        // as the loop value increases, the delta required will decrease as the results tends towards a normal dist.
-        int loop = 1000000;
-        int n = 3;
-        int averageFrequency = loop / (2 * n - 2 + 1);
-        for (int i = 0; i < loop; i++) {
-            int[] roll = Game.rollDice(n);
-            rolls.add(roll[0] + roll[1]);
-        }
-        Map<Integer, Long> map = rolls.stream().collect(Collectors.groupingBy(i -> i, Collectors.counting()));
-        for (Long l : map.values()) {
-            assertEquals(l.intValue(), averageFrequency, averageFrequency * 0.01);
-        }
+    void testStringifyEnum() {
+        assertEquals(systemNameString,  Game.stringifyEnum(systemName));
+        ArrayList<String> sysNamesString = Game.stringifyEnum(SystemName.class);
+        assertEquals(systemNameString, sysNamesString.get(systemNameEnumPos));
     }
 }
