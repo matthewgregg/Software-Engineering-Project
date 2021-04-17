@@ -30,7 +30,7 @@ class GameTest {
     String systemNameString;
     int systemNameEnumPos;
 
-    // methods not tested - printLaunchStatusCheck, printWelcomeMessage, displayGameRules, displayBoardState, bankMenu, epilogue, clearScreen
+    // methods not tested - printLaunchStatusCheck, printWelcomeMessage, displayGameRules, displayBoardState, epilogue, clearScreen
 
     @BeforeEach
     void setUp() throws Exception {
@@ -65,8 +65,33 @@ class GameTest {
     }
 
     @Test
-    void testGenerateOptionsMenu() {
-
+    void testGenerateOptionsMenu() throws BankruptcyException {
+        String rules = "Rules";
+        String board = "Display Board State";
+        String dice = "Roll Dice";
+        String purchaseEle = "Purchase Element";
+        String purchaseDev = "Purchase Developments";
+        String mortgage = "Sell Developments or Mortgage Element";
+        String trade = "Trade with Player";
+        String donate = "Donate to Player";
+        String finish = "Finish Turn";
+        String quit = "Quit Game";
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        ByteArrayInputStream in = new ByteArrayInputStream(("4" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.generateOptionsMenu(scanner, player1, players);
+        assertTrue(out.toString().contains("1. " + rules));
+        assertTrue(out.toString().contains("2. " + board));
+        assertTrue(out.toString().contains("3. " + dice));
+        assertTrue(out.toString().contains("4. " + quit));
+        assertFalse(out.toString().contains(purchaseEle));
+        assertFalse(out.toString().contains(purchaseDev));
+        assertFalse(out.toString().contains(mortgage));
+        assertFalse(out.toString().contains(trade));
+        assertFalse(out.toString().contains(donate));
+        assertFalse(out.toString().contains(finish));
     }
 
     @Test
