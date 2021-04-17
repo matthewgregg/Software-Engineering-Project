@@ -90,7 +90,6 @@ public class Player extends Actor {
      */
     public void purchaseSquare(SystemSquare square) throws BankruptcyException {
         this.ownedSquares.add(square);
-        square.setOwned(true);
         this.addResources(-1 * square.getBaseCost());
     }
 

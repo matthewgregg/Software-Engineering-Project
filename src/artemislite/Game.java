@@ -231,8 +231,7 @@ public class Game {
 			case 10:
 				// quit game
 				clearScreen();
-				System.out.print(
-						"WARNING\nAre you sure you want to quit? The game will end for all players in 10 seconds. Press enter to cancel.");
+				System.out.print("WARNING\nAre you sure you want to quit? The game will end for all players in 10 seconds. Press enter to cancel.");
 				if (inputTimer(10)) {
 					endGame = true;
 				} else {
@@ -629,6 +628,7 @@ public class Game {
 				return;
 			}
 		}
+		ss.setOwned(true);
 		player.purchaseSquare(ss);
 		System.out.printf("Purchasing %s for %d credits for %s", ss.getSquareName(), ss.getBaseCost(), player.getName());
 		loading(3, true);
