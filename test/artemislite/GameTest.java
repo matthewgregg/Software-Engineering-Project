@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import javax.naming.InvalidNameException;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -176,15 +178,14 @@ class GameTest {
         players.add(player3);
         player2.addResources(-1 * player2.getPlayerResources() + 300);
         int bid1 = ss1.getBaseCost() + 1;
-        int bid2 = bid1 + 10;
-        int bid3 = bid1 + 300;
-        ByteArrayInputStream in = new ByteArrayInputStream((bid1 + lineSeparator() + bid3 + lineSeparator() + "#" + lineSeparator()).getBytes());
+        int bid2 = bid1 + 300;
+        ByteArrayInputStream in = new ByteArrayInputStream((bid1 + lineSeparator() + bid2 + lineSeparator() + "#" + lineSeparator()).getBytes());
         System.setIn(in);
         Scanner scanner = new Scanner(System.in);
         int res2 = player2.getPlayerResources();
         int res3 = player3.getPlayerResources();
         Game.auctionSquare(scanner, ss1, player1, players);
-        assertEquals(res3 - bid3, player3.getPlayerResources());
+        assertEquals(res3 - bid2, player3.getPlayerResources());
         assertTrue(player3.getOwnedSquares().contains(ss1));
         assertEquals(res2, player2.getPlayerResources());
         assertFalse(player2.getOwnedSquares().contains(ss1));
@@ -236,8 +237,53 @@ class GameTest {
     }
 
     @Test
-    void testBankMenu() {
+    void testBankMenu() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        ByteArrayInputStream in = new ByteArrayInputStream(("1" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.bankMenu(scanner, player1);
+        assertTrue(out.toString().contains("1. Mortgage Element"));
+        assertFalse(out.toString().contains("1. Sell Developments"));
+        assertFalse(out.toString().contains("1. Pay Off Mortgage"));
 
+
+        player1.developSquare(ss1, 1);
+        out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        in = new ByteArrayInputStream(("1" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.bankMenu(scanner, player1);
+        assertTrue(out.toString().contains("1. Sell Developments"));
+        assertFalse(out.toString().contains("1. Mortgage Element"));
+        assertFalse(out.toString().contains("1. Pay Off Mortgage"));
+
+        player2.purchaseSquare(ss2);
+        ss2.setMortgaged(true);
+        out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        in = new ByteArrayInputStream(("1" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.bankMenu(scanner, player2);
+        assertTrue(out.toString().contains("1. Pay Off Mortgage"));
+        assertFalse(out.toString().contains("1. Sell Developments"));
+        assertFalse(out.toString().contains("1. Mortgage Element"));
+    }
+
+    @Test
+    void testBankMenuCancel() {
+        //check if system is waiting for input with timeout (if cancel fails)
+        assertTimeout(Duration.ofMillis(5000), () -> {
+            player1.purchaseSquare(ss1);
+            ByteArrayInputStream in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
+            System.setIn(in);
+            Scanner scanner = new Scanner(in);
+            Game.bankMenu(scanner, player1);
+        });
     }
 
     @Test
