@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class PlayerTest {
     SystemName systemName1, systemName2, systemName3, systemName4;
-    int[] devCost;
+    int[] landingCost;
     int baseCost, costPerDev, difficulty, playerInitialRes, playerInitPos, resourcesValid, developmentValid, developmentInvalid;
     int bankruptTrue1, bankruptTrue2, bankruptFalse;
     int positionValid1, positionValid2, positionInvalid1, positionInvalid2, positionInvalid3;
@@ -32,7 +32,7 @@ class PlayerTest {
         systemName3 = SystemName.GATEWAY_OUTPOST;
         systemName4 = SystemName.LUNAR_LANDER;
 
-        devCost = new int[]{0, 0, 0, 0, 0};
+        landingCost = new int[]{0, 0, 0, 0, 0};
 
         baseCost = 0;
         costPerDev = 0;
@@ -69,16 +69,16 @@ class PlayerTest {
         MAX_DEVELOPMENT_REACHED = "Element fully developed";
         BANKRUPTCY = "You've gone bankrupt";
 
-        ss1 = new SystemSquare("Square 1", 1, systemName1, difficulty, baseCost, costPerDev, devCost);
-        ss2 = new SystemSquare("Square 2", 2, systemName1, difficulty, baseCost, costPerDev, devCost);
-        ss3 = new SystemSquare("Square 3", 3, systemName2, difficulty, baseCost, costPerDev, devCost);
-        ss4 = new SystemSquare("Square 4", 4, systemName2, difficulty, baseCost, costPerDev, devCost);
-        ss5 = new SystemSquare("Square 5", 5, systemName2, difficulty, baseCost, costPerDev, devCost);
-        ss6 = new SystemSquare("Square 6", 7, systemName3, difficulty, baseCost, costPerDev, devCost);
-        ss7 = new SystemSquare("Square 7", 8, systemName3, difficulty, baseCost, costPerDev, devCost);
-        ss8 = new SystemSquare("Square 8", 9, systemName3, difficulty, baseCost, costPerDev, devCost);
-        ss9 = new SystemSquare("Square 9", 10, systemName4, difficulty, baseCost, costPerDev, devCost);
-        ss10 = new SystemSquare("Square 10", 11, systemName4, difficulty, baseCost, costPerDev, devCost);
+        ss1 = new SystemSquare("Square 1", 1, systemName1, difficulty, baseCost, costPerDev, landingCost);
+        ss2 = new SystemSquare("Square 2", 2, systemName1, difficulty, baseCost, costPerDev, landingCost);
+        ss3 = new SystemSquare("Square 3", 3, systemName2, difficulty, baseCost, costPerDev, landingCost);
+        ss4 = new SystemSquare("Square 4", 4, systemName2, difficulty, baseCost, costPerDev, landingCost);
+        ss5 = new SystemSquare("Square 5", 5, systemName2, difficulty, baseCost, costPerDev, landingCost);
+        ss6 = new SystemSquare("Square 6", 7, systemName3, difficulty, baseCost, costPerDev, landingCost);
+        ss7 = new SystemSquare("Square 7", 8, systemName3, difficulty, baseCost, costPerDev, landingCost);
+        ss8 = new SystemSquare("Square 8", 9, systemName3, difficulty, baseCost, costPerDev, landingCost);
+        ss9 = new SystemSquare("Square 9", 10, systemName4, difficulty, baseCost, costPerDev, landingCost);
+        ss10 = new SystemSquare("Square 10", 11, systemName4, difficulty, baseCost, costPerDev, landingCost);
 
         squares = new TreeSet<>(new ComparePosition());
 

@@ -36,29 +36,9 @@ class GameTest {
         costPerDev = 0;
         difficulty = 0;
 
-        ss1 = new SystemSquare("Square 1",
-                1,
-                systemName1,
-                difficulty,
-                baseCost,
-                costPerDev,
-                devCost);
-
-        ss2 = new SystemSquare("Square 2",
-                2,
-                systemName1,
-                difficulty,
-                baseCost,
-                costPerDev,
-                devCost);
-
-        ss3 = new SystemSquare("Square 3",
-                3,
-                systemName2,
-                difficulty,
-                baseCost,
-                costPerDev,
-                devCost);
+        ss1 = new SystemSquare("Square 1", 1, systemName1, difficulty, baseCost, costPerDev, devCost);
+        ss2 = new SystemSquare("Square 2", 2, systemName1, difficulty, baseCost, costPerDev, devCost);
+        ss3 = new SystemSquare("Square 3", 3, systemName2, difficulty, baseCost, costPerDev, devCost);
     }
 
     @Test

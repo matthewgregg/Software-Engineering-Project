@@ -8,15 +8,15 @@ public class SystemSquare extends Square {
     private static final int MAX_DEVELOPMENT = 4;
     private static final String INVALID_SYSTEM_NAME = "Invalid system name";
     private static final String MAX_DEVELOPMENT_REACHED = "Element fully developed";
+    private static final String INVALID_LANDING_COST = "Invalid landing cost.";
 
     private SystemName systemNameEnum;
     private String systemNameString;
     private int systemType;
-    private int minigameDifficulty;
-    private int baseCost;
-    private int costPerDevelopment;
+    private final int quizDifficulty;
+    private final int baseCost;
+    private final int costPerDevelopment;
     //this may not be required
-    private boolean squareOwned;
     private int development;
     private int[] landingCost;
     private boolean isMortgaged;
@@ -25,23 +25,22 @@ public class SystemSquare extends Square {
     /**
      * constructor with arguments
      * @param systemName the name of the square's system
-     * @param minigameDifficulty the minigame difficulty
+     * @param quizDifficulty the quiz difficulty
      * @param baseCost the base cost of the square
      * @param costPerDevelopment the cost per development
      */
     public SystemSquare(String squareName,
                         int position,
                         SystemName systemName,
-                        int minigameDifficulty,
+                        int quizDifficulty,
                         int baseCost,
                         int costPerDevelopment,
                         int[] landingCost) throws IllegalArgumentException {
         super(squareName, position, null);
         setSystemName(systemName);
-        this.minigameDifficulty = minigameDifficulty;
+        this.quizDifficulty = quizDifficulty;
         this.baseCost = baseCost;
         this.costPerDevelopment = costPerDevelopment;
-        this.squareOwned = false;
         this.development = 0;
         setLandingCost(landingCost);
         this.isMortgaged = false;
@@ -63,7 +62,7 @@ public class SystemSquare extends Square {
     /**
      * @param systemNameString the systemName to set
      */
-    public void setSystemName(SystemName systemNameString) {
+    private void setSystemName(SystemName systemNameString) {
         this.systemNameEnum = systemNameString;
         this.systemNameString = Game.stringifyEnum(systemNameString);
     }
@@ -78,7 +77,7 @@ public class SystemSquare extends Square {
     /**
      * sets the system type
      */
-    public void setSystemType() throws IllegalArgumentException {
+    private void setSystemType() throws IllegalArgumentException {
         switch (systemNameEnum) {
             case EXPLORATION_GROUND_SYSTEM:
             case LUNAR_LANDER:
@@ -93,15 +92,8 @@ public class SystemSquare extends Square {
     /**
      * @return the minigameDifficulty
      */
-    public int getMinigameDifficulty() {
-        return minigameDifficulty;
-    }
-
-    /**
-     * @param minigameDifficulty the minigameDifficulty to set
-     */
-    public void setMinigameDifficulty(int minigameDifficulty) {
-        this.minigameDifficulty = minigameDifficulty;
+    public int getQuizDifficulty() {
+        return quizDifficulty;
     }
 
     /**
@@ -112,31 +104,10 @@ public class SystemSquare extends Square {
     }
 
     /**
-     * @param baseCost the baseCost to set
-     */
-    public void setBaseCost(int baseCost) {
-        this.baseCost = baseCost;
-    }
-
-    /**
      * @return the costPerDevelopment
      */
     public int getCostPerDevelopment() {
         return costPerDevelopment;
-    }
-
-    /**
-     * @param costPerDevelopment the costPerDevelopment to set
-     */
-    public void setCostPerDevelopment(int costPerDevelopment) {
-        this.costPerDevelopment = costPerDevelopment;
-    }
-
-    /**
-     * @return the squareOwned
-     */
-    public boolean isSquareOwned() {
-        return squareOwned;
     }
 
     /**
@@ -160,11 +131,11 @@ public class SystemSquare extends Square {
     /**
      * @param landingCost the landingCost to set
      */
-    public void setLandingCost(int[] landingCost) throws IllegalArgumentException {
+    private void setLandingCost(int[] landingCost) throws IllegalArgumentException {
         if (landingCost.length == MAX_DEVELOPMENT + 1) {
             this.landingCost = landingCost;
         } else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(INVALID_LANDING_COST);
         }
     }
 
@@ -173,14 +144,6 @@ public class SystemSquare extends Square {
      */
     public int getLandingCost() {
         return landingCost[this.development];
-    }
-
-    /**
-     *
-     * @return the minimum development
-     */
-    public int getMinDevelopment() {
-        return MIN_DEVELOPMENT;
     }
 
     /**

@@ -61,7 +61,7 @@ public class Game {
 				bankruptcy = true;
 			}
 			endGame = players.stream().flatMap(p -> p.getOwnedSquares().stream())
-					.filter(e -> e.getDevelopment() == 4).count() == 10;
+					.filter(e -> e.getDevelopment() == e.getMaxDevelopment()).count() == 10;
 		} while (!endGame && !quitGame && !bankruptcy);
 
 		clearScreen();
@@ -621,7 +621,7 @@ public class Game {
 		if (player.getOwnedSquares().stream().filter(s -> s.getSystemNameEnum().equals(ss.getSystemNameEnum())).count() == ss.getSystemType() - 1) {
 			System.out.print("To purchase your last element, you have to pass a quiz. Loading");
 			loading(5, true);
-			if (Quiz.generateQuestions(scanner, ss.getMinigameDifficulty())) {
+			if (Quiz.generateQuestions(scanner, ss.getQuizDifficulty())) {
 				System.out.println("Well done! You passed the quiz.");
 			} else {
 				System.out.print("You didn't pass the quiz. Better luck next time");
@@ -738,12 +738,12 @@ public class Game {
 					if (chosenDevToAdd > 0) {
 						boolean otherSquaresFullyDev = player.getOwnedSquares().stream()
 								.filter(s -> s.getSystemNameEnum().equals(chosenSquare.getSystemNameEnum()))
-								.filter(s -> s.getDevelopment() == 4)
+								.filter(s -> s.getDevelopment() == s.getMaxDevelopment())
 								.count() == chosenSquare.getSystemType();
 						if (otherSquaresFullyDev && chosenDevToAdd == maxDevToAdd) {
 							System.out.print("To purchase your last development, you have to pass a quiz. Loading");
 							loading(5, true);
-							if (Quiz.generateQuestions(scanner, chosenSquare.getMinigameDifficulty())) {
+							if (Quiz.generateQuestions(scanner, chosenSquare.getQuizDifficulty())) {
 								System.out.println("Well done! You passed the quiz.");
 							} else {
 								System.out.print("You didn't pass the quiz. Better luck next time");
