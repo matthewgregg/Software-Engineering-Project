@@ -11,10 +11,11 @@ class SystemSquareTest {
     int[] landingCostValid, landingCostInvalidLower, landingCostInvalidUpper;
     SystemSquare ss1, ss2, ss3;
     boolean initialMortgaged, initialOwned;
-    int baseCost, costPerDev, difficulty, pos1, pos2, pos3, initialDev;
-    int systemTypeSystemName2;
+    int baseCost, costPerDev, difficulty, pos1, pos2, pos3, initDev, devValidUpper;
+    int systemTypeSystemName2, devInvalidLower, devInvalidUpper;
     String name;
     String INVALID_SYSTEM_NAME, MAX_DEVELOPMENT_REACHED, INVALID_LANDING_COST;
+    int MAX_DEVELOPMENT;
 
     @BeforeEach
     void setUp() {
@@ -31,7 +32,10 @@ class SystemSquareTest {
         landingCostValid = new int[]{0, 0, 0, 0, 0};
         landingCostInvalidLower = new int[]{0};
         landingCostInvalidUpper = new int[]{0, 0, 0, 0, 0, 0};
-        initialDev = 0;
+        initDev = 0;
+        devValidUpper = 4;
+        devInvalidLower = -1;
+        devInvalidUpper = 5;
         initialMortgaged = false;
         initialOwned = false;
         systemTypeSystemName2 = 3;
@@ -39,6 +43,7 @@ class SystemSquareTest {
         INVALID_SYSTEM_NAME = "Invalid system name";
         MAX_DEVELOPMENT_REACHED = "Element fully developed";
         INVALID_LANDING_COST = "Invalid landing cost.";
+        MAX_DEVELOPMENT = 4;
 
         ss1 = new SystemSquare(name, pos1, systemName1, difficulty, baseCost, costPerDev, landingCostValid);
         ss2 = new SystemSquare(name, pos2, systemName1, difficulty, baseCost, costPerDev, landingCostValid);
@@ -56,7 +61,7 @@ class SystemSquareTest {
         assertEquals(difficulty, ss3.getQuizDifficulty());
         assertEquals(baseCost, ss3.getBaseCost());
         assertEquals(costPerDev, ss3.getCostPerDevelopment());
-        assertEquals(initialDev, ss3.getDevelopment());
+        assertEquals(initDev, ss3.getDevelopment());
         assertEquals(landingCostValid[ss3.getDevelopment()], ss3.getLandingCost());
         assertEquals(initialMortgaged, ss3.isMortgaged());
         assertEquals(initialOwned, ss3.isOwned());
@@ -78,57 +83,82 @@ class SystemSquareTest {
 
     @Test
     void testGetSystemNameString() {
-
+        assertEquals(name, ss1.getSquareName());
     }
 
     @Test
     void testGetSystemNameEnum() {
-
+        assertEquals(systemName1, ss1.getSystemNameEnum());
     }
 
     @Test
     void testGetSystemType() {
-
+        assertEquals(Game.stringifyEnum(systemName1), ss1.getSystemNameString());
     }
 
     @Test
     void testGetQuizDifficulty() {
-
+        assertEquals(difficulty, ss1.getQuizDifficulty());
     }
 
     @Test
     void testGetBaseCost() {
-
+        assertEquals(baseCost, ss1.getBaseCost());
     }
 
     @Test
     void testGetCostPerDevelopment() {
-
+        assertEquals(costPerDev, ss1.getCostPerDevelopment());
     }
 
     @Test
-    void testGetSetDevelopment() {
+    void testGetSetDevelopmentValid() {
+        ss2.setDevelopment(initDev);
+        assertEquals(initDev, ss2.getDevelopment());
 
+        ss2.setDevelopment(devValidUpper);
+        assertEquals(devValidUpper, ss2.getDevelopment());
+    }
+
+    @Test
+    void testGetSetDevelopmentInvalid() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> {
+           ss2.setDevelopment(devInvalidLower);
+        });
+        assertEquals(MAX_DEVELOPMENT_REACHED, e.getMessage());
+
+        e = assertThrows(IllegalArgumentException.class, () -> {
+            ss2.setDevelopment(devInvalidUpper);
+        });
+        assertEquals(MAX_DEVELOPMENT_REACHED, e.getMessage());
     }
 
     @Test
     void testGetLandingCost() {
-
+        assertEquals(landingCostValid[ss1.getDevelopment()], ss1.getLandingCost());
     }
 
     @Test
     void testGetMaxDevelopment() {
-
+        assertEquals(MAX_DEVELOPMENT, ss1.getMaxDevelopment());
     }
 
     @Test
     void testGetSetIsMortgaged() {
+        ss1.setMortgaged(true);
+        assertTrue(ss1.isMortgaged());
 
+        ss1.setMortgaged(false);
+        assertFalse(ss1.isMortgaged());
     }
 
     @Test
     void testGetSetIsOwned() {
+        ss1.setOwned(true);
+        assertTrue(ss1.isOwned());
 
+        ss1.setOwned(false);
+        assertFalse(ss1.isOwned());
     }
 
 }

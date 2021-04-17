@@ -257,7 +257,7 @@ class PlayerTest {
         player2 = new Player("Player 2");
         for (SystemSquare s : squares) {
             player2.purchaseSquare(s);
-            s.setDevelopment(4);
+            player2.developSquare(s, 4);
         }
         assertNull(player2.getDevelopableSystems());
     }

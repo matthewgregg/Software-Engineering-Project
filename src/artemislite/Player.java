@@ -132,7 +132,7 @@ public class Player extends Actor {
         //remove if incomplete system
         systems.entrySet().removeIf(s -> s.getValue().size() != s.getValue().get(0).getSystemType());
         //remove if fully developed system
-        systems.entrySet().removeIf(s -> s.getValue().stream().allMatch(t -> t.getDevelopment() == 4));
+        systems.entrySet().removeIf(s -> s.getValue().stream().allMatch(t -> t.getDevelopment() == t.getMaxDevelopment()));
         return systems.size() == 0 ? null : new ArrayList<>(systems.keySet());
     }
 
