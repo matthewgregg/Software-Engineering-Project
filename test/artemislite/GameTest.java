@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.naming.InvalidNameException;
 import java.io.ByteArrayInputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameTest {
     List<Player> players;
     Player player1, player2;
-    SystemSquare ss1, ss2, ss3;
+    SystemSquare ss1, ss2, ss3, ss4;
     SystemName systemName1, systemName2;
     int[] devCost;
     int baseCost, costPerDev, difficulty;
@@ -26,6 +27,8 @@ class GameTest {
     SystemName systemName;
     String systemNameString;
     int systemNameEnumPos;
+
+    // methods not tested - printLaunchStatusCheck, printWelcomeMessage, displayGameRules, displayBoardState, bankMenu, epilogue, clearScreen
 
     @BeforeEach
     void setUp() throws Exception {
@@ -39,9 +42,9 @@ class GameTest {
         systemName1 = SystemName.EXPLORATION_GROUND_SYSTEM;
         systemName2 = SystemName.ORION_SPACECRAFT;
         devCost = new int[]{0, 0, 0, 0, 0};
-        baseCost = 0;
-        costPerDev = 0;
-        difficulty = 0;
+        baseCost = 50;
+        costPerDev = 10;
+        difficulty = 1;
         scanLowerLimit = 1;
         scanUpperLimit = 5;
         scanValidMid = 3;
@@ -56,10 +59,16 @@ class GameTest {
         ss1 = new SystemSquare("Square 1", 1, systemName1, difficulty, baseCost, costPerDev, devCost);
         ss2 = new SystemSquare("Square 2", 2, systemName1, difficulty, baseCost, costPerDev, devCost);
         ss3 = new SystemSquare("Square 3", 3, systemName2, difficulty, baseCost, costPerDev, devCost);
+        ss4 = new SystemSquare("Square 4", 4, systemName2, difficulty, baseCost, costPerDev, devCost);
     }
 
     @Test
-    void testScanIntInputValid() {
+    void testGenerateOptionsMenu() {
+
+    }
+
+    @Test
+    void testScanIntInput() {
         ByteArrayInputStream in = new ByteArrayInputStream((scanLowerLimit + lineSeparator()).getBytes());
         System.setIn(in);
         Scanner scanner = new Scanner(in);
@@ -101,9 +110,30 @@ class GameTest {
     }
 
     @Test
+    void testIntroduction() {
+        assertNotNull(Game.introduction());
+    }
+
+    @Test
+    void testGenerateSquareStatus() {
+
+    }
+
+    @Test
+    void testLoading() {
+        assertTimeout(Duration.ofMillis(5050), () -> {
+            Game.loading(5, false);
+        });
+
+        assertTimeout(Duration.ofMillis(5050), () -> {
+            Game.loading(5, true);
+        });
+    }
+
+    @Test
     void testRollDice() {
         ArrayList<Integer> rolls = new ArrayList<>();
-        // as the loop value increases, the delta required will decrease as the results tends towards a normal dist.
+        // as the loop value increases, the delta required will decrease as the results tend towards a discrete uniform dist.
         int loop = 1000000;
         int n = 3;
         int averageFrequency = loop / (2 * n - 2 + 1);
@@ -118,8 +148,121 @@ class GameTest {
     }
 
     @Test
-    void testSellDevelopmentsMenu() {
+    void testPurchaseSquare() throws BankruptcyException {
+        Scanner scanner = new Scanner(System.in);
+        int res = player1.getPlayerResources();
+        Game.purchaseSquare(scanner, ss1, player1);
+        assertTrue(player1.getOwnedSquares().contains(ss1));
+        assertEquals(res - ss1.getBaseCost(), player1.getPlayerResources());
 
+        ByteArrayInputStream in = new ByteArrayInputStream(("1" + lineSeparator() + "1" + lineSeparator() + "1" + lineSeparator() + "1" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.purchaseSquare(scanner, ss2, player1);
+    }
+
+    @Test
+    void testIsAuctionable() throws BankruptcyException {
+        int value = ss1.getBaseCost() + 1;
+        player1.addResources(-1 * player1.getPlayerResources() + value);
+        assertTrue(Game.isAuctionable(ss1, player2, players));
+        player1.addResources(-1 * player1.getPlayerResources());
+        assertFalse(Game.isAuctionable(ss1, player2, players));
+    }
+
+    @Test
+    void testAuctionSquare() throws BankruptcyException, InvalidNameException {
+        Player player3 = new Player("Player 3");
+        players.add(player3);
+        player2.addResources(-1 * player2.getPlayerResources() + 300);
+        int bid1 = ss1.getBaseCost() + 1;
+        int bid2 = bid1 + 10;
+        int bid3 = bid1 + 300;
+        ByteArrayInputStream in = new ByteArrayInputStream((bid1 + lineSeparator() + bid3 + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(System.in);
+        int res2 = player2.getPlayerResources();
+        int res3 = player3.getPlayerResources();
+        Game.auctionSquare(scanner, ss1, player1, players);
+        assertEquals(res3 - bid3, player3.getPlayerResources());
+        assertTrue(player3.getOwnedSquares().contains(ss1));
+        assertEquals(res2, player2.getPlayerResources());
+        assertFalse(player2.getOwnedSquares().contains(ss1));
+
+    }
+
+    @Test
+    void testAuctionSquareCancel() throws BankruptcyException, InvalidNameException {
+        Player player3 = new Player("Player 3");
+        int res2 = player2.getPlayerResources();
+        int res3 = player3.getPlayerResources();
+        ByteArrayInputStream in = new ByteArrayInputStream(("#" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(System.in);
+        Game.auctionSquare(scanner, ss1, player1, players);
+        assertEquals(res3, player3.getPlayerResources());
+        assertFalse(player3.getOwnedSquares().contains(ss1));
+        assertEquals(res2, player2.getPlayerResources());
+        assertFalse(player2.getOwnedSquares().contains(ss1));
+    }
+
+    @Test
+    void testBuyDevelopments() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        player1.purchaseSquare(ss2);
+        int res = player1.getPlayerResources();
+
+        ByteArrayInputStream in = new ByteArrayInputStream(("1" + lineSeparator() + "1" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.buyDevelopments(scanner, player1);
+        assertEquals(res - ss1.getCostPerDevelopment(), player1.getPlayerResources());
+    }
+
+    @Test
+    void testBuyDevelopmentsCancel() {
+        int res = player1.getPlayerResources();
+        ByteArrayInputStream in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.buyDevelopments(scanner, player1);
+        assertEquals(res, player1.getPlayerResources());
+
+        in = new ByteArrayInputStream(("1" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.buyDevelopments(scanner, player1);
+        assertEquals(res, player1.getPlayerResources());
+    }
+
+    @Test
+    void testBankMenu() {
+
+    }
+
+    @Test
+    void testSellDevelopments() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        player1.purchaseSquare(ss2);
+        player1.developSquare(ss2, 1);
+        int res = player1.getPlayerResources();
+
+        ByteArrayInputStream in = new ByteArrayInputStream(("1" + lineSeparator() + "1" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.sellDevelopments(scanner, player1);
+        assertEquals(res + (int) (0.5 * ss1.getCostPerDevelopment()), player1.getPlayerResources());
+        assertEquals(0, ss1.getDevelopment());
+    }
+
+    @Test
+    void testSellDevelopmentsCancel() throws BankruptcyException {
+        int res = player1.getPlayerResources();
+        ByteArrayInputStream in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.sellDevelopments(scanner, player1);
+        assertEquals(res, player1.getPlayerResources());
     }
 
     @Test
@@ -133,13 +276,17 @@ class GameTest {
         System.setIn(in);
         Scanner scanner = new Scanner(in);
         Game.mortgageSquare(scanner, player1);
-        assertEquals(res, player1.getPlayerResources());
-
-        in = new ByteArrayInputStream(("1" + lineSeparator()).getBytes());
-        System.setIn(in);
-        scanner = new Scanner(in);
-        Game.mortgageSquare(scanner, player1);
         assertEquals(res+ss1.getBaseCost(), player1.getPlayerResources());
+    }
+
+    @Test
+    void testMortgageSquareCancel() throws BankruptcyException {
+        int res = player1.getPlayerResources();
+        ByteArrayInputStream in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.mortgageSquare(scanner, player1);
+        assertEquals(res, player1.getPlayerResources());
     }
 
     @Test
@@ -153,10 +300,14 @@ class GameTest {
         Scanner scanner = new Scanner(in);
         Game.payOffMortgage(scanner, player1);
         assertEquals(res - (int)(ss1.getBaseCost() * 1.1), player1.getPlayerResources());
+    }
 
-        in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
+    @Test
+    void testPayOffMortgageCancel() throws BankruptcyException {
+        ByteArrayInputStream in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
         System.setIn(in);
-        scanner = new Scanner(in);
+        Scanner scanner = new Scanner(in);
+        int res = player1.getPlayerResources();
         Game.payOffMortgage(scanner, player1);
         assertEquals(res, player1.getPlayerResources());
     }
@@ -168,10 +319,10 @@ class GameTest {
         ByteArrayInputStream in = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + cost + lineSeparator()).getBytes());
         System.setIn(in);
         Scanner scanner = new Scanner(in);
-        int res = player1.getPlayerResources();
 
         player1.purchaseSquare(ss1);
         player1.purchaseSquare(ss2);
+        int res = player1.getPlayerResources();
         Game.tradeWithPlayer(scanner, player1, players);
         assertEquals(res + cost, player1.getPlayerResources());
         assertTrue(player2.getOwnedSquares().contains(ss1));
@@ -185,6 +336,70 @@ class GameTest {
         assertFalse(player1.getOwnedSquares().contains(ss2));
         assertTrue(player2.getOwnedSquares().contains(ss2));
         assertFalse(player2.getOwnedSquares().contains(ss1));
+    }
+
+    @Test
+    void testTradeWithPlayerCancel() throws BankruptcyException {
+        player1.purchaseSquare(ss1);
+        player1.purchaseSquare(ss2);
+        player2.purchaseSquare(ss3);
+        player2.purchaseSquare(ss4);
+
+        ByteArrayInputStream in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        int res = player1.getPlayerResources();
+        Game.tradeWithPlayer(scanner, player1, players);
+        assertEquals(res, player1.getPlayerResources());
+
+        in = new ByteArrayInputStream(("1" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        res = player1.getPlayerResources();
+        Game.tradeWithPlayer(scanner, player1, players);
+        assertEquals(res, player1.getPlayerResources());
+
+        in = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        res = player1.getPlayerResources();
+        Game.tradeWithPlayer(scanner, player1, players);
+        assertEquals(res, player1.getPlayerResources());
+
+        in = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + "#").getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        res = player1.getPlayerResources();
+        Game.tradeWithPlayer(scanner, player1, players);
+        assertEquals(res, player1.getPlayerResources());
+
+        in = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + "1" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        res = player1.getPlayerResources();
+        Game.tradeWithPlayer(scanner, player1, players);
+        assertEquals(res, player1.getPlayerResources());
+
+        in = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "2" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        res = player1.getPlayerResources();
+        Game.tradeWithPlayer(scanner, player1, players);
+        assertEquals(res, player1.getPlayerResources());
+
+        in = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        res = player1.getPlayerResources();
+        Game.tradeWithPlayer(scanner, player1, players);
+        assertEquals(res, player1.getPlayerResources());
+
+        in = new ByteArrayInputStream(("1" + lineSeparator() + "2" + lineSeparator() + "2" + lineSeparator() + "1" + lineSeparator() + "1" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        res = player1.getPlayerResources();
+        Game.tradeWithPlayer(scanner, player1, players);
+        assertEquals(res, player1.getPlayerResources());
     }
 
     @Test
@@ -214,19 +429,22 @@ class GameTest {
         player3.addResources(-1 * player3.getPlayerResources() + playerToDonateToAmount);
         players.add(player3);
 
-        in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
-        System.setIn(in);
-        scanner = new Scanner(in);
-        Game.makeDonation(scanner, player1, players);
-
         in = new ByteArrayInputStream(("2" + lineSeparator() + donation + lineSeparator()).getBytes());
         System.setIn(in);
         scanner = new Scanner(in);
         Game.makeDonation(scanner, player1, players);
         assertEquals(res1-2*donation, player1.getPlayerResources());
         assertEquals(playerToDonateToAmount+donation, player3.getPlayerResources());
+    }
 
-
+    @Test
+    void testMakeDonationCancel() throws BankruptcyException {
+        int res1 = player1.getPlayerResources();
+        ByteArrayInputStream in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.makeDonation(scanner, player1, players);
+        assertEquals(res1, player1.getPlayerResources());
     }
 
     @Test

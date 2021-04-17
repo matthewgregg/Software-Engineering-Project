@@ -79,7 +79,7 @@ public class Quiz {
 		}
 
 		Game.clearScreen();
-		System.out.println("You got " + correct + " out of ." + questionList.size());
+		System.out.println("You got " + correct + " out of " + questionList.size());
 
 		return (double) correct / (double) 4 > 0.6;
 	}

@@ -3,8 +3,6 @@ package artemislite;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.naming.InvalidNameException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class ExceptionTest {

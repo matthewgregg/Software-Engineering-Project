@@ -38,7 +38,7 @@ public class Game {
 
 		clearScreen();
 		try {
-			launchStatusCheck();
+			printLaunchStatusCheck();
 		} catch (InterruptedException e) {
 			System.out.println("Thread error");
 		}
@@ -199,11 +199,11 @@ public class Game {
 				break;
 			case 5:
 				// buy development
-				buyDevelopmentsMenu(scanner, player);
+				buyDevelopments(scanner, player);
 				break;
 			case 6:
 				// sell developments or mortgage
-				bankMenu(scanner, player, players);
+				bankMenu(scanner, player);
 				break;
 			case 7:
 				// trade or sell square
@@ -289,7 +289,7 @@ public class Game {
 		return message;
 	}
 
-	public static void launchStatusCheck() throws InterruptedException {
+	public static void printLaunchStatusCheck() throws InterruptedException {
 		System.out.print("Verify go/no-go for start all launch sequence.");
 		Thread.sleep(1500);
 		System.out.print("\n\tVerify go.");
@@ -453,7 +453,7 @@ public class Game {
 	 */
 	public static void loading(int time, boolean withDots) {
 		try {
-			for (int i = 0; i <= time; i++) {
+			for (int i = 0; i < time; i++) {
 				Thread.sleep(1000);
 				if (withDots) {
 					System.out.print(".");
@@ -713,7 +713,7 @@ public class Game {
 	 * @param scanner the scanner
 	 * @param player  the current player
 	 */
-	public static void buyDevelopmentsMenu(Scanner scanner, final Player player) {
+	public static void buyDevelopments(Scanner scanner, final Player player) {
 		ArrayList<SystemSquare> squares = player.getOwnedSquares();
 		ArrayList<SystemName> systems = player.getDevelopableSystems();
 
@@ -773,9 +773,8 @@ public class Game {
 	 * 
 	 * @param scanner the scanner
 	 * @param player  the current player
-	 * @param players an arraylist of all players
 	 */
-	public static void bankMenu(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
+	public static void bankMenu(Scanner scanner, final Player player) throws BankruptcyException {
 		System.out.println("Welcome to the space bank. Here you can sell developments, mortgage an element or pay off a mortgage. Please select an option or enter # to cancel.");
 		HashMap<Integer, Integer> bankOptions = new HashMap<>();
 		String[] bankMenu = new String[3];
@@ -809,7 +808,7 @@ public class Game {
 
 		switch (bankOptions.get(userOption)) {
 		case 1:
-			sellDevelopmentsMenu(scanner, player);
+			sellDevelopments(scanner, player);
 			break;
 		case 2:
 			mortgageSquare(scanner, player);
@@ -826,7 +825,7 @@ public class Game {
 	 * @param player  the current player
 	 * @throws BankruptcyException
 	 */
-	public static void sellDevelopmentsMenu(Scanner scanner, final Player player) throws BankruptcyException {
+	public static void sellDevelopments(Scanner scanner, final Player player) throws BankruptcyException {
 		clearScreen();
 		ArrayList<SystemSquare> developedSquares = new ArrayList<>(player.getOwnedSquares());
 		developedSquares.removeIf(s -> s.getDevelopment() == 0);
@@ -841,6 +840,7 @@ public class Game {
 			System.out.print("Enter how many developments to sell. Enter # to cancel.\n");
 			int dev = scanIntInput(scanner, 1, s.getDevelopment(), true);
 			if (dev > 0) {
+				player.addResources((int) (0.5 * s.getCostPerDevelopment()));
 				player.developSquare(s, -1 * dev);
 				System.out.printf("You have sold %s developments for a total of %s", dev, dev * s.getCostPerDevelopment());
 				loading(3, true);
@@ -946,7 +946,7 @@ public class Game {
 			System.out.print("What would you like to sell the element for?\n1. Credits\n2. An element(s)\n");
 
 			paymentMethod = scanIntInput(scanner, 1, 2, true);
-			if (count < 0) {
+			if (paymentMethod < 0) {
 				return;
 			}
 		} else {
@@ -958,7 +958,7 @@ public class Game {
 		}
 
 		clearScreen();
-		System.out.print("Who would you like to sell the element to?\n");
+		System.out.print("Who would you like to sell/trade the element to?\n");
 		count = 1;
 		for (Player buyer : buyers) {
 			System.out.printf("%d. %s\n", count++, buyer.getName());
@@ -975,6 +975,9 @@ public class Game {
 			clearScreen();
 			System.out.println("Enter your agreed price for the element.");
 			int cost = scanIntInput(scanner, 0, buyer.getPlayerResources(), true);
+			if (cost < 0) {
+				return;
+			}
 			System.out.println("The trade will occur in 10 seconds. Press enter to cancel.");
 			if (inputTimer(10)) {
 				player.addResources(cost);
