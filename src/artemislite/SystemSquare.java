@@ -165,7 +165,7 @@ public class SystemSquare extends Square {
      * @param mortgaged the isMortgaged to set
      */
     public void setMortgaged(boolean mortgaged) {
-        isMortgaged = mortgaged;
+        this.isMortgaged = mortgaged;
     }
 
     /**
@@ -179,6 +179,6 @@ public class SystemSquare extends Square {
      * @param owned the isOwned to set
      */
     public void setOwned(boolean owned) {
-        isOwned = owned;
+        this.isOwned = owned;
     }
 }

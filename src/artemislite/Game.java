@@ -379,12 +379,12 @@ public class Game {
 	 * prints user message
 	 *
 	 * @param player       the player
-	 * @param landedSquare the square they've landed on
+	 * @param square the square they've landed on
 	 * @param rolled       whether the current user has rolled or not
 	 * @return systemsquare if the square is a system square
 	 */
 	public static Triplet<SystemSquare, Boolean, Boolean> generateSquareStatus(Scanner scanner, final Player player,
-			final Square landedSquare, final List<Player> players, boolean rolled, boolean paid, boolean auctioned) throws BankruptcyException {
+			final Square square, final List<Player> players, boolean rolled, boolean paid, boolean auctioned) throws BankruptcyException {
 
 		clearScreen();
 		if (players.stream().anyMatch(p -> p.getPlayerResources() < BANKRUPTCY_RISK)) {
@@ -399,7 +399,8 @@ public class Game {
 
 		System.out.printf("%s's turn [%d credits]", player.getName(), player.getPlayerResources());
 
-		Square square = squares.get(player.getPosition());
+		// This line was replaced with passing the landed square into the method in order to make the method more testable
+		//Square square = squares.get(player.getPosition());
 		if (square instanceof SystemSquare) {
 			SystemSquare ss = (SystemSquare) square;
 			if (ss.isOwned()) {
@@ -430,7 +431,7 @@ public class Game {
 				auctionSquare(scanner, ss, player, players);
 				loading(3, true);
 				clearScreen();
-				return generateSquareStatus(scanner, player, landedSquare, players, true, true, true);
+				return generateSquareStatus(scanner, player, square, players, true, true, true);
 			} else if (rolled) {
 				System.out.printf("\nYou are on %s but don't have enough resources to purchase it.",
 						ss.getSquareName());
@@ -440,8 +441,8 @@ public class Game {
 			System.out.print("\n");
 			return new Triplet<>(ss, paid, auctioned);
 		} else {
-			System.out.print("\n" + landedSquare.getMessage());
-			System.out.printf("\nYou are on %s. It can't be owned.\n", landedSquare.getSquareName());
+			System.out.print("\n" + square.getMessage());
+			System.out.printf("\nYou are on %s. It can't be owned.\n", square.getSquareName());
 			return new Triplet<>(null, paid, auctioned);
 		}
 	}
@@ -628,7 +629,6 @@ public class Game {
 				return;
 			}
 		}
-		ss.setOwned(true);
 		player.purchaseSquare(ss);
 		System.out.printf("Purchasing %s for %d credits for %s", ss.getSquareName(), ss.getBaseCost(), player.getName());
 		loading(3, true);

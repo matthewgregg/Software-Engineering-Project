@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameTest {
     List<Player> players;
     Player player1, player2;
+    Square s0;
     SystemSquare ss1, ss2, ss3, ss4;
     SystemName systemName1, systemName2;
     int[] devCost;
@@ -58,6 +59,7 @@ class GameTest {
         systemNameString = "Lunar Lander";
         systemNameEnumPos = 3;
 
+        s0 = new Square("Go", 0, "Go");
         ss1 = new SystemSquare("Square 1", 1, systemName1, difficulty, baseCost, costPerDev, devCost);
         ss2 = new SystemSquare("Square 2", 2, systemName1, difficulty, baseCost, costPerDev, devCost);
         ss3 = new SystemSquare("Square 3", 3, systemName2, difficulty, baseCost, costPerDev, devCost);
@@ -142,8 +144,39 @@ class GameTest {
     }
 
     @Test
-    void testGenerateSquareStatus() {
+    void testGenerateSquareStatus() throws BankruptcyException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        ByteArrayInputStream in = new ByteArrayInputStream((lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.generateSquareStatus(scanner, player1, s0, players, false, false, false);
+        assertTrue(out.toString().contains("It can't be owned."));
 
+        player1.purchaseSquare(ss1);
+        Game.generateSquareStatus(scanner, player1, ss1, players, false, false, false);
+        assertTrue(out.toString().contains("You own it."));
+
+        player2.purchaseSquare(ss2);
+        Game.generateSquareStatus(scanner, player1, ss2, players, false, false, false);
+        assertTrue(out.toString().contains("It is owned by"));
+
+        Game.generateSquareStatus(scanner, player1, ss2, players, true, false, false);
+        assertTrue(out.toString().contains("Paid"));
+
+        Game.generateSquareStatus(scanner, player1, ss3, players, true, false, false);
+        assertTrue(out.toString().contains("It is not owned"));
+        assertTrue(out.toString().contains("You can purchase it"));
+
+        player1.addResources(-1 * player1.getPlayerResources() + ss3.getBaseCost() - 1);
+        Game.generateSquareStatus(scanner, player1, ss3, players, false, false, false);
+        assertTrue(out.toString().contains("You are on"));
+
+        in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.generateSquareStatus(scanner, player1, ss3, players, true, false, false);
+        assertTrue(out.toString().contains("don't have enough resources"));
     }
 
     @Test
