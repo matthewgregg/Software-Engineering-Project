@@ -420,7 +420,7 @@ public class Game {
 					System.out.printf("\nYou are on %s. It is owned by %s.", squareName, owner.getName());
 				}
 			} else if (player.getPlayerResources() >= ss.getBaseCost()) {
-				String string = "\nYou are on " + square.getSquareName() + ". It is not owned.";
+				String string = "\nYou are on " + square.getSquareName() + ", which is part of " + ss.getSystemNameString() + ". It is not owned.";
 				if (rolled) {
 					string += " You can purchase it for " + ss.getBaseCost() + " credits.";
 				}
