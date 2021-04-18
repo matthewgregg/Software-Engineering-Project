@@ -31,8 +31,6 @@ class GameTest {
     String systemNameString;
     int systemNameEnumPos;
 
-    // methods not tested - printLaunchStatusCheck, printWelcomeMessage, displayGameRules, displayBoardState, epilogue, clearScreen
-
     @BeforeEach
     void setUp() throws Exception {
         players = new ArrayList<>();
@@ -144,6 +142,25 @@ class GameTest {
     }
 
     @Test
+    void testLaunchStatusCheck() throws InterruptedException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        Game.printLaunchStatusCheck();
+        assertTrue(out.toString().length() > 0);
+    }
+
+    @Test
+    void testPrintWelcomeMessage() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        Game.printWelcomeMessage(players);
+        assertTrue(out.toString().contains("Welcome"));
+        for (Player p : players) {
+            assertTrue(out.toString().contains(p.getName()));
+        }
+    }
+
+    @Test
     void testGenerateSquareStatus() throws BankruptcyException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         System.setOut(new PrintStream(out));
@@ -177,6 +194,10 @@ class GameTest {
         scanner = new Scanner(in);
         Game.generateSquareStatus(scanner, player1, ss3, players, true, false, false);
         assertTrue(out.toString().contains("don't have enough resources"));
+        assertTrue(out.toString().contains("You are at risk of going bankrupt"));
+
+        Game.generateSquareStatus(scanner, player2, ss3, players, true, false, false);
+        assertTrue(out.toString().contains(player1.getName() + " is at risk of bankruptcy"));
     }
 
     @Test
@@ -188,6 +209,45 @@ class GameTest {
         assertTimeout(Duration.ofMillis(5050), () -> {
             Game.loading(5, true);
         });
+    }
+
+    @Test
+    void testDisplayGameRules() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        ByteArrayInputStream in = new ByteArrayInputStream(("#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        Scanner scanner = new Scanner(in);
+        Game.displayGameRules(scanner);
+        assertTrue(out.toString().contains("All Game Rules"));
+        assertTrue(out.toString().contains("Just the Basics"));
+        assertTrue(out.toString().contains("Buying and Selling"));
+        assertTrue(out.toString().contains("Development Rules"));
+        assertTrue(out.toString().contains("Ending the Game Rules"));
+
+        in = new ByteArrayInputStream(("1" + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.displayGameRules(scanner);
+        assertTrue(out.toString().contains("Basic Game Rules:"));
+        assertTrue(out.toString().contains("Rules for Purchasing and Selling:"));
+        assertTrue(out.toString().contains("Rules for Developing Systems:"));
+        assertTrue(out.toString().contains("Rules for Ending the Game:"));
+    }
+
+    @Test
+    void testDisplayBoardState() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        Game.displayBoardState(players);
+        assertTrue(out.toString().contains("[No]"));
+        assertTrue(out.toString().contains("[Square Name]"));
+        assertTrue(out.toString().contains("[Owner]"));
+        assertTrue(out.toString().contains("[Player Position]"));
+        assertTrue(out.toString().contains("Can't be owned"));
+        for (Player p : players) {
+            assertTrue(out.toString().contains(p.getName()));
+        }
     }
 
     @Test
@@ -276,6 +336,24 @@ class GameTest {
         Scanner scanner = new Scanner(in);
         Game.buyDevelopments(scanner, player1);
         assertEquals(res - ss1.getCostPerDevelopment(), player1.getPlayerResources());
+
+        player1.addResources(-1 * player1.getPlayerResources() + ss1.getCostPerDevelopment() + 10);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        int devToMax = ss1.getMaxDevelopment() - ss1.getDevelopment();
+        in = new ByteArrayInputStream(("1" + lineSeparator() + devToMax + lineSeparator() + "#" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.buyDevelopments(scanner, player1);
+        assertTrue(out.toString().contains("You don't have enough resources to do that. Enter a different number."));
+
+        player1.addResources(1000);
+        player1.developSquare(ss2, ss2.getMaxDevelopment() - ss2.getDevelopment());
+        in = new ByteArrayInputStream(("1" + lineSeparator() + devToMax + lineSeparator() + "1" + lineSeparator() + "1" + lineSeparator() + "1" + lineSeparator() + "1" + lineSeparator()).getBytes());
+        System.setIn(in);
+        scanner = new Scanner(in);
+        Game.buyDevelopments(scanner, player1);
+        assertTrue(out.toString().contains("To purchase your last development, you have to pass a quiz. Loading"));
     }
 
     @Test
@@ -549,6 +627,18 @@ class GameTest {
         Scanner scanner = new Scanner(in);
         Game.makeDonation(scanner, player1, players);
         assertEquals(res1, player1.getPlayerResources());
+    }
+
+    @Test
+    void testEpilogue() throws BankruptcyException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        player1.purchaseSquare(ss1);
+        System.setOut(new PrintStream(out));
+        Game.epilogue(players);
+        for (Player p : players) {
+            assertTrue(out.toString().contains(p.getName()));
+        }
+        assertTrue(out.toString().contains(ss1.getSquareName()));
     }
 
     @Test

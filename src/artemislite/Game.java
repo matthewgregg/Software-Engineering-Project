@@ -469,7 +469,7 @@ public class Game {
 	/**
 	 * Outputs game rules as requested by user via an options menu
 	 *
-	 * @param scanner
+	 * @param scanner the scanner
 	 */
 	public static void displayGameRules(Scanner scanner) {
 
@@ -561,7 +561,6 @@ public class Game {
 			SystemSquare ss = null;
 			if (s instanceof SystemSquare) {
 				Player o = players.stream().filter(p -> p.getOwnedSquares().contains(s)).findAny().orElse(null);
-				// TODO multiple players (truncate to 18 chars)
 				ss = (SystemSquare) s;
 				owner = o != null ? o.getName() + " (Dev " + ss.getDevelopment() + ")" : "";
 			} else {
@@ -739,7 +738,7 @@ public class Game {
 						boolean otherSquaresFullyDev = player.getOwnedSquares().stream()
 								.filter(s -> s.getSystemNameEnum().equals(chosenSquare.getSystemNameEnum()))
 								.filter(s -> s.getDevelopment() == s.getMaxDevelopment())
-								.count() == chosenSquare.getSystemType();
+								.count() == chosenSquare.getSystemType() - 1;
 						if (otherSquaresFullyDev && chosenDevToAdd == maxDevToAdd) {
 							System.out.print("To purchase your last development, you have to pass a quiz. Loading");
 							loading(5, true);
