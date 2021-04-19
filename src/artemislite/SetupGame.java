@@ -32,10 +32,10 @@ public class SetupGame {
 					name = scanner.nextLine();
 					// add new player to players if the name is unique
 					String finalName;
-					if (name.length() > 0) {
+					if (name.trim().length() > 0) {
 						finalName = name.substring(0, 1).toUpperCase() + name.substring(1);
 					} else {
-						finalName = name;
+						throw new InvalidNameException();
 					}
 					if (players.stream().noneMatch(p -> p.getName().equals(finalName))) {
 						players.add(new Player(finalName));

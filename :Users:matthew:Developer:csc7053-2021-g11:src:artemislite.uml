@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>/Users/matthew/Developer/csc7053-2021-g11/src/artemislite</OriginalElement>
+  <nodes>
+    <node x="1954.0" y="-317.0">artemislite.Question</node>
+    <node x="668.5" y="-296.0">artemislite.Actor</node>
+    <node x="606.0" y="-78.0">artemislite.Player</node>
+    <node x="1626.0" y="-317.0">artemislite.SetupGame</node>
+    <node x="15.0" y="498.0">artemislite.Game.IExecCloseable</node>
+    <node x="1666.0" y="363.0">artemislite.DuplicateNameException</node>
+    <node x="1695.0" y="234.0">artemislite.ComparePosition</node>
+    <node x="1967.0" y="113.0">artemislite.Quiz</node>
+    <node x="1050.75" y="-78.0">artemislite.SystemSquare</node>
+    <node x="1967.0" y="363.0">artemislite.BankruptcyException</node>
+    <node x="1967.0" y="234.0">artemislite.CompareWinners</node>
+    <node x="-330.0" y="-361.0">artemislite.Game</node>
+    <node x="1642.0" y="-19.5">artemislite.SystemName</node>
+    <node x="1147.25" y="-250.0">artemislite.Square</node>
+    <node x="1960.0" y="-27.5">artemislite.Triplet</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="artemislite.Player" target="artemislite.Actor" relationship="GENERALIZATION">
+      <point x="0.0" y="-238.0" />
+      <point x="0.0" y="84.0" />
+    </edge>
+    <edge source="artemislite.SystemSquare" target="artemislite.Square" relationship="GENERALIZATION">
+      <point x="0.0" y="-227.0" />
+      <point x="0.0" y="61.0" />
+    </edge>
+    <edge source="artemislite.Game.IExecCloseable" target="artemislite.Game" relationship="INNER_CLASS">
+      <point x="0.0" y="-27.5" />
+      <point x="0.0" y="391.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="1008.0" y="242.5" />
+  <SelectedNodes>
+    <node>artemislite.SystemName</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
