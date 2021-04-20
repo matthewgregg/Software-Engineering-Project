@@ -733,7 +733,7 @@ public class Game {
 			do {
 				try {
 					int maxDevToAdd = chosenSquare.getMaxDevelopment() - chosenSquare.getDevelopment();
-					int chosenDevToAdd = scanIntInput(scanner, chosenSquare.getDevelopment() + 1, maxDevToAdd, true);
+					int chosenDevToAdd = scanIntInput(scanner, 1, maxDevToAdd, true);
 					if (chosenDevToAdd > 0) {
 						boolean otherSquaresFullyDev = player.getOwnedSquares().stream()
 								.filter(s -> s.getSystemNameEnum().equals(chosenSquare.getSystemNameEnum()))
@@ -841,7 +841,7 @@ public class Game {
 			if (dev > 0) {
 				player.addResources((int) (0.5 * s.getCostPerDevelopment()));
 				player.developSquare(s, -1 * dev);
-				System.out.printf("You have sold %s developments for a total of %s", dev, dev * s.getCostPerDevelopment());
+				System.out.printf("You have sold %s developments for a total of %s", dev, dev * (int) (s.getCostPerDevelopment() * 0.5));
 				loading(3, true);
 			}
 		}
