@@ -639,6 +639,8 @@ class GameTest {
             assertTrue(out.toString().contains(p.getName()));
         }
         assertTrue(out.toString().contains(ss1.getSquareName()));
+        int total = ss1.getBaseCost() + ss1.getDevelopment() * ss1.getCostPerDevelopment() + player1.getPlayerResources();
+        assertTrue(out.toString().contains(Integer.toString(total)));
     }
 
     @Test
