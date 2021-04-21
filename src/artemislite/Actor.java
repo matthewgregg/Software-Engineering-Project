@@ -12,7 +12,7 @@ public abstract class Actor {
 
     /**
      * Constructor with arguments for actor class
-     * @param position
+     * @param position the actor's position
      */
     public Actor(int position) {
         this.position = position;

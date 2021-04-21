@@ -1167,7 +1167,7 @@ public class Game {
 			if (p.getOwnedSquares().size() == 0) {
 				System.out.printf("\t%s owned no elements\n", p.getName());
 			} else {
-				// concatenate owned system squares
+				// concatenate owned system square names
 				String owned = p.getOwnedSquares().stream().map(SystemSquare::getSquareName).collect(Collectors.joining(", "));
 				System.out.println("\t" + owned);
 			}
@@ -1267,7 +1267,7 @@ public class Game {
 				new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
 			} else {
 				// for unix devices, use ASCII escape code to clear screen
-				// the clear command in a unix terminal runs the same command
+				// the clear command in a unix terminal uses the same escape code
 				System.out.print("\033[H\033[2J");
 				System.out.flush();
 			}
