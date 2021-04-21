@@ -5,6 +5,12 @@ public class Triplet<A, B, C> {
     private final B second;
     private final C third;
 
+    /**
+     * Custom tuple to allow 3 different objects to be returned
+     * @param first the first object
+     * @param second the second object
+     * @param third the third object
+     */
     public Triplet(A first, B second, C third){
         this.first = first;
         this.second = second;

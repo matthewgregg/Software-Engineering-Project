@@ -52,8 +52,10 @@ public class Question {
 	/**
 	 * sets the answer
 	 * @param correctAnswer the answer to set
+	 * @throws IllegalArgumentException when answer does not exist in choices
 	 */
 	private void setAnswer(String correctAnswer) {
+		// if choices contains correct answer, set answer. Otherwise thrown exception
 		if (Arrays.asList(choices).contains(correctAnswer)) {
 			this.answer = correctAnswer;
 		} else {
@@ -70,8 +72,10 @@ public class Question {
 
 	/**
 	 * @param difficulty the choices to set
+	 * @throws IllegalArgumentException if difficulty is outside range
 	 */
 	private void setDifficulty(int difficulty) {
+		// if difficulty is valid, set difficulty
 		if (difficulty >= MIN_DIFFICULTY && difficulty <= MAX_DIFFICULTY) {
 			this.difficulty = difficulty;
 		} else {

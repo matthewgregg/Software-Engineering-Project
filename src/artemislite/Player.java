@@ -18,11 +18,12 @@ public class Player extends Actor {
     private int playerResources;
 
     /**
-     * constructor with arguments
+     * constructor with arguments for player class
      * @param name the player's name
      */
     public Player(String name) throws InvalidNameException {
         super(0);
+        // check if name is invalid/null or valid
         if (Arrays.asList(INVALID_NAMES).contains(name) || name == null) {
             throw new InvalidNameException();
         } else {
@@ -58,6 +59,7 @@ public class Player extends Actor {
      */
     public void addResources(int delta) throws BankruptcyException {
         int res = this.playerResources + delta;
+        // check if player will go below 0 credits if transaction were to complete
         if (res >= 0) {
             this.playerResources += delta;
         } else {
@@ -75,7 +77,7 @@ public class Player extends Actor {
                 this.addResources(devDelta * square.getCostPerDevelopment() * -1 * (int) (devDelta > 0 ? 1 : 0.5));
                 square.setDevelopment(devDelta+square.getDevelopment());
             } catch (IllegalArgumentException e) {
-                //undo payment
+                //undo payment when exception is thrown
                 this.addResources(devDelta * square.getCostPerDevelopment());
                 throw new IllegalArgumentException(MAX_DEVELOPMENT_REACHED);
             }
@@ -101,7 +103,6 @@ public class Player extends Actor {
     public void purchaseSquare(SystemSquare square, int cost) throws BankruptcyException {
         square.setOwned(true);
         this.ownedSquares.add(square);
-        //this.setPlayerResources(this.playerResources - square.getBaseCost());
         this.addResources(-1 * cost);
     }
 
@@ -143,6 +144,7 @@ public class Player extends Actor {
      * @return whether the player has at least one squares that can be mortgaged
      */
     public boolean hasMortgageableSquares() {
+        // return true if player has any square that are undeveloped and not mortgaged
         return this.getOwnedSquares().stream().filter(s -> s.getDevelopment() == 0).anyMatch(s -> !s.isMortgaged());
     }
 
@@ -155,6 +157,7 @@ public class Player extends Actor {
      * @return whether the player has at least one development
      */
     public boolean hasDevelopments() {
+        // return true if player has any square that are undeveloped
         return this.getOwnedSquares().stream().anyMatch(s -> s.getDevelopment() > 0);
     }
 

@@ -25,7 +25,7 @@ public class Game {
 	private static final int MIN_BANKRUPTCY_DONATION = 100;
 
 	private static final Random rand = new Random();
-	// scanner cannot be closed and then reused
+	// an unmodifiable list ensures the contents of the array cannot be modified. Declared as final so the variable cannot be reassigned
 	private static final List<Square> squares = Collections.unmodifiableList(SetupGame.setupBoard());
 
 	public static void main(String[] args) {
@@ -33,6 +33,8 @@ public class Game {
 		System.out.print(introduction());
 		loading(5, true);
 		clearScreen();
+		// System.in input stream cannot be closed and then reused, so must be passed as a variable. The input stream
+		// is contained inside a Scanner object. This also allows a custom inputstream to be passed for testing
 		final Scanner scanner = new Scanner(System.in);
 		final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
 
@@ -51,15 +53,19 @@ public class Game {
 		do {
 			playerCount++;
 			if (playerCount > players.size()) {
+				// loop back to the start of the player array
 				playerCount = 1;
 			}
 			Player player = players.get(playerCount - 1);
 			try {
+				// generatedOptionsMenu returns a boolean determining whether the players turn ended gracefully or not
+				// if it did not end gracefully (false), then the player quit the game early and quitGame is true
 				quitGame = !generateOptionsMenu(scanner, player, players);
 			} catch (BankruptcyException e) {
 				// player went bankrupt
 				bankruptcy = true;
 			}
+			// checdk if all elements are developed
 			endGame = players.stream().flatMap(p -> p.getOwnedSquares().stream())
 					.filter(e -> e.getDevelopment() == e.getMaxDevelopment()).count() == 10;
 		} while (!endGame && !quitGame && !bankruptcy);
@@ -113,6 +119,7 @@ public class Game {
 			Square landedSquare = squares.get(player.getPosition());
 			Triplet<SystemSquare, Boolean, Boolean> triplet = generateSquareStatus(scanner, player, landedSquare,
 					players, rolled, paid, auctioned);
+			// the square the player is on, null if not a systemsquare
 			SystemSquare ss = triplet.getFirst();
 			paid = triplet.getSecond();
 			auctioned = triplet.getThird();
@@ -262,15 +269,18 @@ public class Game {
 			try {
 				option = scanner.nextLine();
 				if (cancellable && option.equals("#")) {
+					// cancel input
 					valid = true;
 					userOption = -1;
 				} else if (Integer.parseInt(option) >= lowerLimit && Integer.parseInt(option) <= upperLimit) {
+					// valid input, return value
 					valid = true;
 					userOption = Integer.parseInt(option);
 				} else {
 					throw new NumberFormatException();
 				}
 			} catch (NumberFormatException e) {
+				// invalid input
 				System.out.printf("Houston we have a problem! Please enter a number between %d and %d.\n", lowerLimit, upperLimit);
 			}
 		} while (!valid);
@@ -388,6 +398,7 @@ public class Game {
 
 		clearScreen();
 		if (players.stream().anyMatch(p -> p.getPlayerResources() < BANKRUPTCY_RISK)) {
+			// if a player is at risk of bankruptcy, notify them
 			if (player.goingBankrupt()) {
 				System.out.print("You are at risk of going bankrupt, which will end the game! Try and get the other players to donate credits to you.\n");
 			} else {
@@ -399,8 +410,7 @@ public class Game {
 
 		System.out.printf("%s's turn [%d credits]", player.getName(), player.getPlayerResources());
 
-		// This line was replaced with passing the landed square into the method in order to make the method more testable
-		//Square square = squares.get(player.getPosition());
+		// Passing the landed square into the method was used in order to make the method more testable
 		if (square instanceof SystemSquare) {
 			SystemSquare ss = (SystemSquare) square;
 			if (ss.isOwned()) {
@@ -426,6 +436,7 @@ public class Game {
 				}
 				System.out.print(string);
 			} else if (isAuctionable(ss, player, players) && !auctioned && rolled) {
+				// auction element if the player can't buy it
 				System.out.printf("\nYou are on %s but don't have enough resources to purchase it.\nAuctioning element", ss.getSquareName());
 				loading(5, true);
 				auctionSquare(scanner, ss, player, players);
@@ -441,6 +452,7 @@ public class Game {
 			System.out.print("\n");
 			return new Triplet<>(ss, paid, auctioned);
 		} else {
+			// if player lands on not ownable square
 			System.out.print("\n" + square.getMessage());
 			System.out.printf("\nYou are on %s. It can't be owned.\n", square.getSquareName());
 			return new Triplet<>(null, paid, auctioned);
@@ -448,7 +460,7 @@ public class Game {
 	}
 
 	/**
-	 * Loading screen containing slight pause
+	 * Loading screen containing slight pause, can optionally display dots
 	 *
 	 * @param time the time to delay
 	 */
@@ -550,7 +562,7 @@ public class Game {
 	}
 
 	/**
-	 * Displays current state of the board(i.e. which squares are owned by which
+	 * Displays current state of the board (i.e. which squares are owned by which
 	 * players)
 	 */
 	public static void displayBoardState(final List<Player> players) {
@@ -560,16 +572,19 @@ public class Game {
 			String owner;
 			SystemSquare ss = null;
 			if (s instanceof SystemSquare) {
+				// find squares owned by player
 				Player o = players.stream().filter(p -> p.getOwnedSquares().contains(s)).findAny().orElse(null);
 				ss = (SystemSquare) s;
 				owner = o != null ? o.getName() + " (Dev " + ss.getDevelopment() + ")" : "";
 			} else {
+				// if square is not ownable
 				owner = "Can't be owned";
 			}
 			String landedPlayers = players.stream().filter(p -> p.getPosition() == s.getPosition()).map(Player::getName)
 					.collect(Collectors.joining(", "));
 
 			if (landedPlayers.length() - 3 > 20) {
+				// truncate string if over 20 chars, as a player may use a long name or multiple players land on the same square
 				landedPlayers = landedPlayers.substring(0, 17) + "...";
 			}
 
@@ -602,9 +617,12 @@ public class Game {
 	 */
 	public static int[] rollDice(int d) {
 		int lowest = 2;
+		// generate sum of two rolls
 		int rollSum = rand.nextInt(2 * d - lowest + 1) + lowest;
+		// generate split index
 		int split = rand.nextInt(rollSum + 1 - lowest) + lowest;
 		int[] roll = new int[2];
+		// calculate two random rolls from a single roll and split location
 		roll[0] = split - (lowest - 1);
 		roll[1] = (rollSum + 1) - split;
 		return roll;
@@ -617,12 +635,15 @@ public class Game {
 	 * @throws BankruptcyException throws whena  player runs out of resources
 	 */
 	public static void purchaseSquare(Scanner scanner, SystemSquare ss, Player player) throws BankruptcyException {
+		// if player is purchasing their last square, load a quiz
 		if (player.getOwnedSquares().stream().filter(s -> s.getSystemNameEnum().equals(ss.getSystemNameEnum())).count() == ss.getSystemType() - 1) {
 			System.out.print("To purchase your last element, you have to pass a quiz. Loading");
 			loading(5, true);
+			// if player passes quiz, continue to purchase as normal
 			if (Quiz.generateQuestions(scanner, ss.getQuizDifficulty())) {
 				System.out.println("Well done! You passed the quiz.");
 			} else {
+				// if player fails quiz, return without purchasing
 				System.out.print("You didn't pass the quiz. Better luck next time");
 				loading(3, true);
 				return;
@@ -638,7 +659,7 @@ public class Game {
 	/**
 	 * Determines if a square is to be auctioned
 	 *
-	 * @param ss     the system square
+	 * @param ss     the system square the current player is on
 	 * @param player the current player
 	 * @return whether the square can be auctioned or not
 	 */
@@ -663,16 +684,18 @@ public class Game {
 		do {
 			Iterator<Player> i = bidders.iterator();
 			if (bidders.size() == 0) {
+				// break outer while loop when bidding is over
 				biddingEnded = true;
 			}
 			while (i.hasNext()) {
 				Player bidder = i.next();
 				if (bidder.getPlayerResources() < highestBid) {
+					// remove bidder if they can't outbid the current bid
 					i.remove();
 				} else {
 					String names = bidders.stream().map(Player::getName).collect(Collectors.joining(", "));
 					clearScreen();
-					// check if current bidder is the highest bidder - break if so
+					// check if current bidder is the highest bidder (ie all other bidders have not outbid the highest bidder) - break if so
 					if (bidder.equals(highestBidder)) {
 						biddingEnded = true;
 						break;
@@ -686,9 +709,11 @@ public class Game {
 					int bid = scanIntInput(scanner, square.getBaseCost() + (highestBid == square.getBaseCost() ? 0 : 1),
 							bidder.getPlayerResources(), true);
 					if (bid > prevBid) {
+						// update bidder and bid
 						highestBid = bid;
 						highestBidder = bidder;
 					} else if (bid == -1) {
+						// remove bidder if they skip the bid
 						i.remove();
 					}
 					// set current bid to previous user's bid for next iteration
@@ -735,16 +760,20 @@ public class Game {
 					int maxDevToAdd = chosenSquare.getMaxDevelopment() - chosenSquare.getDevelopment();
 					int chosenDevToAdd = scanIntInput(scanner, 1, maxDevToAdd, true);
 					if (chosenDevToAdd > 0) {
+						// check if other squares in the chosen system are fully developed
 						boolean otherSquaresFullyDev = player.getOwnedSquares().stream()
 								.filter(s -> s.getSystemNameEnum().equals(chosenSquare.getSystemNameEnum()))
 								.filter(s -> s.getDevelopment() == s.getMaxDevelopment())
 								.count() == chosenSquare.getSystemType() - 1;
+						// if player is attempting to fully develop a system, load a quiz
 						if (otherSquaresFullyDev && chosenDevToAdd == maxDevToAdd) {
 							System.out.print("To purchase your last development, you have to pass a quiz. Loading");
 							loading(5, true);
 							if (Quiz.generateQuestions(scanner, chosenSquare.getQuizDifficulty())) {
+								// if player passes, continue
 								System.out.println("Well done! You passed the quiz.");
 							} else {
+								// if player fails, break and don't add any developments
 								System.out.print("You didn't pass the quiz. Better luck next time");
 								loading(3, true);
 								return;
@@ -783,12 +812,15 @@ public class Game {
 
 		int menuNum = 0;
 		for (int i = 0; i < bankMenu.length; i++) {
+			// if no developments, skip sell developments
 			if (i == 0 && !player.hasDevelopments()) {
 				continue;
 			}
+			// if no mortgageable squares, skip mortgage element
 			if (i == 1 && !player.hasMortgageableSquares()) {
 				continue;
 			}
+			// if no mortgaged squares, skip pay off mortgage
 			if (i == 2 && !player.hasMortgagedSquares()
 					&& player.getOwnedSquares().stream().filter(SystemSquare::isMortgaged)
 							.noneMatch(s -> player.getPlayerResources() > (int) (s.getBaseCost() * 1.1))) {
@@ -802,6 +834,7 @@ public class Game {
 		int userOption = scanIntInput(scanner, 1, menuNum, true);
 
 		if (userOption < 0) {
+			// break if user cancels
 			return;
 		}
 
@@ -822,11 +855,12 @@ public class Game {
 	 * 
 	 * @param scanner scanner
 	 * @param player  the current player
-	 * @throws BankruptcyException
+	 * @throws BankruptcyException thrown if a player goes bankrupt
 	 */
 	public static void sellDevelopments(Scanner scanner, final Player player) throws BankruptcyException {
 		clearScreen();
 		ArrayList<SystemSquare> developedSquares = new ArrayList<>(player.getOwnedSquares());
+		// remove squares with no developments
 		developedSquares.removeIf(s -> s.getDevelopment() == 0);
 		int count = 1;
 		System.out.print("Enter an element to sell development from. Enter # to cancel.");
@@ -839,6 +873,7 @@ public class Game {
 			System.out.print("Enter how many developments to sell. Enter # to cancel.\n");
 			int dev = scanIntInput(scanner, 1, s.getDevelopment(), true);
 			if (dev > 0) {
+				// add resources to player at half the price of developments, and remove developments
 				player.addResources((int) (0.5 * s.getCostPerDevelopment()));
 				player.developSquare(s, -1 * dev);
 				System.out.printf("You have sold %s developments for a total of %s", dev, dev * (int) (s.getCostPerDevelopment() * 0.5));
@@ -865,6 +900,7 @@ public class Game {
 		}
 		int option = scanIntInput(scanner, 1, undevelopedSquares.size(), true);
 		if (option > 0) {
+			// set mortgaged to true on chosen square, and update player resources
 			SystemSquare s = undevelopedSquares.get(option - 1);
 			s.setMortgaged(true);
 			player.addResources(s.getBaseCost());
@@ -883,6 +919,7 @@ public class Game {
 	 */
 	public static void payOffMortgage(Scanner scanner, final Player player) throws BankruptcyException {
 		System.out.println("Which element would you like to pay off the mortgage on?");
+		// get squares that are mortgaged and can be paid off by the player
 		List<SystemSquare> mortgaged = player.getOwnedSquares().stream().filter(SystemSquare::isMortgaged)
 				.filter(s -> player.getPlayerResources() > (int) (1.1 * s.getBaseCost())).collect(Collectors.toList());
 		int count = 1;
@@ -891,8 +928,10 @@ public class Game {
 		}
 		int mortgagedOption = scanIntInput(scanner, 1, mortgaged.size(), true);
 		if (mortgagedOption < 0) {
+			// break if user cancels
 			return;
 		}
+		// set square to not mortgaged and deduct players resources at 110% of base cost of square
 		SystemSquare m = mortgaged.get(mortgagedOption - 1);
 		player.addResources((int) (-1.1 * m.getBaseCost()));
 		m.setMortgaged(false);
@@ -907,8 +946,10 @@ public class Game {
 	 */
 	public static void tradeWithPlayer(Scanner scanner, final Player player, final List<Player> players) throws BankruptcyException {
 		ArrayList<Player> buyers = new ArrayList<>(players);
+		// remove current player from buyer
 		buyers.remove(player);
 		ArrayList<SystemSquare> sellerUndevelopedSquares = new ArrayList<>(player.getOwnedSquares());
+		// remove developed squares from tradeable squares
 		sellerUndevelopedSquares.removeIf(s -> s.getDevelopment() != 0);
 
 		int count;
@@ -932,6 +973,7 @@ public class Game {
 			if (userOption < 0) {
 				return;
 			} else if (userOption > 0 && userOption < optionNum) {
+				// add chosen square to seller array
 				SystemSquare squareToTrade = sellerUndevelopedSquares.get(userOption - 1);
 				sellerSquares.add(squareToTrade);
 				sellerUndevelopedSquares.remove(squareToTrade);
@@ -940,6 +982,7 @@ public class Game {
 		} while (userOption < optionNum);
 
 		int paymentMethod;
+		// if no other player owns squares, skip option to trade for elements
 		if (buyers.stream().anyMatch(s -> s.getOwnedSquares().size() > 0)) {
 			clearScreen();
 			System.out.print("What would you like to sell the element for?\n1. Credits\n2. An element(s)\n");
@@ -949,10 +992,12 @@ public class Game {
 				return;
 			}
 		} else {
+			// set payment method to credits
 			paymentMethod = 1;
 		}
 
 		if (paymentMethod == 2) {
+			// remove buyers with no squares
 			buyers.removeIf(b -> b.getOwnedSquares().size() == 0);
 		}
 
@@ -981,6 +1026,7 @@ public class Game {
 			if (inputTimer(10)) {
 				player.addResources(cost);
 				for (SystemSquare ss : sellerSquares) {
+					// loop through seller array and transfer
 					player.removeSquare(ss);
 					buyer.purchaseSquare(ss, cost);
 				}
@@ -1006,6 +1052,7 @@ public class Game {
 				if (squareOption < 0) {
 					return;
 				} else if (squareOption != optionNum) {
+					// add square to buyer array
 					SystemSquare squareToTrade = buyerUndevelopedSquares.get(squareOption - 1);
 					buyerSquares.add(squareToTrade);
 					buyerUndevelopedSquares.remove(squareToTrade);
@@ -1014,10 +1061,12 @@ public class Game {
 			} while (squareOption < optionNum);
 			System.out.println("The trade will occur in 10 seconds. Press enter to cancel.");
 			if (inputTimer(10)) {
+				// loop through seller array and transfer resources
 				for (SystemSquare square : buyerSquares) {
 					buyer.removeSquare(square);
 					player.purchaseSquare(square, 0);
 				}
+				// loop through buyer array and transfer resources
 				for (SystemSquare ss : sellerSquares) {
 					buyer.purchaseSquare(ss, 0);
 					player.removeSquare(ss);
@@ -1030,7 +1079,7 @@ public class Game {
 	}
 
 	/**
-	 * get the players that have resources < {@value BANKRUPTCY_RISK}
+	 * get the players (that aren't the current player) that have resources < {@value BANKRUPTCY_RISK}
 	 *
 	 * @param player  the current player
 	 * @param players all players
@@ -1039,7 +1088,9 @@ public class Game {
 	 */
 	public static List<Player> getPlayersNearBankruptcy(final Player player, final List<Player> players) {
 		List<Player> playersNearBankruptcy = new ArrayList<>(players);
+		// remove current player
 		playersNearBankruptcy.remove(player);
+		// remove if greater than bankruptcy risk value
 		playersNearBankruptcy.removeIf(s -> s.getPlayerResources() >= BANKRUPTCY_RISK);
 		return playersNearBankruptcy;
 	}
@@ -1057,6 +1108,7 @@ public class Game {
 		List<Player> recipients = getPlayersNearBankruptcy(player, players);
 		Player recipient;
 		if (recipients.size() == 1) {
+			// if only one player is going bankrupt
 			recipient = recipients.get(0);
 		} else {
 			System.out.println("Which player would you like to donate to?");
@@ -1074,6 +1126,7 @@ public class Game {
 		System.out.printf("How much would you like to donate to %s\n", recipient.getName());
 		int resources = scanIntInput(scanner, MIN_BANKRUPTCY_DONATION, player.getPlayerResources() - MIN_BANKRUPTCY_DONATION, true);
 		if (resources > 0) {
+			// update resources
 			recipient.addResources(resources);
 			player.addResources(-1 * resources);
 			System.out.printf("You have donated %d credits to %s", resources, recipient.getName());
@@ -1082,7 +1135,8 @@ public class Game {
 	}
 
 	/**
-	 * Handles successful completion of the game
+	 * Handles successful completion of the game, shows all player in order of total net worth.
+	 * If two player have the same net worth, they will be ranked by number of owned elements
 	 * @param players all the players
 	 */
 	public static void epilogue(final List<Player> players) {
@@ -1107,6 +1161,7 @@ public class Game {
 			if (p.getOwnedSquares().size() == 0) {
 				System.out.printf("\t%s owned no elements\n", p.getName());
 			} else {
+				// concatenate owned system squares
 				String owned = p.getOwnedSquares().stream().map(SystemSquare::getSquareName).collect(Collectors.joining(", "));
 				System.out.println("\t" + owned);
 			}
@@ -1137,21 +1192,27 @@ public class Game {
 	/**
 	 * starts a timer that can be interrupted by the user
 	 * 
-	 * @return whether the timer stopped gracefully or was interrupted
+	 * @return whether the timer stopped gracefully (true) or was interrupted (false)
 	 */
 	public static boolean inputTimer(int time) {
 		ExecutorService ex = Executors.newSingleThreadExecutor();
+		// autoclose ExecutorService by AutoClose interface when finished
 		try (IExecCloseable ignored = ex::shutdownNow) {
+			// create input timer object using ExecutorService
 			Future<Void> inputTimer = ex.submit(() -> {
 				while (!new BufferedReader(new InputStreamReader(System.in)).ready()) {
+					// check bufferedreader every 100ms
 					Thread.sleep(100);
 				}
 				return null;
 			});
 			try {
+				// run input timer
 				inputTimer.get(time, TimeUnit.SECONDS);
+				// if inputTimer interrupted by user
 				return false;
 			} catch (TimeoutException e) {
+				// if inputTimer times out (ie completes successfully)
 				inputTimer.cancel(true);
 				return true;
 			} catch (InterruptedException | ExecutionException e) {
@@ -1166,8 +1227,10 @@ public class Game {
 	 * @return array of stringified enums
 	 */
 	public static <E extends Enum<E>> ArrayList<String> stringifyEnum(Class<E> en) {
+		// get all values in passed enum class
 		EnumSet<E> enums = EnumSet.allOf(en);
 		ArrayList<String> strEnums = new ArrayList<>();
+		// pass each enum value to stringifyEnum and add to arrayList using iterator
 		enums.iterator().forEachRemaining(s -> strEnums.add(stringifyEnum(s)));
 		return strEnums;
 	}
@@ -1178,6 +1241,8 @@ public class Game {
 	 * @return the enum as a user friendly string
 	 */
 	public static <E extends Enum<E>> String stringifyEnum(E en) {
+		// overloaded method means either enum value or class can be stringified
+		// split enum value on underscore, convert to lowercase and capitalise first letter
 		return Arrays.stream(en.name().toLowerCase().split("_"))
 				.map(s -> s.substring(0, 1).toUpperCase() + s.substring(1))
 				.collect(Collectors.joining(" "));
@@ -1189,12 +1254,14 @@ public class Game {
 	public static void clearScreen() {
 		try {
 			if (System.getProperty("os.name").contains("Windows")) {
+				// enters cmd command to clear screen
 				new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
 			} else {
+				// for unix devices, use ASCII escape code to clear screen
+				// the clear command in a unix terminal runs the same command
 				System.out.print("\033[H\033[2J");
 				System.out.flush();
 			}
-			System.out.println(); // This empty print line is to avoid clearScreen() character formatting
 		} catch (Exception e) {
 			System.out.println("Error clearing console.");
 		}

@@ -10,6 +10,10 @@ public abstract class Actor {
 
     private int position;
 
+    /**
+     * Constructor with arguments for actor class
+     * @param position
+     */
     public Actor(int position) {
         this.position = position;
     }
@@ -32,6 +36,7 @@ public abstract class Actor {
     /**
      * updates the position of a player
      * @param delta - the change in position of a player
+     * @throws IndexOutOfBoundsException if player moves past go
      */
     public void updatePosition(int delta) {
         if (delta > 0) {

@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
  */
 public class Quiz {
 	public static boolean generateQuestions(Scanner scanner, int difficulty) {
-
+		// create question objects
 		Question q1 = new Question("How many months are there in 12 years?", new String[] { "124", "142", "144"}, "144", 1);
 		Question q2 = new Question("What is NASA's motto?", new String[] { "To infinity and beyond", "For the love of space exploration", "For the benefit of all" }, "For the benefit of all", 1);
 		Question q3 = new Question("Which NASA program landed the first humans on the Moon?", new String[] { "Apollo", "Mercury", "Gemini" },"Apollo", 1);
@@ -35,6 +35,7 @@ public class Quiz {
 		Question q20 = new Question("What asteroid disc, made of rock and ice, is around 20 AU wide and starts at Neptune's orbit?", new String[] { "Oort cloud", "Hills cloud", "Asteroid belt", "Kuiper belt" }, "Kuiper belt", 4);
 
 		ArrayList<Question> questions = new ArrayList<>();
+		// add all questions to arraylist
 		Collections.addAll(questions, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20);
 
 		// filter questions matching required difficulty
@@ -44,6 +45,7 @@ public class Quiz {
 		List<Question> questionList = questionsFiltered.subList(0, 3);
 
 		int correct = 0;
+		// loop through questions
 		for (Question question : questionList) {
 			Game.clearScreen();
 			System.out.println(question.getQuestion());
@@ -61,6 +63,7 @@ public class Quiz {
 			boolean valid = false;
 			do {
 				String ans = scanner.nextLine().trim();
+				// allow the user to input the number for an answer or the answer itself
 				if (Arrays.stream(question.getChoices()).anyMatch(a -> a.equalsIgnoreCase(ans))
 						|| Arrays.stream(IntStream.range(1, question.getChoices().length + 1).toArray()).anyMatch(n -> Integer.toString(n).equals(ans))) {
 					valid = true;
@@ -81,6 +84,7 @@ public class Quiz {
 		Game.clearScreen();
 		System.out.println("You got " + correct + " out of " + questionList.size());
 
+		// return true if user gets 60% or more right (3 out of 4 in the current configuration)
 		return (double) correct / (double) 4 > 0.6;
 	}
 }

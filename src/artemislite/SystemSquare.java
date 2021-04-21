@@ -16,7 +16,6 @@ public class SystemSquare extends Square {
     private final int quizDifficulty;
     private final int baseCost;
     private final int costPerDevelopment;
-    //this may not be required
     private int development;
     private int[] landingCost;
     private boolean isMortgaged;
@@ -60,6 +59,7 @@ public class SystemSquare extends Square {
     }
 
     /**
+     * Sets both enum value and string value for systemName
      * @param systemNameString the systemName to set
      */
     private void setSystemName(SystemName systemNameString) {
@@ -119,6 +119,7 @@ public class SystemSquare extends Square {
 
     /**
      * @param development the development to set
+     * @throws IllegalArgumentException if maximum development reached
      */
     public void setDevelopment(int development) throws IllegalArgumentException {
         if (development >= MIN_DEVELOPMENT && development <= MAX_DEVELOPMENT) {
@@ -130,6 +131,7 @@ public class SystemSquare extends Square {
 
     /**
      * @param landingCost the landingCost to set
+     * @throws IllegalArgumentException if the landing costs do not match the number of developments
      */
     private void setLandingCost(int[] landingCost) throws IllegalArgumentException {
         if (landingCost.length == MAX_DEVELOPMENT + 1) {

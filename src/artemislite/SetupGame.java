@@ -9,10 +9,13 @@ import java.util.*;
 public class SetupGame {
 	private static final int MIN_PLAYERS = 2;
 	private static final int MAX_PLAYERS = 4;
-	private static final int MIN_PLAYER_ID = 1;
-	private static final int MAX_PLAYER_ID = 4;
 	private static final String INVALID_PLAYER_ID = "Invalid player ID";
 
+	/**
+	 * This method allows players to enter their names and creates player objects for each player
+	 * @param scanner the scanner
+	 * @return a list of players
+	 */
 	public static List<Player> playerCreation(Scanner scanner) {
 		System.out.println("How many crew members would like to play?\nEnter a number between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
 		int numPlayers = Game.scanIntInput(scanner, MIN_PLAYERS, MAX_PLAYERS, false);
@@ -33,8 +36,10 @@ public class SetupGame {
 					// add new player to players if the name is unique
 					String finalName;
 					if (name.trim().length() > 0) {
+						// capitalise first letter of input
 						finalName = name.substring(0, 1).toUpperCase() + name.substring(1);
 					} else {
+						// if invalid name
 						throw new InvalidNameException();
 					}
 					if (players.stream().noneMatch(p -> p.getName().equals(finalName))) {
@@ -42,6 +47,7 @@ public class SetupGame {
 						validPlayerName = true;
 						count++;
 					} else {
+						// if duplicate name
 						throw new DuplicateNameException();
 					}
 				} catch (InvalidNameException e) {
@@ -49,11 +55,17 @@ public class SetupGame {
 				} catch (DuplicateNameException e) {
 					System.out.printf("%s has already been taken. Please enter a different name.\n", name);
 				}
+				// loop while player name is either a duplicate ir invalid
 			} while (!validPlayerName);
+			// loop until all players have entered names
 		} while (players.size() < numPlayers);
 		return players;
 	}
 
+	/**
+	 * Sets up all elements for the calling method
+	 * @return an arraylist of squares
+	 */
 	public static ArrayList<Square> setupBoard() {
 		ArrayList<Square> squares = new ArrayList<>();
 		Square sq1 = new Square("Mission Control", 0, "Negotiating budget, please wait");
