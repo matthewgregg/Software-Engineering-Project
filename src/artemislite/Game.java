@@ -65,7 +65,7 @@ public class Game {
 				// player went bankrupt
 				bankruptcy = true;
 			}
-			// checdk if all elements are developed
+			// check if all elements are developed
 			endGame = players.stream().flatMap(p -> p.getOwnedSquares().stream())
 					.filter(e -> e.getDevelopment() == e.getMaxDevelopment()).count() == 10;
 		} while (!endGame && !quitGame && !bankruptcy);
@@ -99,6 +99,7 @@ public class Game {
 		boolean paid = false;
 		boolean auctioned = false;
 		int menuNum;
+		// create hashmap containing user-facing menu index paired with value for actual index
 		HashMap<Integer, Integer> menuOptions = new HashMap<>();
 		// initialise menu options
 		String[] allMenu = new String[10];
@@ -430,6 +431,7 @@ public class Game {
 					System.out.printf("\nYou are on %s. It is owned by %s.", squareName, owner.getName());
 				}
 			} else if (player.getPlayerResources() >= ss.getBaseCost()) {
+				// if player can purchase square
 				String string = "\nYou are on " + square.getSquareName() + ", which is part of " + ss.getSystemNameString() + ". It is not owned.";
 				if (rolled) {
 					string += " You can purchase it for " + ss.getBaseCost() + " credits.";
@@ -444,6 +446,7 @@ public class Game {
 				clearScreen();
 				return generateSquareStatus(scanner, player, square, players, true, true, true);
 			} else if (rolled) {
+				// if player can't purchase square and it can't be auctioned
 				System.out.printf("\nYou are on %s but don't have enough resources to purchase it.",
 						ss.getSquareName());
 			} else {
@@ -510,8 +513,6 @@ public class Game {
 		ArrayList<String> endingRules = new ArrayList<>();
 
 		// basic game structure rules
-		// TODO implement this somewhere
-		// basicGameRules.add("Roll dice to decide who goes first");
 		basicGameRules.add("Basic Game Rules:");
 		basicGameRules.add("The aim is to help NASA complete its mission by fully developing all mission-critical Systems");
 		basicGameRules.add("When it's your go, pick what you'd like to do from the menu.");
@@ -580,6 +581,7 @@ public class Game {
 				// if square is not ownable
 				owner = "Can't be owned";
 			}
+			 // concatenate list of player names on square
 			String landedPlayers = players.stream().filter(p -> p.getPosition() == s.getPosition()).map(Player::getName)
 					.collect(Collectors.joining(", "));
 
@@ -590,6 +592,7 @@ public class Game {
 
 			if (!(s instanceof SystemSquare) || !(ss.getSystemNameEnum().equals(prevSystem))) {
 				System.out.println("----------------------------------------------------------------------------");
+				// print out system name if system nam changes between printed squares (ie when new system is obout to be printed)
 				if (ss != null && !(ss.getSystemNameEnum().equals(prevSystem))) {
 					System.out.printf("%s\n", ss.getSystemNameString().toUpperCase());
 				}
@@ -820,7 +823,7 @@ public class Game {
 			if (i == 1 && !player.hasMortgageableSquares()) {
 				continue;
 			}
-			// if no mortgaged squares, skip pay off mortgage
+			// if no mortgaged squares or player can't pay off any mortgaged squares, skip pay off mortgage
 			if (i == 2 && !player.hasMortgagedSquares()
 					&& player.getOwnedSquares().stream().filter(SystemSquare::isMortgaged)
 							.noneMatch(s -> player.getPlayerResources() > (int) (s.getBaseCost() * 1.1))) {
@@ -1023,6 +1026,7 @@ public class Game {
 				return;
 			}
 			System.out.println("The trade will occur in 10 seconds. Press enter to cancel.");
+			// if input timer returns true (completes without interruption)
 			if (inputTimer(10)) {
 				player.addResources(cost);
 				for (SystemSquare ss : sellerSquares) {
@@ -1060,6 +1064,7 @@ public class Game {
 				}
 			} while (squareOption < optionNum);
 			System.out.println("The trade will occur in 10 seconds. Press enter to cancel.");
+			// if input timer returns true (completes without interruption)
 			if (inputTimer(10)) {
 				// loop through seller array and transfer resources
 				for (SystemSquare square : buyerSquares) {
@@ -1140,7 +1145,7 @@ public class Game {
 	 * @param players all the players
 	 */
 	public static void epilogue(final List<Player> players) {
-
+		//sort winners using CompareWinners comparator
 		List<Player> winners = new ArrayList<>(players);
 		winners.sort(new CompareWinners());
 
@@ -1151,6 +1156,7 @@ public class Game {
 		System.out.println("You're all winners but here's the final state of play:");
 		loading(3, true);
 
+		// loop through all players
 		for (Player p : winners) {
 			System.out.printf("\n%s ended the game with a total net value of %d credits:\n", p.getName(), calculateNetWorth(p));
 
@@ -1195,8 +1201,9 @@ public class Game {
 	 * @return whether the timer stopped gracefully (true) or was interrupted (false)
 	 */
 	public static boolean inputTimer(int time) {
+		// create ExecutorService on single thread
 		ExecutorService ex = Executors.newSingleThreadExecutor();
-		// autoclose ExecutorService by AutoClose interface when finished
+		// autoclose ExecutorService when complete using AutoClose interface
 		try (IExecCloseable ignored = ex::shutdownNow) {
 			// create input timer object using ExecutorService
 			Future<Void> inputTimer = ex.submit(() -> {
@@ -1204,6 +1211,8 @@ public class Game {
 					// check bufferedreader every 100ms
 					Thread.sleep(100);
 				}
+				// return null as using runnable instead of callable due to ExecutorService
+				// return value is unused but must be implemented
 				return null;
 			});
 			try {
