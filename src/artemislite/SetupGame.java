@@ -79,7 +79,7 @@ public class SetupGame {
 				3,
 				SystemName.ORION_SPACECRAFT,
 				2,
-				150,
+				120,
 				200,
 				new int[] { 40, 100, 300, 450, 600 });
 
@@ -87,7 +87,7 @@ public class SetupGame {
 				4,
 				SystemName.ORION_SPACECRAFT,
 				2,
-				120,
+				140,
 				150,
 				new int[]  { 40, 100, 300, 450, 600 });
 
@@ -95,7 +95,7 @@ public class SetupGame {
 				5,
 				SystemName.ORION_SPACECRAFT,
 				2,
-				140,
+				150,
 				150,
 				new int[] { 50, 150, 450, 625, 750 });
 
