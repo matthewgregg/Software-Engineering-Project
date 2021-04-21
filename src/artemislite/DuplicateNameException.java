@@ -14,7 +14,7 @@ public class DuplicateNameException extends Exception {
 
     /**
      * Custom DuplicateNameException with message
-     * @param message
+     * @param message the exception's message
      */
     public DuplicateNameException(String message) {
         super(message);

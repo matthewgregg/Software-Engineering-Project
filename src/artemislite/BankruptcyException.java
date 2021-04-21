@@ -14,7 +14,7 @@ public class BankruptcyException extends Exception {
 
     /**
      * custom BankruptcyException with message
-     * @param message
+     * @param message the exception's message
      */
     public BankruptcyException(String message) {
         super(message);
