@@ -411,7 +411,8 @@ public class Game {
 
 		System.out.printf("%s's turn [%d credits]", player.getName(), player.getPlayerResources());
 
-		// Passing the landed square into the method was used in order to make the method more testable
+		// Passing the landed square into the method was used in order to make the method more testable (instead of finding
+		// the index of the user's position in the squares array)
 		if (square instanceof SystemSquare) {
 			SystemSquare ss = (SystemSquare) square;
 			if (ss.isOwned()) {
