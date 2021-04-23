@@ -37,7 +37,7 @@ public class Game {
 		// is contained inside a Scanner object. This also allows a custom inputstream to be passed for testing
 		final Scanner scanner = new Scanner(System.in);
 		final List<Player> players = Collections.unmodifiableList(SetupGame.playerCreation(scanner));
-
+		
 		clearScreen();
 		try {
 			printLaunchStatusCheck();
@@ -138,7 +138,7 @@ public class Game {
 					continue;
 				}
 				// skip roll dice, purchase, develop
-				if (i > 2 && i < 5 && ss != null && ss.isOwned()) {
+				if (i > 2 && i < 4 && ss != null && ss.isOwned()) {
 					continue;
 				}
 				// skip purchase
