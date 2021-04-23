@@ -432,11 +432,10 @@ public class Game {
 						if (opt == 1) {
 							player.addResources(-1 * cost);
 							owner.addResources(cost);
-							paid = true;
 							System.out.printf("Paid %s %d credits", owner.getName(), cost);
 							loading(3, true);
-							return generateSquareStatus(scanner, player, square, players, true, true, auctioned);
 						}
+						return generateSquareStatus(scanner, player, square, players, true, true, auctioned);
 					}
 					System.out.printf("\nYou are on %s. It is owned by %s.", squareName, owner.getName());
 				}
