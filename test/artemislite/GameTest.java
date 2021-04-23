@@ -178,8 +178,12 @@ class GameTest {
         Game.generateSquareStatus(scanner, player1, ss2, players, false, false, false);
         assertTrue(out.toString().contains("It is owned by"));
 
-        Game.generateSquareStatus(scanner, player1, ss2, players, true, false, false);
+        ByteArrayInputStream in2 = new ByteArrayInputStream(("1" + lineSeparator()).getBytes());
+        System.setIn(in2);
+        Scanner scanner2 = new Scanner(in2);
+        Game.generateSquareStatus(scanner2, player1, ss2, players, true, false, false);
         assertTrue(out.toString().contains("Paid"));
+        System.setIn(in);
 
         Game.generateSquareStatus(scanner, player1, ss3, players, true, false, false);
         assertTrue(out.toString().contains("It is not owned"));
