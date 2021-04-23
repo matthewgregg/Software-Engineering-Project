@@ -425,10 +425,18 @@ public class Game {
 					// owned by another player - subtract resources from player
 					int cost = ss.getLandingCost();
 					if (!paid && rolled && !ss.isMortgaged()) {
-						player.addResources(-1 * cost);
-						owner.addResources(cost);
-						paid = true;
-						System.out.printf(" (Paid %s %d credits)", owner.getName(), cost);
+						System.out.printf("\n%s, do you want to charge %s %d credits?\n", owner.getName(), player.getName(), cost);
+						System.out.println("1. Yes");
+						System.out.println("2. No");
+						int opt = scanIntInput(scanner, 1, 2, false);
+						if (opt == 1) {
+							player.addResources(-1 * cost);
+							owner.addResources(cost);
+							paid = true;
+							System.out.printf("Paid %s %d credits", owner.getName(), cost);
+							loading(3, true);
+							return generateSquareStatus(scanner, player, square, players, true, true, auctioned);
+						}
 					}
 					System.out.printf("\nYou are on %s. It is owned by %s.", squareName, owner.getName());
 				}
