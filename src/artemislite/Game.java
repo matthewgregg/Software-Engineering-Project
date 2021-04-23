@@ -128,17 +128,18 @@ public class Game {
 			System.out.println("\nMENU");
 
 			// load options menu, with some skipped
+			// the menu skips options when the condition is true
 			for (int i = 0; i < allMenu.length; i++) {
 				// skip roll dice
 				if (i == 2 && rolled) {
 					continue;
 				}
-				// skip purchase, auction, develop, finish turn
+				// skip purchase, auction, develop, finish turn when not rolled
 				if (i > 2 && i < 9 && !rolled) {
 					continue;
 				}
 				// skip roll dice, purchase, develop
-				if (i > 2 && i < 4 && ss != null && ss.isOwned()) {
+				if (i == 3 && ss != null && ss.isOwned()) {
 					continue;
 				}
 				// skip purchase
